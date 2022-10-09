@@ -18,14 +18,14 @@ Description:
 import functools
 from importlib import import_module
 
-from aops_utils.log.log import LOGGER
+from vulcanus.log.log import LOGGER
 
 
 @functools.lru_cache()
 def load_model(model_id: str, model_path: str, algo_path: str) -> object:
     try:
-        # aops_check.core.experiment.algorithm.diag.Diag
-        # module_path: aops_check.core.experiment.algorithm.diag
+        # diana.core.experiment.algorithm.diag.Diag
+        # module_path: diana.core.experiment.algorithm.diag
         # param_name: Diag
         [module_path, param] = algo_path.rsplit('.', 1)
         module = import_module(module_path)

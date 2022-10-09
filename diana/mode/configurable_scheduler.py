@@ -53,6 +53,6 @@ class ConfigurableScheduler(Scheduler):
             app.register_blueprint(blue)
 
         check_scheduler.start_all_workflow(app)
-        ip = configuration.check.get('IP')
-        port = configuration.check.get('PORT')
+        ip = configuration.diana.get('IP')
+        port = configuration.diana.get('PORT')
         app.run(port=port, host=ip)

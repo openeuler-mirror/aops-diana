@@ -20,11 +20,11 @@ from typing import Tuple, Dict
 from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 
-from aops_utils.database.helper import sort_and_page
-from aops_utils.restful.status import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA
-from aops_utils.database.proxy import MysqlProxy
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.status import DATABASE_INSERT_ERROR, DATA_EXIST
+from vulcanus.database.helper import sort_and_page
+from vulcanus.restful.status import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA
+from vulcanus.database.proxy import MysqlProxy
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.status import DATABASE_INSERT_ERROR, DATA_EXIST
 from diana.database.factory.table import Algorithm
 from diana.conf.constant import SYSTEM_USER
 

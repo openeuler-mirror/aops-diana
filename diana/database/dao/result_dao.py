@@ -16,10 +16,10 @@ from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 
 from diana.database.factory.table import HostCheckResult, AlertHost, DomainCheckResult
-from aops_utils.database.helper import sort_and_page
-from aops_utils.database.proxy import MysqlProxy
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.status import DATABASE_QUERY_ERROR, SUCCEED, NO_DATA, DATABASE_UPDATE_ERROR,\
+from vulcanus.database.helper import sort_and_page
+from vulcanus.database.proxy import MysqlProxy
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.status import DATABASE_QUERY_ERROR, SUCCEED, NO_DATA, DATABASE_UPDATE_ERROR,\
     DATABASE_INSERT_ERROR, DATABASE_DELETE_ERROR
 
 

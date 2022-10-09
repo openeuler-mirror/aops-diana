@@ -17,9 +17,9 @@ Description:
 """
 from typing import Dict, Optional, Tuple
 
-from aops_utils.database.proxy import ElasticsearchProxy
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.status import (
+from vulcanus.database.proxy import ElasticsearchProxy
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.status import (
     SUCCEED,
     DATABASE_INSERT_ERROR,
     DATABASE_QUERY_ERROR,

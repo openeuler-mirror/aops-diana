@@ -17,7 +17,7 @@ Description:
 """
 from typing import NoReturn
 
-from aops_utils.log.log import LOGGER
+from vulcanus.log.log import LOGGER
 
 from diana.conf import configuration
 from diana.core.check.consumer import ConsumerManager

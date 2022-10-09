@@ -17,8 +17,8 @@ Description:
 """
 from elasticsearch import ElasticsearchException
 
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.status import DATA_EXIST, SUCCEED
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.status import DATA_EXIST, SUCCEED
 from diana.conf import configuration
 from diana.core.experiment.app.network_diagnose import NetworkDiagnoseApp
 from diana.database.dao.app_dao import AppDao

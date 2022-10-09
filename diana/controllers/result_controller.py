@@ -13,7 +13,7 @@
 import os
 from io import StringIO
 from flask import jsonify, Response, request
-from aops_utils.restful.status import DATABASE_CONNECT_ERROR
+from vulcanus.restful.status import DATABASE_CONNECT_ERROR
 from diana.database import SESSION
 from diana.database.dao.result_dao import ResultDao
 from diana.utils.schema.result import (
@@ -22,7 +22,7 @@ from diana.utils.schema.result import (
     CheckResultConfirmSchema,
     QueryResultDomainCountSchema
 )
-from aops_utils.restful.response import BaseResponse
+from vulcanus.restful.response import BaseResponse
 
 
 class QueryCheckResultHost(BaseResponse):

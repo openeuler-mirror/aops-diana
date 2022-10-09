@@ -18,9 +18,9 @@ Description:
 import threading
 from kafka.errors import KafkaError
 
-from aops_utils.kafka.consumer import BaseConsumer
-from aops_utils.kafka.kafka_exception import ConsumerInitError
-from aops_utils.log.log import LOGGER
+from vulcanus.kafka.consumer import BaseConsumer
+from vulcanus.kafka.kafka_exception import ConsumerInitError
+from vulcanus.log.log import LOGGER
 
 from diana.utils.register import Register
 

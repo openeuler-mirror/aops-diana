@@ -15,7 +15,7 @@ Time:
 Author:
 Description: default config
 """
-check = {
+diana = {
     "IP": "127.0.0.1",
     "PORT": 11112,
     "MODE": "configurable",
@@ -23,8 +23,8 @@ check = {
 }
 
 default_mode = {
-    "period": 30,
-    "step": 30
+    "PERIOD": 30,
+    "STEP": 30
 }
 
 mysql = {
@@ -51,7 +51,7 @@ agent = {
     "DEFAULT_INSTANCE_PORT": 8888
 }
 
-manager = {
+zeus = {
     "IP": "127.0.0.1",
     "PORT": 11111
 }

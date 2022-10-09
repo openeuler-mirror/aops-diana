@@ -18,9 +18,9 @@ Description: Query raw data from Prometheus
 from typing import Dict, Tuple, List, Optional
 from datetime import datetime
 from prometheus_api_client import PrometheusApiClientException
-from aops_utils.database.proxy import PromDbProxy
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.status import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, PARAM_ERROR, PARTIAL_SUCCEED
+from vulcanus.database.proxy import PromDbProxy
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.status import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, PARAM_ERROR, PARTIAL_SUCCEED
 
 
 class DataDao(PromDbProxy):

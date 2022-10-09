@@ -28,9 +28,9 @@ from diana.conf import configuration
 from diana.conf.constant import HOST_IP_INFO_LIST
 from diana.utils.schema.default_mode import HostAddressSchema
 from diana.core.rule.default_workflow import DefaultWorkflow
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.response import BaseResponse
-from aops_utils.restful.status import SUCCEED
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.response import BaseResponse
+from vulcanus.restful.status import SUCCEED
 
 
 class Util:
@@ -66,14 +66,14 @@ class Util:
                 data = json.load(f)
 
         except FileNotFoundError:
-            LOGGER.error('Cannot find file /etc/aops/check_default.json when start aops-check '
+            LOGGER.error('Cannot find file /etc/aops/diana_default.json when start aops-diana '
                          'by default mode')
-            raise FileNotFoundError("Cannot find file /etc/aops/check_default.json,"
+            raise FileNotFoundError("Cannot find file /etc/aops/diana_default.json,"
                                     "please check it and try again")
 
         except json.decoder.JSONDecodeError:
-            LOGGER.error('check_default json file content structure is not what we expect')
-            raise ValueError("check_default file content structure is not what we expect "
+            LOGGER.error('diana_default json file content structure is not what we expect')
+            raise ValueError("diana_default file content structure is not what we expect "
                              "please check it and try again")
 
         if BaseResponse.verify_args(data, HostAddressSchema) != SUCCEED:
@@ -127,7 +127,7 @@ class Config:
     JOBS = [
         {
             "id": "job_default",
-            "func": "aops_check.mode.default_scheduler:Util.check_default_mode",
+            "func": "diana.mode.default_scheduler:Util.check_default_mode",
             "args": (Util.get_dict_from_file(HOST_IP_INFO_LIST),
                      [int(time.time()) - Util.get_period_and_step()[1], int(time.time())]),
             "trigger": "interval",
@@ -154,4 +154,4 @@ class DefaultScheduler(Scheduler):
         scheduler = APScheduler()
         scheduler.init_app(app)
         scheduler.start()
-        app.run(port=configuration.check.get('PORT'), host=configuration.check.get('IP'))
+        app.run(port=configuration.diana.get('PORT'), host=configuration.diana.get('IP'))

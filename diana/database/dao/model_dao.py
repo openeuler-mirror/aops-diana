@@ -19,10 +19,10 @@ from typing import Tuple, Dict, List
 from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 
-from aops_utils.database.helper import judge_return_code, sort_and_page
-from aops_utils.database.proxy import MysqlProxy
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.status import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, \
+from vulcanus.database.helper import judge_return_code, sort_and_page
+from vulcanus.database.proxy import MysqlProxy
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.status import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, \
     DATABASE_INSERT_ERROR, DATA_EXIST
 
 from diana.conf.constant import SYSTEM_USER

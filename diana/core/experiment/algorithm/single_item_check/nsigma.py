@@ -28,7 +28,7 @@ class NSigma(BaseSingleItemAlgorithm):
             "algo_name": "ngisgma",
             "field": "singlecheck",
             "description": "It's a single item check method using nsigma algorithm.",
-            "path": "aops_check.core.experiment.algorithm.single_item_check.nsigma.NSigma"
+            "path": "diana.core.experiment.algorithm.single_item_check.nsigma.NSigma"
         }
         return data
 

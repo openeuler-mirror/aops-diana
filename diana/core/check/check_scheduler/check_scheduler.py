@@ -23,9 +23,9 @@ from diana.database import SESSION
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.core.check.check_scheduler.task_keeper import CheckTaskKeeper
 from diana.core.check.check_scheduler.time_keeper import time_keeper_manager
-from aops_utils.singleton import singleton
-from aops_utils.restful.status import SUCCEED, DATABASE_CONNECT_ERROR, PARAM_ERROR
-from aops_utils.log.log import LOGGER
+from vulcanus.singleton import singleton
+from vulcanus.restful.status import SUCCEED, DATABASE_CONNECT_ERROR, PARAM_ERROR
+from vulcanus.log.log import LOGGER
 
 
 @singleton
@@ -37,7 +37,7 @@ class CheckScheduler:
     def __init__(self):
         self._workflow_task_manager = {}
         self._work_flow_list_lock = Lock()
-        self.timing_check = True if configuration.check.get("TIMING_CHECK") == "on" else False
+        self.timing_check = True if configuration.diana.get("TIMING_CHECK") == "on" else False
 
     @staticmethod
     def _query_running_workflow() -> tuple:

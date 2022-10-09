@@ -18,7 +18,7 @@ Description: Test Data dao
 import unittest
 from unittest.mock import Mock, MagicMock
 from prometheus_api_client import PrometheusConnect, PrometheusApiClientException
-from aops_utils.restful.status import SUCCEED, PARAM_ERROR, PARTIAL_SUCCEED
+from vulcanus.restful.status import SUCCEED, PARAM_ERROR, PARTIAL_SUCCEED
 from diana.database.dao.data_dao import DataDao
 from diana.conf import configuration
 

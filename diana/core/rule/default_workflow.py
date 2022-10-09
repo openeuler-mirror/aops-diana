@@ -14,8 +14,8 @@ from typing import Dict, Tuple
 import uuid
 from importlib import import_module
 
-from aops_utils.kafka.kafka_exception import ProducerInitError
-from aops_utils.kafka.producer import BaseProducer
+from vulcanus.kafka.kafka_exception import ProducerInitError
+from vulcanus.kafka.producer import BaseProducer
 
 from diana.core.experiment.app.network_diagnose import NetworkDiagnoseApp
 from diana.core.rule.model_assign import ModelAssign
@@ -23,10 +23,10 @@ from diana.database.dao.data_dao import DataDao
 from diana.errors.workflow_error import WorkflowModelAssignError
 from diana.conf import configuration
 from diana.conf.constant import ALGO_LIST
-from aops_utils.restful.status import SUCCEED, DATABASE_CONNECT_ERROR, DATABASE_QUERY_ERROR,\
+from vulcanus.restful.status import SUCCEED, DATABASE_CONNECT_ERROR, DATABASE_QUERY_ERROR,\
     TASK_EXECUTION_FAIL, PARTIAL_SUCCEED
 from diana.core.experiment.app import App
-from aops_utils.log.log import LOGGER
+from vulcanus.log.log import LOGGER
 
 
 class DefaultWorkflow:

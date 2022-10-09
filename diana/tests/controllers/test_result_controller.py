@@ -18,7 +18,7 @@ from flask import Flask
 from sqlalchemy.orm import scoping
 
 import diana
-from aops_utils.restful.status import PARAM_ERROR, TOKEN_ERROR, SUCCEED, NO_DATA
+from vulcanus.restful.status import PARAM_ERROR, TOKEN_ERROR, SUCCEED, NO_DATA
 from diana.database.dao.result_dao import ResultDao
 
 app = Flask("check")
@@ -125,7 +125,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_result_list_should_return_result_list_when_input_correct(self,
                                                                             mock_sort,
                                                                             mock_session,
@@ -179,7 +179,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_result_list_should_return_result_list_when_input_with_no_page(self,
                                                                                  mock_sort,
                                                                                  mock_session,
@@ -232,7 +232,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_result_list_should_return_result_list_when_input_with_no_perpage(self,
                                                                                     mock_sort,
                                                                                     mock_session,
@@ -285,7 +285,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_result_list_should_return_result_list_when_input_with_no_domain(self,
                                                                                    mock_sort,
                                                                                    mock_session,
@@ -338,7 +338,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_result_list_should_return_result_list_when_input_with_no_level(self,
                                                                                   mock_sort,
                                                                                   mock_session,
@@ -391,7 +391,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_result_list_should_return_result_list_when_input_with_no_sort(self,
                                                                                  mock_sort,
                                                                                  mock_session,
@@ -444,7 +444,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_result_list_should_return_result_list_when_input_with_no_direction(self,
                                                                                       mock_sort,
                                                                                       mock_session,
@@ -497,7 +497,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_result_list_should_return_result_list_when_input_with_no_direction(self,
                                                                                       mock_sort,
                                                                                       mock_session,
@@ -628,7 +628,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_domain_result_count_should_return_result_count_when_input_all_correct(
             self,
             mock_sort,
@@ -663,7 +663,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_domain_result_count_should_return_result_count_when_input_with_no_page(
             self,
             mock_sort,
@@ -698,7 +698,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_domain_result_count_should_return_result_count_when_input_with_no_per_page(
             self,
             mock_sort,
@@ -733,7 +733,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_domain_result_count_should_return_result_count_when_input_with_no_sort(
             self,
             mock_sort,
@@ -767,7 +767,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_domain_result_count_should_return_result_count_when_input_with_no_direction(
             self,
             mock_sort,
@@ -801,7 +801,7 @@ class TestResultController(unittest.TestCase):
     @mock.patch.object(ResultDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.result_dao.sort_and_page')
+    @mock.patch('diana.database.dao.result_dao.sort_and_page')
     def test_query_domain_result_count_should_return_result_count_when_request_with_no_input(
             self,
             mock_sort,

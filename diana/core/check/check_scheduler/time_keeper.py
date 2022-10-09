@@ -19,8 +19,8 @@ Description: Time keeper of check scheduler
 import time
 from typing import List
 from threading import Lock
-from aops_utils.singleton import singleton
-from aops_utils.log.log import LOGGER
+from vulcanus.singleton import singleton
+from vulcanus.log.log import LOGGER
 
 
 class CheckTimeKeeper:

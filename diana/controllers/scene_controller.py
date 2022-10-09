@@ -18,8 +18,8 @@ Description:
 from typing import Dict, Tuple
 from flask import jsonify
 
-from aops_utils.restful.response import BaseResponse
-from aops_utils.restful.status import SUCCEED
+from vulcanus.restful.response import BaseResponse
+from vulcanus.restful.status import SUCCEED
 
 from diana.core.experiment.algorithm.scene_identify.package_weight import PackageWeightIdentify
 from diana.utils.schema.scene import IdentifySceneSchema
