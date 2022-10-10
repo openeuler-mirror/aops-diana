@@ -18,7 +18,7 @@ from flask import Flask
 
 import diana
 from diana.database.dao.algo_dao import AlgorithmDao
-from aops_utils.restful.status import TOKEN_ERROR, SUCCEED, NO_DATA, PARAM_ERROR
+from vulcanus.restful.status import TOKEN_ERROR, SUCCEED, NO_DATA, PARAM_ERROR
 
 app = Flask("check")
 for blue, api in diana.BLUE_POINT:
@@ -43,7 +43,7 @@ class TestQueryAlgorithmList(unittest.TestCase):
     @mock.patch.object(AlgorithmDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.algo_dao.sort_and_page')
+    @mock.patch('diana.database.dao.algo_dao.sort_and_page')
     def test_query_algorithm_list_should_return_algo_list_when_all_input_correct(
             self, mock_sort_and_page, mock_session, mock_count, mock_connect, mock_query_to_dict,
             mock_query_algo_list):
@@ -77,7 +77,7 @@ class TestQueryAlgorithmList(unittest.TestCase):
     @mock.patch.object(AlgorithmDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.algo_dao.sort_and_page')
+    @mock.patch('diana.database.dao.algo_dao.sort_and_page')
     def test_query_algorithm_list_should_return_algo_list_when_input_with_no_field(
             self, mock_sort_and_page, mock_session, mock_count, mock_connect, mock_query_to_dict,
             mock_query_algo_list):
@@ -110,7 +110,7 @@ class TestQueryAlgorithmList(unittest.TestCase):
     @mock.patch.object(AlgorithmDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.algo_dao.sort_and_page')
+    @mock.patch('diana.database.dao.algo_dao.sort_and_page')
     def test_query_algorithm_list_should_return_algo_list_when_with_no_page(
             self, mock_sort_and_page, mock_session, mock_count, mock_connect, mock_query_to_dict,
             mock_query_algo_list):
@@ -155,7 +155,7 @@ class TestQueryAlgorithmList(unittest.TestCase):
     @mock.patch.object(AlgorithmDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.algo_dao.sort_and_page')
+    @mock.patch('diana.database.dao.algo_dao.sort_and_page')
     def test_query_algorithm_list_should_return_algo_list_when_input_with_no_per_page(
             self, mock_sort_and_page, mock_session, mock_count, mock_connect, mock_query_to_dict,
             mock_query_algo_list):
@@ -200,7 +200,7 @@ class TestQueryAlgorithmList(unittest.TestCase):
     @mock.patch.object(AlgorithmDao, 'connect')
     @mock.patch.object(mock.Mock, 'all', create=True)
     @mock.patch.object(scoping, 'scoped_session')
-    @mock.patch('aops_check.database.dao.algo_dao.sort_and_page')
+    @mock.patch('diana.database.dao.algo_dao.sort_and_page')
     def test_query_algorithm_list_should_return_algo_list_when_input_with_no_input(
             self, mock_sort_and_page, mock_session, mock_count, mock_connect, mock_query_to_dict,
             mock_query_algo_list):

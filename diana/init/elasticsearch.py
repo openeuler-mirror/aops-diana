@@ -17,7 +17,7 @@ Description:
 """
 from elasticsearch import ElasticsearchException
 
-from aops_utils.log.log import LOGGER
+from vulcanus.log.log import LOGGER
 from diana.conf import configuration
 from diana.database.dao.app_dao import AppDao
 from diana.database.factory.mapping import MAPPINGS

@@ -20,8 +20,8 @@ import uuid
 from copy import deepcopy
 from importlib import import_module
 
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.status import DATABASE_INSERT_ERROR
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.status import DATABASE_INSERT_ERROR
 from diana.conf.constant import SYSTEM_USER, ALGO_LIST
 from diana.database import SESSION
 from diana.database.dao.algo_dao import AlgorithmDao

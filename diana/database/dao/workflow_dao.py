@@ -23,10 +23,10 @@ from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 from elasticsearch import ElasticsearchException
 
-from aops_utils.database.helper import sort_and_page
-from aops_utils.database.proxy import ElasticsearchProxy, MysqlProxy
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.status import (
+from vulcanus.database.helper import sort_and_page
+from vulcanus.database.proxy import ElasticsearchProxy, MysqlProxy
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.status import (
     SUCCEED,
     DATABASE_INSERT_ERROR,
     DATABASE_QUERY_ERROR,

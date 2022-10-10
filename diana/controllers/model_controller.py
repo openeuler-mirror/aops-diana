@@ -17,7 +17,7 @@ Description:
 """
 from flask import jsonify
 
-from aops_utils.restful.response import BaseResponse
+from vulcanus.restful.response import BaseResponse
 from diana.database import SESSION
 from diana.database.dao.model_dao import ModelDao
 from diana.utils.schema.model import QueryModelListSchema

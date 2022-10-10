@@ -29,7 +29,7 @@ class Mae(BaseSingleItemAlgorithm):
             "algo_name": "mae",
             "field": "singlecheck",
             "description": "It's a single item check method using mae algorithm.",
-            "path": "aops_check.core.experiment.algorithm.single_item_check.mae.Mae"
+            "path": "diana.core.experiment.algorithm.single_item_check.mae.Mae"
         }
         return data
 

@@ -20,9 +20,9 @@ import os
 # system config
 BASE_CONFIG_PATH = '/etc/aops'
 # check config
-CHECK_CONFIG_PATH = os.path.join(BASE_CONFIG_PATH, 'check.ini')
+CHECK_CONFIG_PATH = os.path.join(BASE_CONFIG_PATH, 'diana.ini')
 MODEL_FOLDER_PATH = "/opt/aops/models"
-HOST_IP_INFO_LIST = os.path.join(BASE_CONFIG_PATH, 'check_default.json')
+HOST_IP_INFO_LIST = os.path.join(BASE_CONFIG_PATH, 'diana_default.json')
 
 APP_INDEX = "app"
 WORKFLOW_INDEX = "workflow"
@@ -59,7 +59,7 @@ SYSTEM_USER = "system"
 
 ALGO_LIST = [
     {
-        "algo_module": "aops_check.core.experiment.algorithm.single_item_check.ewma.EWMA",
+        "algo_module": "diana.core.experiment.algorithm.single_item_check.ewma.EWMA",
         "models": [{
             "username": SYSTEM_USER,
             "model_id": "Ewma-1",
@@ -72,7 +72,7 @@ ALGO_LIST = [
         }]
     },
     {
-        "algo_module": "aops_check.core.experiment.algorithm.single_item_check.mae.Mae",
+        "algo_module": "diana.core.experiment.algorithm.single_item_check.mae.Mae",
         "models": [{
             "username": SYSTEM_USER,
             "model_id": "Mae-1",
@@ -85,7 +85,7 @@ ALGO_LIST = [
         }]
     },
     {
-        "algo_module": "aops_check.core.experiment.algorithm.single_item_check.nsigma.NSigma",
+        "algo_module": "diana.core.experiment.algorithm.single_item_check.nsigma.NSigma",
         "models": [{
             "username": SYSTEM_USER,
             "model_id": "NSigma-1",
@@ -98,7 +98,7 @@ ALGO_LIST = [
         }]
     },
     {
-        "algo_module": "aops_check.core.experiment.algorithm.multi_item_check.statistical_multi_item_check."
+        "algo_module": "diana.core.experiment.algorithm.multi_item_check.statistical_multi_item_check."
                        "StatisticalCheck",
         "models": [{
             "username": SYSTEM_USER,
@@ -112,7 +112,7 @@ ALGO_LIST = [
         }]
     },
     {
-        "algo_module": "aops_check.core.experiment.algorithm.diag.statistic_diag.StatisticDiag",
+        "algo_module": "diana.core.experiment.algorithm.diag.statistic_diag.StatisticDiag",
         "models": [{
             "username": SYSTEM_USER,
             "model_id": "StatisticDiag-1",

@@ -18,9 +18,9 @@ description: Check scheduler task manager
 """
 from typing import Optional
 from flask import Flask, current_app
-from aops_utils.kafka.producer import BaseProducer
-from aops_utils.kafka.kafka_exception import ProducerInitError
-from aops_utils.log.log import LOGGER
+from vulcanus.kafka.producer import BaseProducer
+from vulcanus.kafka.kafka_exception import ProducerInitError
+from vulcanus.log.log import LOGGER
 from diana.conf import configuration
 from diana.core.check.check_scheduler.time_keeper import time_keeper_manager
 

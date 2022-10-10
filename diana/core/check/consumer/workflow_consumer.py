@@ -15,7 +15,7 @@ Time:
 Author:
 Description:
 """
-from aops_utils.log.log import LOGGER
+from vulcanus.log.log import LOGGER
 
 from diana.core.check.consumer import Consumer
 from diana.core.rule.workflow import Workflow

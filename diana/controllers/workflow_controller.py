@@ -20,10 +20,10 @@ import time
 from typing import Dict, Tuple
 from flask import jsonify, request
 
-from aops_utils.database.helper import operate
-from aops_utils.restful.response import BaseResponse
-from aops_utils.restful.status import SUCCEED, WORKFLOW_ASSIGN_MODEL_FAIL, DATABASE_CONNECT_ERROR
-from aops_utils.log.log import LOGGER
+from vulcanus.database.helper import operate
+from vulcanus.restful.response import BaseResponse
+from vulcanus.restful.status import SUCCEED, WORKFLOW_ASSIGN_MODEL_FAIL, DATABASE_CONNECT_ERROR
+from vulcanus.log.log import LOGGER
 
 from diana.conf import configuration
 from diana.database import SESSION

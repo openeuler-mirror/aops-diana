@@ -15,7 +15,7 @@ from flask import jsonify
 from diana.database import SESSION
 from diana.database.dao.algo_dao import AlgorithmDao
 from diana.utils.schema.algorithm import QueryAlgorithmListSchema, QueryAlgorithmSchema
-from aops_utils.restful.response import BaseResponse
+from vulcanus.restful.response import BaseResponse
 
 
 class QueryAlgorithmList(BaseResponse):

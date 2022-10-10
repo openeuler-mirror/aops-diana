@@ -19,9 +19,9 @@ import uuid
 from typing import Dict, Tuple
 from flask import jsonify
 
-from aops_utils.database.helper import operate
-from aops_utils.restful.response import BaseResponse
-from aops_utils.restful.status import SUCCEED
+from vulcanus.database.helper import operate
+from vulcanus.restful.response import BaseResponse
+from vulcanus.restful.status import SUCCEED
 
 from diana.conf import configuration
 from diana.database.dao.app_dao import AppDao

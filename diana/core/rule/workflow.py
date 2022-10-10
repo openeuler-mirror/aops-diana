@@ -19,14 +19,14 @@ import time
 from typing import Dict, Tuple
 
 import sqlalchemy
-from aops_utils.kafka.kafka_exception import ProducerInitError
-from aops_utils.kafka.producer import BaseProducer
-from aops_utils.restful.status import SUCCEED, DATABASE_INSERT_ERROR, TASK_EXECUTION_FAIL,\
+from vulcanus.kafka.kafka_exception import ProducerInitError
+from vulcanus.kafka.producer import BaseProducer
+from vulcanus.restful.status import SUCCEED, DATABASE_INSERT_ERROR, TASK_EXECUTION_FAIL,\
     DATABASE_QUERY_ERROR, DATABASE_CONNECT_ERROR
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.response import MyResponse
-from aops_utils.conf.constant import URL_FORMAT, QUERY_HOST_DETAIL
-from aops_utils.database.helper import operate
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.response import MyResponse
+from vulcanus.conf.constant import URL_FORMAT, QUERY_HOST_DETAIL
+from vulcanus.database.helper import operate
 
 from diana.database import SESSION
 from diana.conf import configuration
@@ -342,8 +342,8 @@ class Workflow:
         Returns:
             dict: e.g. {"host1": {"host_ip": "127.0.0.1", "scene": "big_data", "host_name": "host1"}}
         """
-        manager_ip = configuration.manager.get("IP")  # pylint: disable=E1101
-        manager_port = configuration.manager.get("PORT")  # pylint: disable=E1101
+        manager_ip = configuration.zeus.get("IP")  # pylint: disable=E1101
+        manager_port = configuration.zeus.get("PORT")  # pylint: disable=E1101
         manager_url = URL_FORMAT % (manager_ip, manager_port, QUERY_HOST_DETAIL)
         header = {
             "access_token": token,

@@ -67,7 +67,7 @@ class StatisticalCheck(BaseMultiItemAlgorithmTwo):
             "algo_name": "statistical_multi_item_check",
             "field": "multicheck",
             "description": "It's a statistical multiple item check method.",
-            "path": "aops_check.core.experiment.algorithm.multi_item_check."
+            "path": "diana.core.experiment.algorithm.multi_item_check."
                     "statistical_multi_item_check.StatisticalCheck"
         }
         return data

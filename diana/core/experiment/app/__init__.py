@@ -19,8 +19,8 @@ from copy import deepcopy
 from importlib import import_module
 from typing import Dict, List, Any
 
-from aops_utils.log.log import LOGGER
-from aops_utils.restful.status import SUCCEED
+from vulcanus.log.log import LOGGER
+from vulcanus.restful.status import SUCCEED
 from diana.conf.constant import ALGO_LIST
 from diana.core.experiment.model import load_model
 from diana.database import SESSION

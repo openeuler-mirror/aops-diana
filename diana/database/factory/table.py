@@ -17,8 +17,8 @@ Description: mysql tables
 """
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String, Float, Boolean
-from aops_utils.database.table import Base, MyBase
-from aops_utils.database.helper import create_tables
+from vulcanus.database.table import Base, MyBase
+from vulcanus.database.helper import create_tables
 from diana.database import ENGINE
 
 
@@ -135,7 +135,7 @@ class HostCheckResult(Base, MyBase):
 
 def create_check_tables(engine=ENGINE):
     """
-    create check tables of aops-check service
+    create check tables of aops-diana service
     Args:
         engine: mysql engine
 

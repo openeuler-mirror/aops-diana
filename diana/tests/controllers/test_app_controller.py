@@ -21,7 +21,7 @@ from flask import Flask
 from flask_restful import Api
 from flask.blueprints import Blueprint
 
-from aops_utils.restful.status import PARAM_ERROR, TOKEN_ERROR, DATABASE_CONNECT_ERROR, SUCCEED
+from vulcanus.restful.status import PARAM_ERROR, TOKEN_ERROR, DATABASE_CONNECT_ERROR, SUCCEED
 
 import diana
 from diana.conf.constant import CREATE_APP, QUERY_APP, QUERY_APP_LIST
@@ -94,7 +94,7 @@ class AppControllerTestCase(unittest.TestCase):
             },
             "detail": {}
         }
-        with mock.patch("aops_check.controllers.app_controller.operate") as mock_operate:
+        with mock.patch("diana.controllers.app_controller.operate") as mock_operate:
             mock_operate.return_value = DATABASE_CONNECT_ERROR
             response = client.post(CREATE_APP, json=args,
                                    headers=header_with_token).json
@@ -110,7 +110,7 @@ class AppControllerTestCase(unittest.TestCase):
             },
             "detail": {}
         }
-        with mock.patch("aops_check.controllers.app_controller.operate") as mock_operate:
+        with mock.patch("diana.controllers.app_controller.operate") as mock_operate:
             mock_operate.return_value = SUCCEED
             response = client.post(CREATE_APP, json=args,
                                    headers=header_with_token).json
@@ -133,14 +133,14 @@ class AppControllerTestCase(unittest.TestCase):
         self.assertEqual(response['code'], TOKEN_ERROR)
 
     def test_query_app_list_should_return_database_error_when_database_is_wrong(self):
-        with mock.patch("aops_utils.restful.response.operate") as mock_operate:
+        with mock.patch("vulcanus.restful.response.operate") as mock_operate:
             mock_operate.return_value = DATABASE_CONNECT_ERROR
             response = client.get(
                 QUERY_APP_LIST + "?page=1&per_page=2", headers=header_with_token).json
             self.assertEqual(response['code'], DATABASE_CONNECT_ERROR)
 
     def test_query_app_list_should_return_succeed_when_correct(self):
-        with mock.patch("aops_utils.restful.response.operate") as mock_operate:
+        with mock.patch("vulcanus.restful.response.operate") as mock_operate:
             mock_operate.return_value = SUCCEED
             response = client.get(
                 QUERY_APP_LIST + "?page=1&per_page=2", headers=header_with_token).json
@@ -161,14 +161,14 @@ class AppControllerTestCase(unittest.TestCase):
         self.assertEqual(response['code'], TOKEN_ERROR)
 
     def test_query_app_should_return_database_error_when_database_is_wrong(self):
-        with mock.patch("aops_utils.restful.response.operate") as mock_operate:
+        with mock.patch("vulcanus.restful.response.operate") as mock_operate:
             mock_operate.return_value = DATABASE_CONNECT_ERROR
             response = client.get(QUERY_APP + "?app_id='2'",
                                   headers=header_with_token).json
             self.assertEqual(response['code'], DATABASE_CONNECT_ERROR)
 
     def test_query_app_should_return_succeed_when_correct(self):
-        with mock.patch("aops_utils.restful.response.operate") as mock_operate:
+        with mock.patch("vulcanus.restful.response.operate") as mock_operate:
             mock_operate.return_value = SUCCEED
             response = client.get(QUERY_APP + "?app_id='3'",
                                   headers=header_with_token).json

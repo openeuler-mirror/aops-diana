@@ -18,7 +18,7 @@ Description:
 import sqlalchemy
 from diana.database import ENGINE
 from diana.database.factory.table import create_check_tables
-from aops_utils.log.log import LOGGER
+from vulcanus.log.log import LOGGER
 
 
 def init_mysql():
@@ -27,7 +27,7 @@ def init_mysql():
     """
     try:
         create_check_tables(ENGINE)
-        LOGGER.info("initialize mysql tables for aops-check succeed.")
+        LOGGER.info("initialize mysql tables for aops-diana succeed.")
     except sqlalchemy.exc.SQLAlchemyError:
-        LOGGER.error("initialize mysql tables for aops-check failed.")
+        LOGGER.error("initialize mysql tables for aops-diana failed.")
         raise sqlalchemy.exc.SQLAlchemyError("create tables fail")

@@ -30,7 +30,7 @@ class EWMA(BaseSingleItemAlgorithm):
             "algo_name": "ewma",
             "field": "singlecheck",
             "description": "It's a single item check method using ewma algorithm.",
-            "path": "aops_check.core.experiment.algorithm.single_item_check.ewma.EWMA"
+            "path": "diana.core.experiment.algorithm.single_item_check.ewma.EWMA"
         }
         return data
 

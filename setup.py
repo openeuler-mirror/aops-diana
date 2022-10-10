@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-NAME = "aops_check"
+NAME = "diana"
 VERSION = "1.0.0"
 
 # To install the library, run the following
@@ -30,15 +30,15 @@ REQUIRES = [
 setup(
     name=NAME,
     version=VERSION,
-    description="aops-check",
+    description="aops-diana",
     install_requires=REQUIRES,
     packages=find_packages(),
     data_files=[
-        ('/etc/aops', ['conf/check.ini', 'conf/check_default.json']),
-        ('/usr/lib/systemd/system', ['aops-check.service'])
+        ('/etc/aops', ['conf/diana.ini', 'conf/diana_default.json']),
+        ('/usr/lib/systemd/system', ['aops-diana.service'])
     ],
     entry_points={
-        'console_scripts': ['aops-check=aops_check.manage:main']
+        'console_scripts': ['aops-diana=diana.manage:main']
     },
     zip_safe=False
 )

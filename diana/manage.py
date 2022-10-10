@@ -32,7 +32,7 @@ def run(mode_name: str):
 
 
 def main():
-    run(configuration.check.get('MODE'))
+    run(configuration.diana.get('MODE'))
 
 
 if __name__ == "__main__":
