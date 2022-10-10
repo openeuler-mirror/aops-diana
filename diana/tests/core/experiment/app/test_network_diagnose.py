@@ -130,7 +130,7 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
         fake_load_models = False
         mock_load_models.return_value = fake_load_models
         self.assertEqual(app.execute(fake_model_info, fake_detail, fake_data), {})
-        mock_load_models.assert_called_once_with(fake_model_info)
+        mock_load_models.assert_called_once_with(fake_model_info, False)
 
     @mock.patch.object(NetworkDiagnoseApp, 'do_single_check')
     @mock.patch.object(NetworkDiagnoseApp, 'load_models')
@@ -197,7 +197,7 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
         mock_do_diag.return_value = fake_diag_result
 
         app.execute(fake_model_info, fake_detail, fake_data)
-        mock_load_models.assert_called_once_with(fake_model_info)
+        mock_load_models.assert_called_once_with(fake_model_info, False)
         mock_do_single_check.assert_called_once_with(fake_detail['singlecheck'], fake_data)
         mock_do_multi_check.assert_called_once_with(fake_detail['multicheck'], fake_single_check_result)
         mock_do_diag.assert_called_once_with(fake_detail['diag'], fake_multi_check_result)
