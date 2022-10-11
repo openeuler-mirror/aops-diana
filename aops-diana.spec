@@ -6,10 +6,6 @@ License:	MulanPSL2
 URL:		https://gitee.com/openeuler/%{name}
 Source0:	%{name}-%{version}.tar.gz
 
-
-%description
-An intelligent abnormal detection framework of aops
-
 BuildRequires:  python3-setuptools
 Requires:   aops-vulcanus = %{version}-%{release}
 Requires:   python3-requests python3-flask python3-flask-restful python3-marshmallow >= 3.13.0
@@ -18,6 +14,10 @@ Requires:   python3-sqlalchemy python3-PyMySQL python3-Flask-APScheduler >= 1.11
 Requires:   python3-scipy
 Provides:   aops-diana
 Conflicts:  aops-check
+
+
+%description
+An intelligent abnormal detection framework of aops
 
 
 %prep
@@ -38,7 +38,7 @@ Conflicts:  aops-check
 %attr(0644,root,root) %{_sysconfdir}/aops/diana_default.json
 %attr(0755,root,root) %{_bindir}/aops-diana
 %attr(0755,root,root) %{_unitdir}/aops-diana.service
-%{python3_sitelib}/diana*.egg-info
+%{python3_sitelib}/aops_diana*.egg-info
 %{python3_sitelib}/diana/*
 
 
