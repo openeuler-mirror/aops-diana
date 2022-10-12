@@ -34,7 +34,7 @@ setup(
     install_requires=REQUIRES,
     packages=find_packages(),
     data_files=[
-        ('/etc/aops', ['conf/diana.ini', 'conf/diana_default.json']),
+        ('/etc/aops', ['conf/diana.ini', 'conf/diana_hosts.json']),
         ('/usr/lib/systemd/system', ['aops-diana.service'])
     ],
     entry_points={

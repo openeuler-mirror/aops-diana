@@ -66,9 +66,9 @@ class Util:
                 data = json.load(f)
 
         except FileNotFoundError:
-            LOGGER.error('Cannot find file /etc/aops/diana_default.json when start aops-diana '
+            LOGGER.error('Cannot find file /etc/aops/diana_hosts.json when start aops-diana '
                          'by default mode')
-            raise FileNotFoundError("Cannot find file /etc/aops/diana_default.json,"
+            raise FileNotFoundError("Cannot find file /etc/aops/diana_hosts.json,"
                                     "please check it and try again")
 
         except json.decoder.JSONDecodeError:
@@ -124,16 +124,19 @@ class Config:
     """
         Scheduled task configuration
     """
-    JOBS = [
-        {
-            "id": "job_default",
-            "func": "diana.mode.default_scheduler:Util.check_default_mode",
-            "args": (Util.get_dict_from_file(HOST_IP_INFO_LIST),
-                     [int(time.time()) - Util.get_period_and_step()[1], int(time.time())]),
-            "trigger": "interval",
-            "seconds": Util.get_period_and_step()[0],
-        }
-    ]
+    JOBS = []
+
+    def __init__(self):
+        Config.JOBS = [
+            {
+                "id": "job_default",
+                "func": "diana.mode.default_scheduler:Util.check_default_mode",
+                "args": (Util.get_dict_from_file(HOST_IP_INFO_LIST),
+                         [int(time.time()) - Util.get_period_and_step()[1], int(time.time())]),
+                "trigger": "interval",
+                "seconds": Util.get_period_and_step()[0],
+            }
+        ]
 
 
 @mode.register('default')

@@ -22,7 +22,7 @@ BASE_CONFIG_PATH = '/etc/aops'
 # check config
 CHECK_CONFIG_PATH = os.path.join(BASE_CONFIG_PATH, 'diana.ini')
 MODEL_FOLDER_PATH = "/opt/aops/models"
-HOST_IP_INFO_LIST = os.path.join(BASE_CONFIG_PATH, 'diana_default.json')
+HOST_IP_INFO_LIST = os.path.join(BASE_CONFIG_PATH, 'diana_hosts.json')
 
 APP_INDEX = "app"
 WORKFLOW_INDEX = "workflow"
