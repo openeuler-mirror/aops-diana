@@ -35,7 +35,7 @@ An intelligent abnormal detection framework of aops
 %files
 %doc README.*
 %attr(0644,root,root) %{_sysconfdir}/aops/diana.ini
-%attr(0644,root,root) %{_sysconfdir}/aops/diana_default.json
+%attr(0644,root,root) %{_sysconfdir}/aops/diana_hosts.json
 %attr(0755,root,root) %{_bindir}/aops-diana
 %attr(0755,root,root) %{_unitdir}/aops-diana.service
 %{python3_sitelib}/aops_diana*.egg-info
