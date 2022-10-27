@@ -38,7 +38,8 @@ mysql = {
 
 elasticsearch = {
     "IP": "127.0.0.1",
-    "PORT": 9200
+    "PORT": 9200,
+    "MAX_ES_QUERY_NUM": 10000000
 }
 
 prometheus = {
