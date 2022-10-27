@@ -34,3 +34,9 @@ def init_es():
             raise ElasticsearchException("create elasticsearch index %s fail", index_name)
 
     LOGGER.info("create check related elasticsearch index succeed")
+    
+    # update es settings
+    config = {
+        "max_result_window": configuration.elasticsearch.get('MAX_ES_QUERY_NUM')
+    }
+    dao.update_settings(**config)
