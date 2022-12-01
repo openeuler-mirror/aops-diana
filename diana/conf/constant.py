@@ -76,5 +76,38 @@ ALGO_LIST = [
             # "file_path": r"D:\lostway\debugtheworld\diana-debug\aops-diana\conf\algorithm\test.json",
             "precision": None
         }]
+    },
+    {
+        "algo_module": "diana.core.experiment.algorithm.multi_item_check.diagnose_by_tree.Diagnose",
+        "models": [{
+            "username": SYSTEM_USER,
+            "model_id": "lvs-node-in-Mysql-net-scene",
+            "model_name": "lvs-node-in-Mysql-net-scene",
+            "algo_id": "",
+            "create_time": 1660471500,
+            "tag": "",
+            "file_path": "/etc/aops/conf/algorithm/lvs_network_error_tree.json",
+            "precision": None
+        },
+        {
+            "username": SYSTEM_USER,
+            "model_id": "tpcc-node-in-Mysql-net-scene",
+            "model_name": "tpcc-node-in-Mysql-net-scene",
+            "algo_id": "",
+            "create_time": 1660471500,
+            "tag": "",
+            "file_path": "/etc/aops/conf/algorithm/tpcc_network_error_tree.json",
+            "precision": None
+        },
+        {
+            "username": SYSTEM_USER,
+            "model_id": "mysql-node-in-Mysql-net-scene",
+            "model_name": "mysql-node-in-Mysql-net-scene",
+            "algo_id": "",
+            "create_time": 1660471500,
+            "tag": "",
+            "file_path": "/etc/aops/conf/algorithm/mysql_network_error_tree.json",
+            "precision": None
+        }]
     }
 ]
