@@ -100,10 +100,10 @@ class MysqlNetworkDiagnoseApp(App):
             }
         """
         result = defaultdict(list)
-        for host_id, metrics in check_result.items():
-            for metric_name in metrics:
+        for host_id, value in check_result.items():
+            if value:
                 result[host_id].append({
-                    "metric_name": metric_name,
+                    "metric_name": "",
                     "metric_label": "",
                     "is_root": False
                 })
