@@ -80,8 +80,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
                         "hosts": {"host1": {"host_ip": "127.0.0.1", "scene": "big_data",
                                   "host_name": "host1"}}
                     },
-                    "step": 5,
-                    "period": 10,
+                    "step": 900,
+                    "period": 60,
                     "alert": {},
                     "detail": {
                         "singlecheck": {
@@ -477,8 +477,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
                                 }
                             }
                         },
-                        "step": 5,
-                        "period": 30,
+                        "step": 900,
+                        "period": 60,
                         "alert": {},
                         "detail": {
                             {
