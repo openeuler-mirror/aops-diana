@@ -21,10 +21,11 @@ from vulcanus.log.log import LOGGER
 from vulcanus.restful.status import DATA_EXIST, SUCCEED
 from diana.conf import configuration
 from diana.core.experiment.app.network_diagnose import NetworkDiagnoseApp
+from diana.core.experiment.app.mysql_network_diagnose import MysqlNetworkDiagnoseApp
 from diana.database.dao.app_dao import AppDao
 
 default_app = [
-    NetworkDiagnoseApp
+    MysqlNetworkDiagnoseApp
 ]
 
 

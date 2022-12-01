@@ -1,0 +1,55 @@
+{
+    "metric_list": {
+        "metric1": {
+            "model": {
+                "enabled": "nsigma",
+                "algorithm_list": {
+                    "nsigma": {
+                        "n": 3,
+                        "train_length": 200
+                    },
+                    "adtk": {}
+                }
+            }
+        },
+        "metric2": {
+            "model": {
+                "enabled": "adtk",
+                "algorithm_list": {
+                    "nsigma": {},
+                    "adtk": {
+                        "algorithm_name": "PersistAD",
+                        "param": {
+                            "window": 9,
+                            "c": 6,
+                            "side":"positive",
+                            "agg": "median"
+                        }
+                    }
+                }
+            }
+        },
+        "metric3": {
+            "model": {
+                "enabled": "adtk",
+                "algorithm_list": {
+                    "nsigma": {},
+                    "adtk": {
+                        "algorithm_name": "LevelShiftAD",
+                        "param": {
+                            "window": 9,
+                            "c": 6,
+                            "side": "positive"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "preprocess": {
+        "normalize": "",
+        "filtering": ""
+    },
+    "rule": {
+    }
+}
