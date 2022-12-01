@@ -121,6 +121,7 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
         """
         filter_rule = metric_info.get('filter_rule')
         agg_data = data_aggregation(series_list, filter_rule)
+        # print(agg_data)
         if len(agg_data) == 0:
             return [0]
         normalized_data = normalize(agg_data)
