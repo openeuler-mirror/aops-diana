@@ -50,5 +50,5 @@ def reformat_queried_data(queried_data: dict) -> dict:
             continue
         for metric_with_label, data_list in data_info.items():
             metric_name = metric_with_label.split("{")[0]
-            reformat_data[host_id][metric_name][metric_with_label] = queried_data
+            reformat_data[host_id][metric_name][metric_with_label] = data_list
     return dict(reformat_data)
