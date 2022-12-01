@@ -10,14 +10,15 @@
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
-from typing import Dict, Tuple
+from typing import Dict
 import uuid
 from importlib import import_module
 
 from vulcanus.kafka.kafka_exception import ProducerInitError
 from vulcanus.kafka.producer import BaseProducer
 
-from diana.core.experiment.app.network_diagnose import NetworkDiagnoseApp
+from diana.core.experiment.app.mysql_network_diagnose import MysqlNetworkDiagnoseApp
+from diana.core.rule.functions import reformat_queried_data
 from diana.core.rule.model_assign import ModelAssign
 from diana.database.dao.data_dao import DataDao
 from diana.errors.workflow_error import WorkflowModelAssignError
@@ -31,7 +32,7 @@ from vulcanus.log.log import LOGGER
 
 class DefaultWorkflow:
 
-    def __init__(self, hosts: list, app=NetworkDiagnoseApp):
+    def __init__(self, hosts: list, app=MysqlNetworkDiagnoseApp):
         if not issubclass(app, App):
             raise TypeError()
         self.__app = app()
@@ -110,8 +111,9 @@ class DefaultWorkflow:
             LOGGER.error("Promethus data query error.")
             return DATABASE_QUERY_ERROR, None
 
+        processed_data = reformat_queried_data(monitor_data)
         network_monitor_data = self.__app.execute(
-            model_info=self.__model_info, detail=self.__detail_info, data=monitor_data, default_mode=True)
+            model_info=self.__model_info, detail=self.__detail_info, data=processed_data, default_mode=True)
         if not network_monitor_data:
             LOGGER.debug("No error message.")
 

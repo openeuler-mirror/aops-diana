@@ -39,6 +39,7 @@ from diana.core.rule.model_assign import ModelAssign
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.database.dao.result_dao import ResultDao
 from diana.core.experiment.app.mysql_network_diagnose import MysqlNetworkDiagnoseApp
+from diana.core.rule.functions import reformat_queried_data
 
 
 class Workflow:
@@ -210,12 +211,13 @@ class Workflow:
             LOGGER.error("Data query error")
             return DATABASE_QUERY_ERROR
 
+        processed_data = reformat_queried_data(monitor_data)
         LOGGER.debug("Finish querying workflow '%s' data and original data, start executing app."
                      % self.__workflow_id)
 
         app = MysqlNetworkDiagnoseApp()
         network_monitor_data = app.execute(model_info=workflow.get(
-            "model_info"), detail=workflow.get("detail"), data=monitor_data)
+            "model_info"), detail=workflow.get("detail"), data=processed_data)
         if not network_monitor_data:
             LOGGER.debug("No error message,workflow id: %s." % self.__workflow_id)
             return SUCCEED
