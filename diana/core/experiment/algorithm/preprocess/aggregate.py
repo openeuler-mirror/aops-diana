@@ -107,7 +107,8 @@ def data_aggregation(
 
 
 def parse_label_info(label_info: str) -> Dict[str, str]:
-    labels = label_info[1:-1].split(',')
+    index = label_info.find('{')
+    labels = label_info[index + 1:-1].split(',')
     mapping = {}
     for label in labels:
         equal_index = label.find('=')
