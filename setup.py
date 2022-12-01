@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 NAME = "aops-diana"
-VERSION = "2.0.0"
+VERSION = "1.1.0"
 
 # To install the library, run the following
 #
@@ -24,7 +24,8 @@ REQUIRES = [
     'requests',
     'SQLAlchemy',
     'PyMySQL',
-    'scipy'
+    'scipy',
+    'adtk'
 ]
 
 setup(
@@ -36,6 +37,10 @@ setup(
     data_files=[
         ('/etc/aops', ['conf/diana.ini', 'conf/diana_hosts.json']),
         ('/etc/aops/algorithm', ['conf/algorithm/mysql_intelligent.json']),
+        ('/etc/aops/algorithm', ['conf/algorithm/ai_template1.json', 'conf/algorithm/ai_template1.json']),
+        ('/etc/aops/algorithm', ['conf/algorithm/lvs_network_error_tree.json']),
+        ('/etc/aops/algorithm', ['conf/algorithm/mysql_network_error_tree.json']),
+        ('/etc/aops/algorithm', ['conf/algorithm/tpcc_network_error_tree.json']),
         ('/usr/lib/systemd/system', ['aops-diana.service'])
     ],
     entry_points={
