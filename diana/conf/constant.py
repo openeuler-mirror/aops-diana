@@ -57,6 +57,11 @@ QUERY_HOST_DETAIL = "/manage/host/info/query"
 # a user for built-in algorithm and model
 SYSTEM_USER = "system"
 
+# metric config
+QUERY_METRIC_NAMES = '/check/host/metric/names'
+QUERY_METRIC_DATA = '/check/host/metric/data'
+QUERY_METRIC_LIST = '/check/host/metric/list'
+
 ALGO_LIST = [
     {
         "algo_module": "diana.core.experiment.algorithm.single_item_check.ewma.EWMA",
