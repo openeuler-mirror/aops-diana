@@ -45,6 +45,9 @@ def reformat_queried_data(queried_data: dict) -> dict:
     """
     reformat_data = defaultdict(dict)
     for host_id, data_info in queried_data.items():
+        if not data_info:
+            reformat_data[host_id] = None
+            continue
         for metric_with_label, data_list in data_info.items():
             metric_name = metric_with_label.split("{")[0]
             reformat_data[host_id][metric_name][metric_with_label] = queried_data
