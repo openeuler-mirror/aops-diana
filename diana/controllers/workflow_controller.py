@@ -56,8 +56,8 @@ class CreateWorkflow(BaseResponse):
                         "domain": "host_group_1",
                         "hosts": ["host_id1", "host_id2"]
                     },
-                    "step": 5,  // optional
-                    "period": 15,  // optional
+                    "step": 900,  // optional
+                    "period": 60,  // optional
                     "alert": {}  // optional
                 }
         """
@@ -73,7 +73,7 @@ class CreateWorkflow(BaseResponse):
 
         model_info = Workflow.get_model_info(detail)
 
-        args['step'] = args.get('step', 60)
+        args['step'] = args.get('step', 900)
         args["period"] = args.get("period", 60)
         args["alert"] = args.get("alert", {})
         args["create_time"] = int(time.time())

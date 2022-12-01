@@ -23,8 +23,8 @@ diana = {
 }
 
 default_mode = {
-    "PERIOD": 30,
-    "STEP": 30
+    "PERIOD": 60,
+    "STEP": 900
 }
 
 mysql = {

@@ -33,7 +33,6 @@ class CheckTimeKeeper:
         Constructor
         """
         self._step = step if step else 60
-        self._last_moment = int(time.time())
 
     def get_time_range(self) -> List[int]:
         """
@@ -42,12 +41,7 @@ class CheckTimeKeeper:
             time range (list)
         """
         now = int(time.time())
-        last = self._last_moment
-        if now - last > self._step:
-            now = last + self._step
-        # update last time stamp
-        self._last_moment = now
-        return [last, now]
+        return [now - 900, now]
 
 
 @singleton
