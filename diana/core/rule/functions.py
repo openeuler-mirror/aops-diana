@@ -49,6 +49,8 @@ def reformat_queried_data(queried_data: dict) -> dict:
             reformat_data[host_id] = None
             continue
         for metric_with_label, data_list in data_info.items():
+            if not data_list:
+                continue
             metric_name = metric_with_label.split("{")[0]
             reformat_data[host_id][metric_name][metric_with_label] = data_list
     return dict(reformat_data)
