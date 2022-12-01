@@ -27,12 +27,12 @@ METRIC_MODEL_MAP = {
 }
 
 SCENE_MODEL_MAP = {
-    "default_model": "intelligent-1",  # StatisticalCheck
+    "default_model": "intelligent-1",  # intelligent
     "model_info": {
-        "big_data": "intelligent-1",  # StatisticalCheck
-        "web": "intelligent-1",  # StatisticalCheck
-        "edge": "intelligent-1",  # StatisticalCheck
-        "cloud": "intelligent-1",  # StatisticalCheck
+        "big_data": "intelligent-1",  # intelligent
+        "web": "intelligent-1",  # intelligent
+        "edge": "intelligent-1",  # intelligent
+        "cloud": "intelligent-1",  # intelligent
     }
 }
 
