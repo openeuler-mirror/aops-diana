@@ -19,6 +19,7 @@ import time
 from typing import Dict, Tuple
 
 import sqlalchemy
+
 from vulcanus.kafka.kafka_exception import ProducerInitError
 from vulcanus.kafka.producer import BaseProducer
 from vulcanus.restful.status import SUCCEED, DATABASE_INSERT_ERROR, TASK_EXECUTION_FAIL,\
@@ -37,7 +38,7 @@ from diana.database.dao.model_dao import ModelDao
 from diana.core.rule.model_assign import ModelAssign
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.database.dao.result_dao import ResultDao
-from diana.core.experiment.app.network_diagnose import NetworkDiagnoseApp
+from diana.core.experiment.app.mysql_network_diagnose import MysqlNetworkDiagnoseApp
 
 
 class Workflow:
@@ -212,7 +213,7 @@ class Workflow:
         LOGGER.debug("Finish querying workflow '%s' data and original data, start executing app."
                      % self.__workflow_id)
 
-        app = NetworkDiagnoseApp()
+        app = MysqlNetworkDiagnoseApp()
         network_monitor_data = app.execute(model_info=workflow.get(
             "model_info"), detail=workflow.get("detail"), data=monitor_data)
         if not network_monitor_data:

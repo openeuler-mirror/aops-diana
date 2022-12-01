@@ -64,68 +64,16 @@ QUERY_METRIC_LIST = '/check/host/metric/list'
 
 ALGO_LIST = [
     {
-        "algo_module": "diana.core.experiment.algorithm.single_item_check.ewma.EWMA",
+        "algo_module": "diana.core.experiment.algorithm.multi_item_check.intelligent.Intelligent",
         "models": [{
             "username": SYSTEM_USER,
-            "model_id": "Ewma-1",
-            "model_name": "Ewma",
+            "model_id": "intelligent-1",
+            "model_name": "intelligent-1",
             "algo_id": "",
             "create_time": 1660471200,
             "tag": "",
-            "file_path": None,
-            "precision": None
-        }]
-    },
-    {
-        "algo_module": "diana.core.experiment.algorithm.single_item_check.mae.Mae",
-        "models": [{
-            "username": SYSTEM_USER,
-            "model_id": "Mae-1",
-            "model_name": "Mae",
-            "algo_id": "",
-            "create_time": 1660471200,
-            "tag": "",
-            "file_path": None,
-            "precision": None
-        }]
-    },
-    {
-        "algo_module": "diana.core.experiment.algorithm.single_item_check.nsigma.NSigma",
-        "models": [{
-            "username": SYSTEM_USER,
-            "model_id": "NSigma-1",
-            "model_name": "NSigma",
-            "algo_id": "",
-            "create_time": 1660471200,
-            "tag": "",
-            "file_path": None,
-            "precision": None
-        }]
-    },
-    {
-        "algo_module": "diana.core.experiment.algorithm.multi_item_check.statistical_multi_item_check."
-                       "StatisticalCheck",
-        "models": [{
-            "username": SYSTEM_USER,
-            "model_id": "StatisticalCheck-1",
-            "model_name": "StatisticalCheck",
-            "algo_id": "",
-            "create_time": 1660471200,
-            "tag": "",
-            "file_path": None,
-            "precision": None
-        }]
-    },
-    {
-        "algo_module": "diana.core.experiment.algorithm.diag.statistic_diag.StatisticDiag",
-        "models": [{
-            "username": SYSTEM_USER,
-            "model_id": "StatisticDiag-1",
-            "model_name": "StatisticDiag",
-            "algo_id": "",
-            "create_time": 1660471200,
-            "tag": "",
-            "file_path": None,
+            "file_path": "/etc/aops/algorithm/mysql_intelligent.json",
+            # "file_path": r"D:\lostway\debugtheworld\diana-debug\aops-diana\conf\algorithm\test.json",
             "precision": None
         }]
     }

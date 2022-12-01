@@ -35,6 +35,7 @@ setup(
     packages=find_packages(),
     data_files=[
         ('/etc/aops', ['conf/diana.ini', 'conf/diana_hosts.json']),
+        ('/etc/aops/algorithm', ['conf/algorithm/mysql_intelligent.json']),
         ('/usr/lib/systemd/system', ['aops-diana.service'])
     ],
     entry_points={
