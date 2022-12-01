@@ -1,0 +1,40 @@
+{
+    "tree":{
+        "node name":"网络类故障树",
+        "value":null,
+        "condition":"lvs节点中断",
+        "description":"发生网络类故障",
+        "advice":"",
+        "children":[
+            {
+                "node name":"lvs节点中断",
+                "value":null,
+                "condition":"TCP发送片数极低持续150s",
+                "description":"lvs节点中断",
+                "advice":"",
+                "children":[
+                    {
+                        "node name":"TCP发送片数极低持续150s",
+                        "value": null,
+                        "check item":"cpu_net_rx_low_last_150s",
+                        "msg":""
+                    }
+                ]
+            }
+        ]
+    },
+    "leaves":[
+        {
+            "check_item":"cpu_net_rx_low_last_150s",
+            "data_list":[
+                {
+                    "metric":"gala_gopher_cpu_net_rx",
+                    "type":"kpi",
+                    "method": "sum"
+                }
+            ],
+            "condition":"$0.avg(150s) < 400",
+            "description":"(lvs节点)各cpu的TCP发送片总数极低，可能是mysql节点切换或lvs节点中断；mysql节点切换耗时100秒左右，lvs节点中断耗时200秒左右"
+        }
+    ]
+}

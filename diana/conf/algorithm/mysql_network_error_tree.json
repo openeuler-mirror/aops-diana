@@ -1,0 +1,67 @@
+{
+    "tree":{
+        "node name":"网络类故障树",
+        "value":null,
+        "condition":"mysql节点中断 || mysql网络延迟",
+        "description":"发生网络类故障",
+        "advice":"",
+        "children":[
+            {
+                "node name":"mysql节点中断",
+                "value":null,
+                "condition":"磁盘利用率大幅下降",
+                "description":"mysql节点中断/故障",
+                "advice":"",
+                "children":[
+                    {
+                        "node name":"磁盘利用率大幅下降",
+                        "value": null,
+                        "check item":"disk_util_decrease",
+                        "msg":""
+                    }
+                ]
+            },
+            {
+                "node name":"mysql网络延迟",
+                "value":null,
+                "condition":"磁盘利用率略微下降",
+                "description":"mysql网络延迟",
+                "advice":"",
+                "children":[
+                    {
+                        "node name":"磁盘利用率略微下降",
+                        "value": null,
+                        "check item":"disk_util_slight_decrease",
+                        "msg":""
+                    }
+                ]
+            }
+        ]
+    },
+    "leaves":[
+        {
+            "check_item":"disk_util_decrease",
+            "data_list":[
+                {
+                    "metric":"gala_gopher_disk_util",
+                    "type":"kpi",
+                    "method": "sum"
+                }
+            ],
+            "condition":"1.5 * $0.avg(180s) - 1.5 * $0.avg(60) > 200",
+            "description":"(mysql节点)过去180到过去60秒的各分区磁盘利用率总量平均值比过去60秒的平均值大200"
+        },
+        {
+            "check_item":"disk_util_slight_decrease",
+            "data_list":[
+                {
+                    "metric":"gala_gopher_disk_util",
+                    "type":"kpi",
+                    "method": "sum"
+                }
+            ],
+            "condition":"(1.5 * $0.avg(180s) - 1.5 * $0.avg(60) > 50) && (1.5 * $0.avg(180s) - 1.5 * $0.avg(60) < 150)",
+            "description":"(mysql节点)过去180到过去60秒的各分区磁盘利用率总量平均值比过去60秒的平均值大50～150"
+        }
+    ]
+}
