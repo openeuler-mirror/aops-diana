@@ -86,7 +86,7 @@ ALGO_LIST = [
             "algo_id": "",
             "create_time": 1660471500,
             "tag": "",
-            "file_path": "/etc/aops/conf/algorithm/lvs_network_error_tree.json",
+            "file_path": "/etc/aops/algorithm/lvs_network_error_tree.json",
             "precision": None
         },
         {
@@ -96,7 +96,7 @@ ALGO_LIST = [
             "algo_id": "",
             "create_time": 1660471500,
             "tag": "",
-            "file_path": "/etc/aops/conf/algorithm/tpcc_network_error_tree.json",
+            "file_path": "/etc/aops/algorithm/tpcc_network_error_tree.json",
             "precision": None
         },
         {
@@ -106,7 +106,7 @@ ALGO_LIST = [
             "algo_id": "",
             "create_time": 1660471500,
             "tag": "",
-            "file_path": "/etc/aops/conf/algorithm/mysql_network_error_tree.json",
+            "file_path": "/etc/aops/algorithm/mysql_network_error_tree.json",
             "precision": None
         }]
     }
