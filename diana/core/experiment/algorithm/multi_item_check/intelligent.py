@@ -146,7 +146,7 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
         # print(fixed_labels)
         return fixed_labels
 
-    def calculate(self, data: Dict[str, Dict[str, list]]) -> List[str]:
+    def calculate(self, data: Dict[str, Dict[str, list]]) -> bool:
         """
         Args:
             data, original data from prometheus. e.g.
@@ -162,7 +162,7 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
             }
 
         Returns:
-            list:
+            bool
         """
         if self.config is None:
             return []
@@ -180,6 +180,4 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
         # print(result)
         # apply rule
         vote_res = self.vote(result)
-        if vote_res:
-            return ['']
-        return []
+        return vote_res
