@@ -73,7 +73,7 @@ class CreateWorkflow(BaseResponse):
 
         model_info = Workflow.get_model_info(detail)
 
-        args['step'] = args.get('step', 900)
+        args['step'] = args.get('step', 60)
         args["period"] = args.get("period", 60)
         args["alert"] = args.get("alert", {})
         args["create_time"] = int(time.time())
