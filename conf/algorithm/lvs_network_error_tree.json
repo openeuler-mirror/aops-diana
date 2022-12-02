@@ -2,7 +2,7 @@
     "tree":{
         "node name":"网络类故障树",
         "value":null,
-        "condition":"lvs节点中断",
+        "condition":"lvs节点中断 || lvs节点网络延迟过高 || lvs节点reorder错包",
         "description":"发生网络类故障",
         "advice":"",
         "children":[
@@ -17,6 +17,42 @@
                         "node name":"TCP发送片数极低持续150s",
                         "value": null,
                         "check item":"cpu_net_rx_low_last_150s",
+                        "msg":""
+                    }
+                ]
+            },
+            {
+                "node name":"lvs节点网络延迟过高",
+                "value":null,
+                "condition":"TCP发送片数下降后趋于平稳",
+                "description":"网络延迟过高",
+                "advice":"",
+                "children":[
+                    {
+                        "node name":"TCP发送片数下降后趋于平稳",
+                        "value": null,
+                        "check item":"cpu_net_rx_decrease_and_smooth",
+                        "msg":""
+                    }
+                ]
+            },
+            {
+                "node name":"lvs节点reorder错包",
+                "value":null,
+                "condition":"TC backlog队列包数量不为0 && !TCP发送片数下降后趋于平稳",
+                "description":"reorder错包",
+                "advice":"",
+                "children":[
+                    {
+                        "node name":"TC backlog队列包数量不为0",
+                        "value": null,
+                        "check item":"nic_tc_backlog_not_zero",
+                        "msg":""
+                    },
+                    {
+                        "node name":"TCP发送片数下降后趋于平稳",
+                        "value": null,
+                        "check item":"cpu_net_rx_decrease_and_smooth",
                         "msg":""
                     }
                 ]
@@ -35,6 +71,30 @@
             ],
             "condition":"$0.avg(150s) < 400",
             "description":"(lvs节点)各cpu的TCP发送片总数极低，可能是mysql节点切换或lvs节点中断；mysql节点切换耗时100秒左右，lvs节点中断耗时200秒左右"
+        },
+        {
+            "check_item":"cpu_net_rx_decrease_and_smooth",
+            "data_list":[
+                {
+                    "metric":"gala_gopher_cpu_net_rx",
+                    "type":"kpi",
+                    "method": "sum"
+                }
+            ],
+            "condition":"$0.sd(120s) < 10000",
+            "description":"(tpcc节点)TCP发送片数下降后趋于平稳"
+        },
+        {
+            "check_item":"nic_tc_backlog_not_zero",
+            "data_list":[
+                {
+                    "metric":"gala_gopher_nic_tc_backlog",
+                    "type":"kpi",
+                    "method": "sum"
+                }
+            ],
+            "condition":"$0 > 0",
+            "description":"TC backlog队列包数量不为0"
         }
     ]
 }
