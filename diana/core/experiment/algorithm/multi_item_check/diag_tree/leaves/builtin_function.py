@@ -250,7 +250,7 @@ def builtin_sd(target, args_list, data_backpack):
         data_list = []
 
         while index >= 0:
-            if data_backpack.get_time_stamp(index, data_name) < shift_time_stamp:
+            if data_backpack.get_time_stamp(index, data_name) <= shift_time_stamp:
                 break
             data_list.append(data_backpack.get_data_value(index, data_name))
             index -= 1

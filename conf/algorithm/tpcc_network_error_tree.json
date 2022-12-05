@@ -2,25 +2,10 @@
     "tree":{
         "node name":"tpcc节点网络类故障树",
         "value":null,
-        "condition":"tpcc节点中断 || tpcc节点网络延迟过高",
+        "condition":"tpcc节点网络延迟过高 || tpcc节点reorder错包",
         "description":"发生网络类故障",
         "advice":"",
         "children":[
-            {
-                "node name":"tpcc节点中断",
-                "value":null,
-                "condition":"网卡掉线",
-                "description":"之前工作的网卡突然掉线",
-                "advice":"检查配置",
-                "children":[
-                    {
-                        "node name":"网卡掉线",
-                        "value": null,
-                        "check item":"net_down",
-                        "msg":""
-                    }
-                ]
-            },
             {
                 "node name":"tpcc节点网络延迟过高",
                 "value":null,
@@ -41,21 +26,37 @@
                         "msg": ""
                     }
                 ]
+            },
+            {
+                "node name":"tpcc节点reorder错包",
+                "value":null,
+                "condition":"TC backlog队列包数量不为0 && !(TCP发送片数下降后趋于平稳 || 网卡收包中断次数下降后趋于平稳)",
+                "description":"reorder错包",
+                "advice":"",
+                "children":[
+                    {
+                        "node name":"TC backlog队列包数量不为0",
+                        "value": null,
+                        "check item":"nic_tc_backlog_not_zero",
+                        "msg":""
+                    },
+                    {
+                        "node name":"TCP发送片数下降后趋于平稳",
+                        "value": null,
+                        "check item":"cpu_net_rx_decrease_and_smooth",
+                        "msg":""
+                    },
+                    {
+                        "node name": "网卡收包中断次数下降后趋于平稳",
+                        "value": null,
+                        "check item": "net_tcp_out_segs_decrease_and_smooth",
+                        "msg": ""
+                    }
+                ]
             }
         ]
     },
     "leaves":[
-        {
-            "check_item":"net_down",
-            "data_list":[
-                {
-                    "metric":"up",
-                    "type":"kpi"
-                }
-            ],
-            "condition":"$0 != 1",
-            "description":"(tpcc节点)网卡连接断开"
-        },
         {
             "check_item":"cpu_net_rx_decrease_and_smooth",
             "data_list":[
@@ -65,7 +66,7 @@
                     "method": "sum"
                 }
             ],
-            "condition":"$0.sd(200s) < 10000",
+            "condition":"$0.sd(120s) < 10000",
             "description":"(tpcc节点)TCP发送片数下降后趋于平稳"
         },
         {
@@ -76,8 +77,20 @@
                     "type":"kpi"
                 }
             ],
-            "condition":"$0.sd(200s) < 2000",
+            "condition":"$0.sd(120s) < 2000",
             "description":"(tpcc节点)网卡收包中断次数下降后趋于平稳"
+        },
+        {
+            "check_item":"nic_tc_backlog_not_zero",
+            "data_list":[
+                {
+                    "metric":"gala_gopher_nic_tc_backlog",
+                    "type":"kpi",
+                    "method": "sum"
+                }
+            ],
+            "condition":"$0 > 0",
+            "description":"TC backlog队列包数量不为0"
         }
     ]
 }

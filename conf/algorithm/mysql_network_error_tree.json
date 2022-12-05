@@ -2,7 +2,7 @@
     "tree":{
         "node name":"网络类故障树",
         "value":null,
-        "condition":"mysql节点中断 || mysql网络延迟",
+        "condition":"mysql节点中断 || mysql网络延迟 || mysql节点reorder错包",
         "description":"发生网络类故障",
         "advice":"",
         "children":[
@@ -28,6 +28,27 @@
                 "description":"mysql网络延迟",
                 "advice":"",
                 "children":[
+                    {
+                        "node name":"磁盘利用率略微下降",
+                        "value": null,
+                        "check item":"disk_util_slight_decrease",
+                        "msg":""
+                    }
+                ]
+            },
+            {
+                "node name":"mysql节点reorder错包",
+                "value":null,
+                "condition":"TC backlog队列包数量不为0 && !磁盘利用率略微下降",
+                "description":"reorder错包",
+                "advice":"",
+                "children":[
+                    {
+                        "node name":"TC backlog队列包数量不为0",
+                        "value": null,
+                        "check item":"nic_tc_backlog_not_zero",
+                        "msg":""
+                    },
                     {
                         "node name":"磁盘利用率略微下降",
                         "value": null,
@@ -62,6 +83,18 @@
             ],
             "condition":"(1.5 * $0.avg(180s) - 1.5 * $0.avg(60) > 50) && (1.5 * $0.avg(180s) - 1.5 * $0.avg(60) < 150)",
             "description":"(mysql节点)过去180到过去60秒的各分区磁盘利用率总量平均值比过去60秒的平均值大50～150"
+        },
+        {
+            "check_item":"nic_tc_backlog_not_zero",
+            "data_list":[
+                {
+                    "metric":"gala_gopher_nic_tc_backlog",
+                    "type":"kpi",
+                    "method": "sum"
+                }
+            ],
+            "condition":"$0 > 0",
+            "description":"TC backlog队列包数量不为0"
         }
     ]
 }

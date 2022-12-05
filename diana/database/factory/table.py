@@ -77,7 +77,7 @@ class Model(Base, MyBase):
     __tablename__ = "model"
 
     model_id = Column(String(32), primary_key=True, nullable=False)
-    model_name = Column(String(20), nullable=False)
+    model_name = Column(String(50), nullable=False)
     tag = Column(String(255), nullable=True)
     algo_id = Column(String(32), ForeignKey(
         'algorithm.algo_id'), nullable=False)
