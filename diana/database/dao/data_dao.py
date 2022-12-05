@@ -439,9 +439,9 @@ class DataDao(PromDbProxy):
                     step=query_range_step
                 )
                 if not data or "values" not in data[0]:
-                    LOGGER.error("Query data result is empty. "
-                                 "metric %s in %d-%d doesn't record in the prometheus " % (
-                                     metric, time_range[0], time_range[1]))
+                    LOGGER.debug("Query data result is empty. "
+                                "metric %s in %d-%d doesn't record in the prometheus " % (
+                                    metric, time_range[0], time_range[1]))
                     data_list[metric] = None
                     ret = PARTIAL_SUCCEED
                     continue

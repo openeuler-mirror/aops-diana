@@ -218,5 +218,5 @@ class DefaultWorkflow:
         Raises:
             ValueError
         """
-        host_algo = {host_ip: "intelligent-1" for host_ip in hosts_info}
+        host_algo = {host_ip: "intelligent-for-tpcc" for host_ip in hosts_info}
         return host_algo
