@@ -37,7 +37,7 @@ class MysqlNetworkDiagnoseApp(App):
             },
             "detail": {
                 "multicheck": {
-                    "default_model": "intelligent-1"
+                    "default_model": "intelligent-for-mysql"
                 }
             }
         }

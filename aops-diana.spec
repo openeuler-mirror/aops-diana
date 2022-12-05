@@ -36,12 +36,7 @@ An intelligent abnormal detection framework of aops
 %doc README.*
 %attr(0644,root,root) %{_sysconfdir}/aops/diana.ini
 %attr(0644,root,root) %{_sysconfdir}/aops/diana_hosts.json
-%attr(0644,root,root) %{_sysconfdir}/aops/algorithm/ai_template1.json
-%attr(0644,root,root) %{_sysconfdir}/aops/algorithm/ai_template2.json
-%attr(0644,root,root) %{_sysconfdir}/aops/algorithm/mysql_intelligent.json
-%attr(0644,root,root) %{_sysconfdir}/aops/algorithm/lvs_network_error_tree.json
-%attr(0644,root,root) %{_sysconfdir}/aops/algorithm/mysql_network_error_tree.json
-%attr(0644,root,root) %{_sysconfdir}/aops/algorithm/tpcc_network_error_tree.json
+%attr(0644,root,root) %{_sysconfdir}/aops/algorithm/*.json
 %attr(0755,root,root) %{_bindir}/aops-diana
 %attr(0755,root,root) /usr/lib/systemd/system/aops-diana.service
 %{python3_sitelib}/aops_diana*.egg-info
