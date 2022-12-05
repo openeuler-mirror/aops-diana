@@ -166,6 +166,8 @@ class MysqlNetworkDiagnoseApp(App):
             return {}
 
         format_result = self.format_result(check_result)
+        if not format_result:
+            return {}
 
         result = {
             "host_result": format_result,
