@@ -23,16 +23,16 @@ from diana.core.experiment.app.mysql_network_diagnose import MysqlNetworkDiagnos
 class MysqlNetworkDiagnoseTestCase(unittest.TestCase):
     def test_somoke(self):
         model_info = {
-            "intelligent-1": {
-                "model_name": "intelligent-1",
+            "intelligent-for-tpcc": {
+                "model_name": "intelligent-for-tpcc",
                 "algo_id": "",
                 "algo_name": "Intelligent"
             }
         }
         detail = {
             "multicheck": {
-                "host1": "intelligent-1",
-                "host2": "intelligent-1"
+                "host1": "intelligent-for-tpcc",
+                "host2": "intelligent-for-tpcc"
             }
         }
         data = {

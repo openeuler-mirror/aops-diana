@@ -239,7 +239,7 @@ class Workflow:
             return workflow
 
         network_monitor_data = self._get_app_execute_result(time_range, workflow["hosts"], workflow["workflow"])
-
+        LOGGER.debug(network_monitor_data)
         if isinstance(network_monitor_data,int):
             return network_monitor_data
 
