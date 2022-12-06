@@ -22,8 +22,8 @@ import sqlalchemy
 
 from vulcanus.kafka.kafka_exception import ProducerInitError
 from vulcanus.kafka.producer import BaseProducer
-from vulcanus.restful.status import SUCCEED, DATABASE_INSERT_ERROR, TASK_EXECUTION_FAIL,\
-    DATABASE_QUERY_ERROR, DATABASE_CONNECT_ERROR
+from vulcanus.restful.status import SUCCEED, PARTIAL_SUCCEED, DATABASE_INSERT_ERROR, \
+    TASK_EXECUTION_FAIL, DATABASE_QUERY_ERROR, DATABASE_CONNECT_ERROR
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.response import MyResponse
 from vulcanus.conf.constant import URL_FORMAT, QUERY_HOST_DETAIL
@@ -207,7 +207,7 @@ class Workflow:
         data_status, monitor_data = data_dao.query_data(
             time_range=time_range, host_list=hosts)
 
-        if data_status != SUCCEED:
+        if data_status not in [SUCCEED, PARTIAL_SUCCEED]:
             LOGGER.error("Data query error")
             return DATABASE_QUERY_ERROR
 

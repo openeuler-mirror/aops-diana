@@ -320,6 +320,7 @@ class DataDao(PromDbProxy):
             ret, metric_list = self.query_metric_list_of_host(host_ip, host_port, metric)
             if ret != SUCCEED:
                 status = PARTIAL_SUCCEED
+                host_data_list[host_id] = None
                 continue
             ret, data_list = self.__query_data_by_host(metric_list, time_range, adjusted_range_step)
             if ret != SUCCEED:
