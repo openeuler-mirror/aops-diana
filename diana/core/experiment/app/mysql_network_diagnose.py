@@ -44,7 +44,7 @@ class MysqlNetworkDiagnoseApp(App):
         return info
 
     def do_check(self, detail: Dict[str, str],
-                 data: Dict[str, List[str]]) -> Dict[str, List[int]]:
+                 data: Dict[str, List[str]], time_range: list) -> Dict[str, List[int]]:
         """
         Args:
             detail: it's a map between metric and model. e.g.
@@ -62,6 +62,8 @@ class MysqlNetworkDiagnoseApp(App):
                     },
                     "id2": None
                 }
+            time_range: time_range: time range of this diagnose, only error happened in time range
+                will be recorded
 
         Returns:
             dict, e.g. {
@@ -75,7 +77,7 @@ class MysqlNetworkDiagnoseApp(App):
 
             model_id = detail[host_id]
             model: Algorithm = self.model.get(model_id)
-            result[host_id] = model.calculate(metrics)
+            result[host_id] = model.calculate(metrics, time_range)
 
         return result
 
@@ -107,7 +109,7 @@ class MysqlNetworkDiagnoseApp(App):
         return result
 
     def execute(self, model_info: Dict[str, Dict[str, str]],
-                detail: dict, data: dict, default_mode: bool = False) -> dict:
+                detail: dict, data: dict, time_range: list, default_mode: bool = False) -> dict:
         """
         Args:
             model_info: it's information about model and algorithm. e.g.
@@ -135,6 +137,9 @@ class MysqlNetworkDiagnoseApp(App):
                     },
                     "id2": None
                 }
+            time_range: time range of this diagnose.  If data is in [1660000000, 1660000900],
+                and time_range is [1660000000, 1660000060], then only error happened in time range
+                will be recorded
             default_mode: load model from database or local, it's used for
                           configurable mode and default mode correspondingly
 
@@ -155,7 +160,7 @@ class MysqlNetworkDiagnoseApp(App):
         if not self.load_models(model_info, default_mode):
             return {}
 
-        check_result = self.do_check(detail['multicheck'], data)
+        check_result = self.do_check(detail['multicheck'], data, time_range)
         if not check_result:
             return {}
 

@@ -204,8 +204,10 @@ class Workflow:
             LOGGER.error("Promethus connection failed.")
             return DATABASE_CONNECT_ERROR
 
+        # data time range should based on the algorithm in the future
+        data_time_range = [time_range[1]-900, time_range[1]]
         data_status, monitor_data = data_dao.query_data(
-            time_range=time_range, host_list=hosts)
+            time_range=data_time_range, host_list=hosts)
 
         if data_status not in [SUCCEED, PARTIAL_SUCCEED]:
             LOGGER.error("Data query error")
@@ -217,7 +219,7 @@ class Workflow:
 
         app = MysqlNetworkDiagnoseApp()
         network_monitor_data = app.execute(model_info=workflow.get(
-            "model_info"), detail=workflow.get("detail"), data=processed_data)
+            "model_info"), detail=workflow.get("detail"), data=processed_data, time_range=time_range)
         if not network_monitor_data:
             LOGGER.debug("No error message,workflow id: %s." % self.__workflow_id)
             return SUCCEED
