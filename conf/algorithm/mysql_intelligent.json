@@ -1,28 +1,33 @@
 {
     "metric_list": {
-        "metric1": {
+        "gala_gopher_net_tcp_curr_estab": {
             "filter_rule": {}
         },
-        "metric2": {
+        "gala_gopher_cpu_net_rx": {
+            "filter_rule": {}
         },
-        "metric3": {}
+        "gala_gopher_nic_tc_backlog": {
+            "filter_rule": {}
+        },
+        "gala_gopher_nic_rx_packets": {
+            "filter_rule": {}
+        }
     },
     "rule": {
         "rule1": {
             "related_metrics": {
-                "metric1": {
+                "gala_gopher_net_tcp_curr_estab": {
                     "preprocess_model": {
                         "enabled": "adtk",
                         "algorithm_list": {
                             "adtk": {
                                 "algorithm_name": "DoubleRollingAggregate",
                                 "param": {
-                                    "agg": "min",
+                                    "agg": "mean",
                                     "window": 18,
                                     "diff": "diff"
                                 }
-                            },
-                            "normal": {}
+                            }
                         }
                     },
                     "check_model": {
@@ -36,42 +41,63 @@
                                     "side": "negative",
                                     "agg": "median"
                                 }
-                            },
-                            "nsigma": {}
+                            }
                         }
                     }
                 },
-                 "metric2": {
+                 "gala_gopher_cpu_net_rx": {
                     "preprocess_model": {
-                        "enabled": "normal",
-                        "algorithm_list": {
-                            "adtk": {
-                                "algorithm_name": "DoubleRollingAggregate",
-                                "param": {
-                                    "agg": "min",
-                                    "window": 18,
-                                    "diff": "diff"
-                                }
-                            },
-                            "normal": {}
-                        }
+                        "enabled": "none"
                     },
                     "check_model": {
-                        "enabled": "nsigma",
+                        "enabled": "adtk",
+                        "algorithm_list": {
+                            "adtk": {
+                                "algorithm_name": "LevelShiftAD",
+                                "param": {
+                                    "window": [50, 15],
+                                    "c": 3,
+                                    "side": "negative"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "fusion_strategy": "intersection"
+        },
+        "rule2": {
+            "related_metrics": {
+                "gala_gopher_nic_tc_backlog": {
+                    "preprocess_model": {
+                        "enabled": "none"
+                    },
+                    "check_model": {
+                        "enabled": "adtk",
                         "algorithm_list": {
                             "adtk": {
                                 "algorithm_name": "PersistAD",
                                 "param": {
-                                    "window": 24,
-                                    "c": 6,
-                                    "side": "negative",
+                                    "window": 20,
+                                    "c": 5,
+                                    "side": "positive",
                                     "agg": "median"
                                 }
-                            },
-                            "nsigma": {
+                            }
+                        }
+                    }
+                },
+                 "gala_gopher_nic_rx_packets": {
+                    "preprocess_model": {
+                        "enabled": "none"
+                    },
+                    "check_model": {
+                        "enabled": "adtk",
+                        "algorithm_list": {
+                            "adtk": {
+                                "algorithm_name": "ThresholdAD",
                                 "param": {
-                                    "n": 3,
-                                    "train_length": 100
+                                    "high": 600
                                 }
                             }
                         }

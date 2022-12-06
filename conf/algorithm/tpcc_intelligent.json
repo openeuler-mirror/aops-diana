@@ -1,28 +1,15 @@
 {
     "metric_list": {
-        "gala_gopher_net_tcp_curr_estab": {
+        "gala_gopher_nic_tc_backlog": {
             "filter_rule": {}
-        },
-        "gala_gopher_cpu_net_rx": {
         }
     },
     "rule": {
-        "rule1": {
+        "rule2": {
             "related_metrics": {
-                "gala_gopher_net_tcp_curr_estab": {
+                "gala_gopher_nic_tc_backlog": {
                     "preprocess_model": {
-                        "enabled": "adtk",
-                        "algorithm_list": {
-                            "adtk": {
-                                "algorithm_name": "DoubleRollingAggregate",
-                                "param": {
-                                    "agg": "min",
-                                    "window": 18,
-                                    "diff": "diff"
-                                }
-                            },
-                            "normal": {}
-                        }
+                        "enabled": "none"
                     },
                     "check_model": {
                         "enabled": "adtk",
@@ -30,54 +17,18 @@
                             "adtk": {
                                 "algorithm_name": "PersistAD",
                                 "param": {
-                                    "window": 24,
-                                    "c": 6,
-                                    "side": "negative",
+                                    "window": 20,
+                                    "c": 5,
+                                    "side": "positive",
                                     "agg": "median"
                                 }
-                            },
-                            "nsigma": {}
-                        }
-                    }
-                },
-                 "gala_gopher_cpu_net_rx": {
-                    "preprocess_model": {
-                        "enabled": "normal",
-                        "algorithm_list": {
-                            "adtk": {
-                                "algorithm_name": "DoubleRollingAggregate",
-                                "param": {
-                                    "agg": "min",
-                                    "window": 18,
-                                    "diff": "diff"
-                                }
-                            },
-                            "normal": {}
-                        }
-                    },
-                    "check_model": {
-                        "enabled": "nsigma",
-                        "algorithm_list": {
-                            "adtk": {
-                                "algorithm_name": "PersistAD",
-                                "param": {
-                                    "window": 24,
-                                    "c": 6,
-                                    "side": "negative",
-                                    "agg": "median"
-                                }
-                            },
-                            "nsigma": {
-                                "param": {
-                                    "n": 3,
-                                    "train_length": 100
-                                }
+                                
                             }
                         }
                     }
                 }
             },
-            "fusion_strategy": "intersection"
+            "fusion_strategy": "single"
         }
     }
 }
