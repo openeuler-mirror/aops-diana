@@ -127,6 +127,7 @@ class HostCheckResult(Base, MyBase):
     id = Column(Integer, autoincrement=True, primary_key=True)
     host_id = Column(String(32), ForeignKey(
         'alert_host.host_id', ondelete="CASCADE"))
+    alert_id = Column(String(32), ForeignKey('domain_check_result.alert_id', ondelete="CASCADE"))
     time = Column(Integer, nullable=False)
     is_root = Column(Boolean, default=False)
     metric_name = Column(String(50))
