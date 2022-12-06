@@ -15,11 +15,7 @@ Time:
 Author:
 Description:
 """
-from typing import List, Dict
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
+from typing import List, Dict, Literal
 
 import pandas as pd
 

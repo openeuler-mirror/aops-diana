@@ -1,55 +1,84 @@
 {
     "metric_list": {
         "metric1": {
-            "model": {
-                "enabled": "nsigma",
-                "algorithm_list": {
-                    "nsigma": {
-                        "n": 3,
-                        "train_length": 200
-                    },
-                    "adtk": {}
-                }
-            }
+            "filter_rule": {}
         },
         "metric2": {
-            "model": {
-                "enabled": "adtk",
-                "algorithm_list": {
-                    "nsigma": {},
-                    "adtk": {
-                        "algorithm_name": "PersistAD",
-                        "param": {
-                            "window": 9,
-                            "c": 6,
-                            "side":"positive",
-                            "agg": "median"
-                        }
-                    }
-                }
-            }
         },
-        "metric3": {
-            "model": {
-                "enabled": "adtk",
-                "algorithm_list": {
-                    "nsigma": {},
-                    "adtk": {
-                        "algorithm_name": "LevelShiftAD",
-                        "param": {
-                            "window": 9,
-                            "c": 6,
-                            "side": "positive"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "preprocess": {
-        "normalize": "",
-        "filtering": ""
+        "metric3": {}
     },
     "rule": {
+        "rule1": {
+            "related_metrics": {
+                "metric1": {
+                    "preprocess_model": {
+                        "enabled": "adtk",
+                        "algorithm_list": {
+                            "adtk": {
+                                "algorithm_name": "DoubleRollingAggregate",
+                                "param": {
+                                    "agg": "min",
+                                    "window": 18,
+                                    "diff": "diff"
+                                }
+                            },
+                            "normal": {}
+                        }
+                    },
+                    "check_model": {
+                        "enabled": "adtk",
+                        "algorithm_list": {
+                            "adtk": {
+                                "algorithm_name": "PersistAD",
+                                "param": {
+                                    "window": 24,
+                                    "c": 6,
+                                    "side": "negative",
+                                    "agg": "median"
+                                }
+                            },
+                            "nsigma": {}
+                        }
+                    }
+                },
+                 "metric2": {
+                    "preprocess_model": {
+                        "enabled": "normal",
+                        "algorithm_list": {
+                            "adtk": {
+                                "algorithm_name": "DoubleRollingAggregate",
+                                "param": {
+                                    "agg": "min",
+                                    "window": 18,
+                                    "diff": "diff"
+                                }
+                            },
+                            "normal": {}
+                        }
+                    },
+                    "check_model": {
+                        "enabled": "nsigma",
+                        "algorithm_list": {
+                            "adtk": {
+                                "algorithm_name": "PersistAD",
+                                "param": {
+                                    "window": 24,
+                                    "c": 6,
+                                    "side": "negative",
+                                    "agg": "median"
+                                }
+                            },
+                            "nsigma": {
+                                "param": {
+                                    "n": 3,
+                                    "train_length": 100
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "fusion_strategy": "intersection"
+        }
     }
 }

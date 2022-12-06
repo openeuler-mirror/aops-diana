@@ -16,6 +16,8 @@ Author:
 Description:
 """
 import pandas as pd
+from adtk.data import validate_series
+from adtk.transformer import DoubleRollingAggregate
 
 
 def filtering(series: pd.Series, moving_window: int = 30,
@@ -26,3 +28,11 @@ def filtering(series: pd.Series, moving_window: int = 30,
             min_periods=min_periods).median())
 
     return series
+
+
+def adtk_preprocess(series: pd.Series, strategy_name, **kwargs):
+    preprocessed_series = validate_series(series)
+    if strategy_name == 'DoubleRollingAggregate':
+        preprocessed_series = DoubleRollingAggregate(**kwargs).transform(preprocessed_series)
+
+    return preprocessed_series
