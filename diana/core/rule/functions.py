@@ -20,11 +20,11 @@ def reformat_queried_data(queried_data: dict) -> dict:
         queried_data: queried data from data dao.  e.g.
             {
                 'id1': {
-                    'metric1'{instance="172.168.128.164:9100",label1="value2"}':
-                                                                       [[time1, 'value1'],
-                                                                       [time2, 'value2'],
-                    'metric12{instance="172.168.128.164:8080"}': [], => get data list is empty
-                    'metric13{instance="172.168.128.164:8080"}': None => get no data
+                    'metric1'{label1="a",label2="a"}':[[time1, 'value1'], [time2, 'value2']],
+                    'metric1'{label1="a",label2="b"}':[[time1, 'value1'], [time2, 'value2']],
+                    'metric1'{label1="a",label2="c"}':[],
+                    'metric2{label1="a"}': [], => get data list is empty
+                    'metric2{label1="b"}': None => get no data
                 },
                 'id2': None => get no metric list of this host
             }
@@ -34,13 +34,11 @@ def reformat_queried_data(queried_data: dict) -> dict:
         {
             'id1': {
                 "metric1": {
-                    "metric1{label1='',label2='a'}": [[1660000000, 1], [1660000015, 1]],
-                    "metric1{label1='',label2='b'}": [[1660000000, 1], [1660000015, 3]]
-                },
-                "metric2": {
-                    "metric2{label1=''}": [[1660000000, 1], [1660000015, 1], [1660000030, 1]]
+                    "metric1{label1='a',label2='a'}": [[1660000000, 1], [1660000015, 1]],
+                    "metric1{label1='a',label2='b'}": [[1660000000, 1], [1660000015, 3]]
                 }
-            }
+            },
+            "id2": None
         }
     """
     reformat_data = defaultdict(dict)

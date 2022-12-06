@@ -54,16 +54,13 @@ class MysqlNetworkDiagnoseApp(App):
                 }
             data: input original data. e.g.
                 {
-                    "host1": {
+                    'id1': {
                         "metric1": {
-                            "label1": [[time1, value1], [time2, value2]],
-                        },
-                        "metric2": {
-                            "label1": [[time1, value1], [time2, value2]],
+                            "metric1{label1='a',label2='a'}": [[1660000000, 1], [1660000015, 1]],
+                            "metric1{label1='a',label2='b'}": [[1660000000, 1], [1660000015, 3], [1660000030, 3]]
                         }
-                        "metric3": {}
                     },
-                    "host2": None # no metric
+                    "id2": None
                 }
 
         Returns:
@@ -130,16 +127,13 @@ class MysqlNetworkDiagnoseApp(App):
                 }
             data: input original data. e.g.
                 {
-                    "host1": {
+                    'id1': {
                         "metric1": {
-                            "label1": [[time1, value1], [time2, value2]],
-                        },
-                        "metric2": {
-                            "label1": [[time1, value1], [time2, value2]],
+                            "metric1{label1='a',label2='a'}": [[1660000000, 1], [1660000015, 1]],
+                            "metric1{label1='a',label2='b'}": [[1660000000, 1], [1660000015, 3]]
                         }
-                        "metric3": {}
                     },
-                    "host2": None # no metric
+                    "id2": None
                 }
             default_mode: load model from database or local, it's used for
                           configurable mode and default mode correspondingly
