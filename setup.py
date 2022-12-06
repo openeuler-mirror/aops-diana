@@ -36,7 +36,7 @@ setup(
     packages=find_packages(),
     data_files=[
         ('/etc/aops', ['conf/diana.ini', 'conf/diana_hosts.json']),
-        ('/etc/aops/algorithm', ['conf/algorithm/ai_template1.json', 'conf/algorithm/ai_template2.json']),
+        ('/etc/aops/algorithm', ['conf/algorithm/ai_template1.json']),
         ('/etc/aops/algorithm', ['conf/algorithm/tpcc_intelligent.json']),
         ('/etc/aops/algorithm', ['conf/algorithm/mysql_intelligent.json']),
         ('/etc/aops/algorithm', ['conf/algorithm/lvs_intelligent.json']),

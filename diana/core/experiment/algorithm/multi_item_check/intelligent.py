@@ -21,7 +21,7 @@ from adtk.detector import LevelShiftAD, PersistAD, SeasonalAD
 
 from diana.core.experiment.algorithm.base_algo import BaseMultiItemAlgorithmTwo
 from diana.core.experiment.algorithm.preprocess.aggregate import transfer_str_2_series, data_aggregation
-from diana.core.experiment.algorithm.preprocess.filter import filtering
+from diana.core.experiment.algorithm.preprocess.filter import filtering, adtk_preprocess
 from diana.core.experiment.algorithm.preprocess.normalize import normalize
 
 
@@ -74,7 +74,7 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
         return labels
 
     @staticmethod
-    def run_adtk(data: pd.Series, algorithm_name, **kwargs):
+    def run_adtk(data: pd.Series, algorithm_name: str, **kwargs):
         series = validate_series(data)
 
         if algorithm_name == 'LevelShiftAD':
@@ -110,42 +110,129 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
 
         return result
 
-    def run(self, metric_info: dict, series_list: Dict[str, pd.Series]) -> List[int]:
+    def enable_fusion_strategy(
+            self, rule_info: dict, temp_result: Dict[str, pd.Series]) -> bool:
+        concat_result = pd.concat(temp_result.values(), axis=1)
+        fusion_strategy = rule_info['fusion_strategy']
+        concat_result['total'] = concat_result[0] & True
+        if fusion_strategy == 'intersection':
+            for column in concat_result.columns:
+                concat_result['total'] = concat_result['total'] & concat_result[column]
+
+        if concat_result[concat_result['total'] == True].shape[0] > 0:
+            return True
+
+        return False
+
+    def check(self, model_info: dict,
+              preprocessed_data: pd.Series) -> List[bool]:
+        check_model_info = model_info['check_model']
+        check_model_name = check_model_info['enabled']
+        # adtk
+        if check_model_name == 'adtk':
+            algorithm_name = check_model_info['algorithm_list'][check_model_name]['algorithm_name']
+            param = check_model_info['algorithm_list'][check_model_name]['param']
+            # adtk need timestamp
+            original_labels = self.run_adtk(
+                preprocessed_data, algorithm_name, **param)
+        else:
+            param = check_model_info['algorithm_list']['nsigma']['param']
+            original_labels = self.run_nsigma(
+                preprocessed_data, param['n'], param['train_length'])
+            original_labels = list(
+                map(lambda x: True if x > 0 else False, original_labels))
+        return original_labels
+
+    @staticmethod
+    def preprocess(agg_data: pd.Series, model_info: dict) -> pd.Series:
+        # adtk need time index
+        agg_data.index = pd.to_datetime(agg_data.index.values, unit='s')
+        preprocess_model_info = model_info['preprocess_model']
+        preprocess_model_name = preprocess_model_info['enabled']
+        if preprocess_model_name == "adtk":
+            strategy_name = preprocess_model_info['algorithm_list'][preprocess_model_name]['algorithm_name']
+            param = preprocess_model_info['algorithm_list'][preprocess_model_name]['param']
+            preprocessed_data = adtk_preprocess(
+                agg_data, strategy_name, **param)
+        # normalize and filter
+        elif preprocess_model_name == "normal":
+            normalized_data = normalize(agg_data)
+            preprocessed_data = filtering(normalized_data)
+        # do nothing
+        else:
+            preprocessed_data = agg_data
+        return preprocessed_data
+
+    def aggregate(
+            self, data: Dict[str, Dict[str, list]]) -> Dict[str, pd.Series]:
         """
         Args:
-            metric_info
-            series_list
+            data: original data from prometheus. e.g.
+                {
+                    "metric1":
+                        {
+                            "metric1label1": [[time1, value1], [time2, value2]],
+                            "metric1label2": [],
+                            "metric1label3": [[time1, value1], [time2, value2], [time3, value3]]
+                        }
+        Returns:
+            dict: e.g.
+                {
+                    "metric1": pd.Series([value1, value2])
+                }
+        """
+        aggregated_data = {}
+        for metric_name, metric_info in self.config['metric_list'].items():
+            if not data.get(metric_name):
+                continue
+            series_list = transfer_str_2_series(data[metric_name])
+
+            filter_rule = metric_info.get('filter_rule')
+            agg_data = data_aggregation(series_list, filter_rule)
+            # print(agg_data)
+            if len(agg_data) == 0:
+                continue
+            aggregated_data[metric_name] = agg_data
+        return aggregated_data
+
+    def run(self, aggregated_data: Dict[str, Dict[str, list]]) -> bool:
+        """
+        Args:
+            aggregated_data, e.g.
+            {
+                "metric1": pd.Series
+                "metric2": pd.Series
+            }
 
         Returns:
-            pd.Series
+            bool
         """
-        filter_rule = metric_info.get('filter_rule')
-        agg_data = data_aggregation(series_list, filter_rule)
-        # print(agg_data)
-        if len(agg_data) == 0:
-            return [0]
-        normalized_data = normalize(agg_data)
-        # print(normalized_data)
-        filtered_data = filtering(normalized_data)
-        # print(filtered_data)
-        # load model param
-        algo = metric_info['model']['enabled']
-        if algo == 'nsigma':
-            params = metric_info['model']['algorithm_list']['nsigma']
-            original_labels = self.run_nsigma(
-                filtered_data, params['n'], params['train_length'])
-        # adtk
-        else:
-            algorithm_name = metric_info['model']['algorithm_list']['adtk']['algorithm_name']
-            param = metric_info['model']['algorithm_list']['adtk']['param']
-            # adtk need timestemp
-            filtered_data.index = pd.to_datetime(filtered_data.index.values, unit='s')
-            original_labels = self.run_adtk(
-                filtered_data, algorithm_name, **param)
-        # print(original_labels)
-        fixed_labels = self.fix_result(original_labels)
-        # print(fixed_labels)
-        return fixed_labels
+        # run preprocess and check model for each rule
+        for _, rule_info in self.config['rule'].items():
+            related_metrics = rule_info['related_metrics']
+            temp_result = {}
+            for metric_name, model_info in related_metrics.items():
+                agg_data = aggregated_data.get(metric_name)
+                if agg_data is None:
+                    continue
+
+                # preprocess data
+                preprocessed_data = self.preprocess(agg_data, model_info)
+                # do check
+                original_labels = self.check(model_info, preprocessed_data)
+                temp_result[metric_name] = pd.Series(
+                    original_labels, index=preprocessed_data.index)
+
+            # no result
+            if not temp_result:
+                continue
+
+            # enable fusion strategy
+            result = self.enable_fusion_strategy(rule_info, temp_result)
+            if result:
+                return True
+
+        return False
 
     def calculate(self, data: Dict[str, Dict[str, list]]) -> bool:
         """
@@ -166,19 +253,10 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
             bool
         """
         if self.config is None:
-            return []
+            return False
 
-        result = {}
+        # aggregate data
+        aggregated_data = self.aggregate(data)
 
-        for metric_name, metric_info in self.config['metric_list'].items():
-            if not data.get(metric_name):
-                result[metric_name] = 0
-                continue
-            series_list = transfer_str_2_series(data[metric_name])
-            fixed_labels = self.run(metric_info, series_list)
-            result[metric_name] = fixed_labels[-1]
-
-        # print(result)
-        # apply rule
-        vote_res = self.vote(result)
-        return vote_res
+        # run preprocess and check model for each rule
+        return self.run(aggregated_data)
