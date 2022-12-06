@@ -73,9 +73,9 @@ class Workflow:
             raise WorkflowExecuteError
 
     @staticmethod
-    def _insert_alert_host(result_dao, workflow, alert_id):
-        hosts = workflow["input"]["hosts"]
-        for host_id, host in hosts.items():
+    def _insert_alert_host(result_dao, workflow, alert_host_ids, alert_id):
+        for host_id in alert_host_ids:
+            host = workflow["input"]["hosts"].get(host_id)
             if result_dao.insert_alert_host(data=dict(host_id=host_id,
                                                       alert_id=alert_id,
                                                       host_ip=host.get(
@@ -85,13 +85,14 @@ class Workflow:
                 raise WorkflowExecuteError
 
     @staticmethod
-    def _insert_host_check(result_dao, network_monitor_data, insert_time):
+    def _insert_host_check(result_dao, network_monitor_data, insert_time, alert_id):
         for host_id, metrics in network_monitor_data.get("host_result", dict()).items():
             if not isinstance(metrics, list):
                 continue
             for metric_item in metrics:
                 if result_dao.insert_host_check(data=dict(host_id=host_id,
                                                           time=insert_time,
+                                                          alert_id=alert_id,
                                                           is_root=metric_item.get(
                                                               "is_root", False),
                                                           metric_name=metric_item.get(
@@ -101,21 +102,20 @@ class Workflow:
                     LOGGER.debug("Failed to insert host check workflow data.")
                     raise WorkflowExecuteError
 
-    def add_workflow_alert(self, network_monitor_data: dict, workflow: dict, domain: str) -> int:
+    def add_workflow_alert(self, network_monitor_data: dict, workflow: dict, domain: str, alert_time: str) -> int:
         result_dao = ResultDao()
         if not result_dao.connect(SESSION):
             LOGGER.error("Connect mysql fail when insert built-in algorithm.")
             raise sqlalchemy.exc.SQLAlchemyError("Connect mysql failed.")
-        _time = str(int(time.time()))
-        alert_id = _time + "-" + domain
+        alert_id = alert_time + "-" + domain
         try:
             self._insert_domain(result_dao, alert_id, domain,
-                                _time, network_monitor_data, workflow["workflow_name"])
-
-            self._insert_alert_host(result_dao, workflow, alert_id)
+                                alert_time, network_monitor_data, workflow["workflow_name"])
+            alert_host_ids = [host_id for host_id in network_monitor_data.get("host_result", dict()).keys()]
+            self._insert_alert_host(result_dao, workflow, alert_host_ids, alert_id)
 
             self._insert_host_check(
-                result_dao, network_monitor_data, _time)
+                result_dao, network_monitor_data, alert_time, alert_id)
 
             LOGGER.debug("Insert the success, workflow name: %s workflow id: %s" % (
                 workflow["workflow_name"], self.__workflow_id))
@@ -247,7 +247,7 @@ class Workflow:
         if storage:
             try:
                 storage_status = self.add_workflow_alert(
-                    network_monitor_data, workflow["workflow"], workflow["domain"])
+                    network_monitor_data, workflow["workflow"], workflow["domain"], str(time_range[-1]))
                 LOGGER.debug("Insert workflow '%s' execute result into database successful."
                              % self.__workflow_id)
             except sqlalchemy.exc.SQLAlchemyError:

@@ -122,6 +122,7 @@ class ResultDao(MysqlProxy):
                                                     HostCheckResult.metric_name,
                                                     HostCheckResult.metric_label
                                                     ). \
+            filter(HostCheckResult.alert_id == data.get('alert_id')). \
             join(host_id_query, HostCheckResult.host_id ==
                  host_id_query.c.host_id).all()
         return check_result_info_list
