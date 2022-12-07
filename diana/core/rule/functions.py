@@ -52,5 +52,6 @@ def reformat_queried_data(queried_data: dict) -> dict:
             metric_name = metric_with_label.split("{")[0]
             if metric_name not in reformat_data[host_id]:
                 reformat_data[host_id][metric_name] = {}
-            reformat_data[host_id][metric_name][metric_with_label] = data_list
+            new_data_list = [[timestamp, float(point_data)] for timestamp, point_data in data_list]
+            reformat_data[host_id][metric_name][metric_with_label] = new_data_list
     return dict(reformat_data)
