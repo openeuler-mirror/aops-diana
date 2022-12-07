@@ -71,7 +71,9 @@ class Test:
                 # return
         
         agg_data = self.tmp_aggregate(tmp_data, self.algo.config)
-        tmp_res = self.algo.run(agg_data)
+        # TODO
+        # time range to be used
+        tmp_res = self.algo.run(agg_data, [1,2])
         result.append(1 if tmp_res else 0)
 
     def process_raw_data(self, df):
@@ -157,7 +159,7 @@ class IntelligentTestCase(unittest.TestCase):
                            ['55', '26'], ['56', '26'], ['57', '26'], ['58', '26'], ['59', '26'], ['60', '26'],
                            ['61', '26'], ['62', '26'], ['63', '26'], ['64', '26'], ['65', '26'], ['66', '26']]}
         }
-        res = self.algo.calculate(data)
+        res = self.algo.calculate(data, [1, 2])
         print(res)
 
     def test_csv_smoke(self):

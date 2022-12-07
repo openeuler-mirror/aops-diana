@@ -118,7 +118,7 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
         return result
 
     def enable_fusion_strategy(
-            self, rule_info: dict, temp_result: Dict[str, pd.Series]) -> bool:
+            self, rule_info: dict, temp_result: Dict[str, pd.Series], time_range: List[int]) -> bool:
         concat_result = pd.concat(temp_result.values(), axis=1)
         fusion_strategy = rule_info['fusion_strategy']
         concat_result['total'] = concat_result[0] & True
@@ -201,7 +201,7 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
             aggregated_data[metric_name] = agg_data
         return aggregated_data
 
-    def run(self, aggregated_data: Dict[str, Dict[str, list]]) -> bool:
+    def run(self, aggregated_data: Dict[str, Dict[str, list]], time_range: List[int]) -> bool:
         """
         Args:
             aggregated_data, e.g.
@@ -209,6 +209,7 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
                 "metric1": pd.Series
                 "metric2": pd.Series
             }
+            time_range
 
         Returns:
             bool
@@ -234,13 +235,13 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
                 continue
 
             # enable fusion strategy
-            result = self.enable_fusion_strategy(rule_info, temp_result)
+            result = self.enable_fusion_strategy(rule_info, temp_result, time_range)
             if result:
                 return True
 
         return False
 
-    def calculate(self, data: Dict[str, Dict[str, list]]) -> bool:
+    def calculate(self, data: Dict[str, Dict[str, list]], time_range: List[int]) -> bool:
         """
         Args:
             data, original data from prometheus. e.g.
@@ -254,6 +255,7 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
                 }
                 "metric3": {}
             }
+            time_range
 
         Returns:
             bool
@@ -265,4 +267,4 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
         aggregated_data = self.aggregate(data)
 
         # run preprocess and check model for each rule
-        return self.run(aggregated_data)
+        return self.run(aggregated_data, time_range)
