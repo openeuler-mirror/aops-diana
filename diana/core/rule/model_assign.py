@@ -27,12 +27,12 @@ METRIC_MODEL_MAP = {
 }
 
 SCENE_MODEL_MAP = {
-    "default_model": "intelligent-1",  # intelligent
+    "default_model": "intelligent-for-mysql",  # intelligent
     "model_info": {
-        "big_data": "intelligent-1",  # intelligent
-        "web": "intelligent-1",  # intelligent
-        "edge": "intelligent-1",  # intelligent
-        "cloud": "intelligent-1",  # intelligent
+        "big_data": "intelligent-for-mysql",  # intelligent
+        "web": "intelligent-for-mysql",  # intelligent
+        "edge": "intelligent-for-mysql",  # intelligent
+        "cloud": "intelligent-for-mysql",  # intelligent
     }
 }
 
