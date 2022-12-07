@@ -17,7 +17,7 @@ from typing import Dict, List
 import numpy as np
 import pandas as pd
 from adtk.data import validate_series
-from adtk.detector import LevelShiftAD, PersistAD, SeasonalAD
+from adtk.detector import LevelShiftAD, PersistAD, ThresholdAD
 
 from diana.core.experiment.algorithm.base_algo import BaseMultiItemAlgorithmTwo
 from diana.core.experiment.algorithm.preprocess.aggregate import transfer_str_2_series, data_aggregation
@@ -75,17 +75,24 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
 
     @staticmethod
     def run_adtk(data: pd.Series, algorithm_name: str, **kwargs):
+        def kwargs_formatting(kwargs):
+            for key, value in kwargs.items():
+                if isinstance(value,list):
+                    kwargs[key] = tuple(value)
+            return kwargs
+        
+        kwargs = kwargs_formatting(kwargs)
         series = validate_series(data)
 
         if algorithm_name == 'LevelShiftAD':
             anomaly_detector = LevelShiftAD(**kwargs)
-        elif algorithm_name == 'SeasonlAD':
-            anomaly_detector = SeasonalAD(**kwargs)
-        else:
+            labels = anomaly_detector.fit_detect(series)
+        elif algorithm_name == 'PersistAD':
             anomaly_detector = PersistAD(**kwargs)
-
-        labels = anomaly_detector.fit_detect(series)
-
+            labels = anomaly_detector.fit_detect(series)
+        elif algorithm_name == 'ThresholdAD':
+            anomaly_detector = ThresholdAD(**kwargs)
+            labels = anomaly_detector.detect(series)
         return labels
 
     @staticmethod
@@ -118,7 +125,6 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
         if fusion_strategy == 'intersection':
             for column in concat_result.columns:
                 concat_result['total'] = concat_result['total'] & concat_result[column]
-
         if concat_result[concat_result['total'] == True].shape[0] > 0:
             return True
 
