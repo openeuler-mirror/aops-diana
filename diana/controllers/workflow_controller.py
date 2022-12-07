@@ -56,8 +56,8 @@ class CreateWorkflow(BaseResponse):
                         "domain": "host_group_1",
                         "hosts": ["host_id1", "host_id2"]
                     },
-                    "step": 900,  // optional
-                    "period": 60,  // optional
+                    "step": 60,  // optional
+                    "period": 900,  // optional
                     "alert": {}  // optional
                 }
         """
