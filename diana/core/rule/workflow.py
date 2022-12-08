@@ -205,7 +205,7 @@ class Workflow:
             return DATABASE_CONNECT_ERROR
 
         # data time range should based on the algorithm in the future
-        data_time_range = [time_range[1]-900, time_range[1]]
+        data_time_range = [time_range[1]-1500, time_range[1]]
         data_status, monitor_data = data_dao.query_data(
             time_range=data_time_range, host_list=hosts)
 

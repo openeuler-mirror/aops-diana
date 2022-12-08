@@ -306,11 +306,10 @@ class ResultDao(MysqlProxy):
         try:
             fliters = {
                 DomainCheckResult.username == data['username'],
-                DomainCheckResult.alert_id == AlertHost.alert_id,
                 DomainCheckResult.confirmed == 0
             }
             alert_count_query = self.session.query(
-                func.count(AlertHost.alert_id)).filter(*fliters).scalar()
+                func.count(DomainCheckResult.alert_id)).filter(*fliters).scalar()
 
         except SQLAlchemyError as error:
             LOGGER.error(error)

@@ -125,7 +125,13 @@ class Intelligent(BaseMultiItemAlgorithmTwo):
         if fusion_strategy == 'intersection':
             for column in concat_result.columns:
                 concat_result['total'] = concat_result['total'] & concat_result[column]
-        if concat_result[concat_result['total'] == True].shape[0] > 0:
+
+        time = pd.to_datetime(time_range[1] - 600, unit='s')
+        index = concat_result.index
+        select_index = index[index > time]
+        select_result = concat_result.loc[select_index]
+        
+        if select_result[select_result['total'] == True].shape[0] > 0:
             return True
 
         return False
