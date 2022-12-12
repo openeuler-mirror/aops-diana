@@ -43,6 +43,10 @@ setup(
         ('/etc/aops/algorithm', ['conf/algorithm/lvs_network_error_tree.json']),
         ('/etc/aops/algorithm', ['conf/algorithm/mysql_network_error_tree.json']),
         ('/etc/aops/algorithm', ['conf/algorithm/tpcc_network_error_tree.json']),
+        ('/etc/aops/algorithm/intelligent/mysql', ['conf/model/intelligent/mysql/rule1_gala_gopher_net_tcp_curr_estab']),
+        ('/etc/aops/algorithm/intelligent/mysql', ['conf/model/intelligent/mysql/rule1_gala_gopher_cpu_net_rx']),
+        ('/etc/aops/algorithm/intelligent/mysql', ['conf/model/intelligent/mysql/rule2_gala_gopher_nic_tc_backlog']),
+        ('/etc/aops/algorithm/intelligent/mysql', ['conf/model/intelligent/mysql/rule2_gala_gopher_nic_rx_packets'])
         ('/usr/lib/systemd/system', ['aops-diana.service'])
     ],
     entry_points={
