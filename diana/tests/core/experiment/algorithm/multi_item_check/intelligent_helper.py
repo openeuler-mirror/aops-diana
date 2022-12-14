@@ -50,8 +50,8 @@ class IntelligentTestCase(unittest.TestCase):
         res = self.algo.calculate(data, [1, 2])
         print(res)
 
-    def test_csv_smoke(self, train=True, test=True):
-        raw_data = pd.read_csv(r'/home/project/aops/aops-diana/data/mysql.csv')
+    def test_csv_smoke(self, train=False, test=True):
+        raw_data = pd.read_csv(r'/home/project/aops/aops-diana/data/mysqlA.csv')
         self.algo.load(r'/home/project/aops/aops-diana/conf/algorithm/mysql_intelligent.json')
         data, truth = process_raw_data(raw_data, self.algo.config['metric_list'])
         if train:
@@ -60,7 +60,7 @@ class IntelligentTestCase(unittest.TestCase):
         if test:
             print("start testing")
             self.algo.load(r'/home/project/aops/aops-diana/conf/tmp/mysql_intelligent_train.json')
-            result, labels = self.algo.test(data, truth)
+            result, labels = self.algo.test(data, truth, step=10)
             show_result(result, labels)
 
 
