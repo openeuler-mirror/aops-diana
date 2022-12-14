@@ -316,14 +316,11 @@ class Intelligent(Algorithm):
                 continue
             for label, value in group_by_metric_name_data[metric_name].items():
                 tmp_data[metric_name][label] = value[cursor:cursor + window]
-                # print(tmp_data[label])
-                # return
 
         agg_data = self._aggregate(tmp_data, False)
         temp = list(agg_data.values())[0]
         end_index = temp.index[-1]
         time_array = time.strptime(str(end_index), "%Y-%m-%d %H:%M:%S")
-        # 转换为时间戳
         timestamp = int(time.mktime(time_array))
 
         tmp_res = self.run(agg_data, [timestamp - 60, timestamp])
@@ -405,8 +402,6 @@ class Intelligent(Algorithm):
             cursor = cursor + step
 
         print("dataset generated done")
-        # print(result)
         print("number of sample:")
         print(len(result))
-        # print(labels)
         return result, labels

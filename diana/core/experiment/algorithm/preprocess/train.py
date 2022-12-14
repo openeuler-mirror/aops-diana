@@ -32,7 +32,6 @@ def process_raw_data(df, metric_list):
     group_by_metric_name_data = defaultdict(dict)
     for column in data.columns:
         tmp = column.split('{')
-        # print(tmp)
         metric_name = tmp[0]
         if metric_name not in metric_list:
             continue
