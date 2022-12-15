@@ -1,10 +1,60 @@
 {
     "metric_list": {
+        "gala_gopher_net_tcp_retrans_segs": {
+            "filter_rule": {}
+        },
+        "gala_gopher_cpu_net_rx": {
+            "filter_rule": {}
+        },
         "gala_gopher_nic_tc_backlog": {
             "filter_rule": {}
         }
     },
     "rule": {
+        "rule1": {
+            "related_metrics": {
+                "gala_gopher_net_tcp_retrans_segs": {
+                    "preprocess_model": {
+                        "enabled": "none"
+                    },
+                    "check_model": {
+                        "enabled": "adtk",
+                        "algorithm_list": {
+                            "adtk": {
+                                "algorithm_name": "PersistAD",
+                                "param": {
+                                    "window": 30,
+                                    "c": 3,
+                                    "side": "positive",
+                                    "agg": "mean"
+                                } 
+                            },
+                            "model_path": "/etc/aops/algorithm/intelligent/tpcc/rule1_gala_gopher_net_tcp_retrans_segs"
+                        }
+                    }
+                },
+                "gala_gopher_cpu_net_rx": {
+                    "preprocess_model": {
+                        "enabled": "none"
+                    },
+                    "check_model": {
+                        "enabled": "adtk",
+                        "algorithm_list": {
+                            "adtk": {
+                                "algorithm_name": "LevelShiftAD",
+                                "param": {
+                                    "window": [20, 5],
+                                    "c": 2,
+                                    "side": "negative"
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/tpcc/rule1_gala_gopher_cpu_net_rx"
+                            }
+                        }
+                    }
+                }
+            },
+            "fusion_strategy": "intersection"
+        },
         "rule2": {
             "related_metrics": {
                 "gala_gopher_nic_tc_backlog": {
@@ -21,8 +71,8 @@
                                     "c": 5,
                                     "side": "positive",
                                     "agg": "median"
-                                }
-                                
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/tpcc/rule2_gala_gopher_nic_tc_backlog"  
                             }
                         }
                     }
