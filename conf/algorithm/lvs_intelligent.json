@@ -26,7 +26,8 @@
                                     "window": 20,
                                     "c": 2,
                                     "side": "negative"
-                                }
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/lvs/rule1_gala_gopher_nic_rx_packets"
                             }
                         }
                     }
@@ -42,7 +43,8 @@
                                 "algorithm_name": "ThresholdAD",
                                 "param": {
                                     "low": 400
-                                }
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/lvs/rule1_gala_gopher_cpu_net_rx"
                             }
                         }
                     }
@@ -66,7 +68,8 @@
                                     "c": 5,
                                     "side": "positive",
                                     "agg": "median"
-                                }
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/lvs/rule2_gala_gopher_nic_tc_backlog"
                             }
                         }
                     }
