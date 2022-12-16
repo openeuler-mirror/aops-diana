@@ -27,9 +27,9 @@
                                     "c": 3,
                                     "side": "positive",
                                     "agg": "mean"
-                                } 
-                            },
-                            "model_path": "/etc/aops/algorithm/intelligent/tpcc/rule1_gala_gopher_net_tcp_retrans_segs"
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/tpcc/rule1_gala_gopher_net_tcp_retrans_segs"
+                            }
                         }
                     }
                 },
