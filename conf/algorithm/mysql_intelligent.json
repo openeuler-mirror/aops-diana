@@ -23,7 +23,7 @@
                             "adtk": {
                                 "algorithm_name": "DoubleRollingAggregate",
                                 "param": {
-                                    "agg": "mean",
+                                    "agg": "min",
                                     "window": 18,
                                     "diff": "diff"
                                 }
@@ -40,7 +40,8 @@
                                     "c": 6,
                                     "side": "negative",
                                     "agg": "median"
-                                }
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/mysql/rule1_gala_gopher_net_tcp_curr_estab"
                             }
                         }
                     }
@@ -58,7 +59,8 @@
                                     "window": [50, 15],
                                     "c": 3,
                                     "side": "negative"
-                                }
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/mysql/rule1_gala_gopher_cpu_net_rx"
                             }
                         }
                     }
@@ -82,7 +84,8 @@
                                     "c": 5,
                                     "side": "positive",
                                     "agg": "median"
-                                }
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/mysql/rule2_gala_gopher_nic_tc_backlog"
                             }
                         }
                     }
@@ -98,7 +101,8 @@
                                 "algorithm_name": "ThresholdAD",
                                 "param": {
                                     "high": 600
-                                }
+                                },
+                                "model_path": "/etc/aops/algorithm/intelligent/mysql/rule2_gala_gopher_nic_rx_packets"
                             }
                         }
                     }
