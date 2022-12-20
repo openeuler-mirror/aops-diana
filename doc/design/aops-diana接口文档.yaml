@@ -1,0 +1,2506 @@
+swagger: '2.0'
+info:
+  version: v1
+  title: Check
+  description: Desc
+schemes:
+  - http
+host: localhost.com
+basePath: /check
+tags:
+  - name: algorithm
+  - name: module
+  - name: train
+  - name: sample
+  - name: app
+  - name: workflow
+  - name: task
+  - name: result
+  - name: recommend
+  - name: report
+  - name: metric
+    description: 查询指标数据
+paths:
+  /algo/add:
+    post:
+      tags:
+        - algorithm
+      operationId: add_algorithm
+      description: '添加算法,TODO'
+      produces:
+        - application/json
+      deprecated: true
+      parameters:
+        - name: algo
+          in: body
+          required: true
+          description: 算法信息
+          schema:
+            $ref: '#/definitions/AlgorithmInfo'
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Suceessful response
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.algorithm_controller
+  /algo/list:
+    get:
+      tags:
+        - algorithm
+      description: 获取算法的列表和基础信息
+      operationId: query_algorithm_list
+      parameters:
+        - name: field
+          in: query
+          required: false
+          description: 算法类型
+          type: string
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: per_page
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/QueryAlgorithmInfoListRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.algorithm_controller
+  /algo/model/train:
+    post:
+      tags:
+        - module
+      description: '训练模型,TODO'
+      operationId: train_model
+      consumes:
+        - multipart/form-data
+      deprecated: true
+      parameters:
+        - name: train_file
+          in: formData
+          required: true
+          description: 训练数据
+          type: file
+        - name: model_id
+          in: formData
+          required: true
+          description: 训练的模型
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.module_controller
+  /algo/train/task/create:
+    post:
+      tags:
+        - train
+      operationId: create_train_task
+      deprecated: true
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      description: '创建模型训练任务,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.train_controller
+  /algo/train/task/execute:
+    post:
+      tags:
+        - train
+      operationId: execute_train_task
+      deprecated: true
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      description: '执行训练任务,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.train_controller
+  /algo/train/task/list:
+    get:
+      tags:
+        - train
+      operationId: query_train_task_list
+      deprecated: true
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      description: '查询训练任务列表,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.train_controller
+  /algo/model/register:
+    post:
+      tags:
+        - module
+      operationId: register_model
+      description: '注册模型,TODO'
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: model_info
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ModelInfo'
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/GeneralRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.module_controller
+  /algo/model/list:
+    get:
+      tags:
+        - module
+      description: 查询模型列表
+      operationId: query_model_list
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+        - name: query_model_list_body
+          in: body
+          required: false
+          description: 请求model list的body体
+          schema:
+            $ref: '#/definitions/QueryModelList'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/QueryModelListInfoRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.module_controller
+  /algo/template:
+    get:
+      tags:
+        - algorithm
+      operationId: download_algorithm_template
+      deprecated: true
+      description: '下载算法模板,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.algorithm_controller
+  /sample/import:
+    post:
+      tags:
+        - sample
+      operationId: import_train_sample
+      deprecated: true
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      description: '导入训练样本,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.sample_controller
+  /sample/create:
+    post:
+      tags:
+        - sample
+      operationId: create_train_sample
+      deprecated: true
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      description: '创建训练样本,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.sample_controller
+  /sample:
+    delete:
+      tags:
+        - sample
+      operationId: del_train_sample
+      deprecated: true
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      description: '删除训练样本,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.sample_controller
+  /app/list:
+    get:
+      tags:
+        - app
+      operationId: query_app_list
+      description: 查询应用列表
+      parameters:
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          minimum: 1
+        - name: per_page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 50
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/QueryAppListInfoRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.app_controller
+  '/app/{app_id}':
+    get:
+      tags:
+        - app
+      operationId: query_app
+      description: 查询应用详情
+      parameters:
+        - name: app_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/QueryAppInfoRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.app_controller
+  /app/create:
+    post:
+      tags:
+        - app
+      operationId: create_app
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+        - name: app
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/AppInfo'
+      description: '创建应用,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/GeneralRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.app_controller
+  /workflow/update:
+    post:
+      tags:
+        - workflow
+      operationId: update_workflow
+      description: 修改主机工作流
+      produces:
+        - application/json
+      parameters:
+        - name: workflow
+          in: body
+          required: true
+          description: 工作流id
+          schema:
+            $ref: '#/definitions/UpdateWorkflow'
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 成功返回
+          schema:
+            $ref: '#/definitions/GeneralRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+  /workflow/create:
+    post:
+      tags:
+        - workflow
+      description: 创建工作流
+      operationId: create_workflow
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+        - name: workflow
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/WorkflowCreateInfo'
+      responses:
+        '200':
+          description: 成功的response
+          schema:
+            $ref: '#/definitions/GeneralRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+  /workflow/list:
+    get:
+      tags:
+        - workflow
+      description: 查询工作流列表
+      operationId: query_workflow_list
+      parameters:
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: per_page
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: status
+          in: query
+          required: false
+          description: 根据状态筛选
+          type: string
+        - name: domain
+          in: query
+          required: false
+          description: 根据主机组名称查找工作流
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/QueryWorkflowListRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+  '/algo/train/task/{task_id}':
+    get:
+      tags:
+        - train
+      operationId: query_train_task
+      deprecated: true
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      description: '查询训练任务详情,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.train_controller
+    delete:
+      tags:
+        - train
+      operationId: del_train_task
+      deprecated: true
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      description: '删除训练任务,TODO'
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.train_controller
+  /task/import_kpi_data:
+    post:
+      tags:
+        - task
+      description: 导入数据集
+      operationId: import_kpi_data
+      deprecated: true
+      parameters:
+        - name: data_name
+          in: query
+          required: true
+          description: 数据名称
+          type: string
+        - name: data_type
+          in: query
+          required: true
+          description: 数据类别
+          type: string
+        - name: file_path
+          in: query
+          required: true
+          description: 本地文件路径
+          type: string
+        - name: encode_type
+          in: query
+          required: true
+          description: 文件编码类型
+          type: string
+        - name: delimiter
+          in: query
+          required: true
+          description: 分隔符
+          type: string
+        - name: header
+          in: query
+          required: true
+          description: 是否有标题行
+          type: boolean
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 导入成功
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /task/import_log_data:
+    post:
+      tags:
+        - task
+      description: 导入日志样本数据
+      operationId: import_log_data
+      deprecated: true
+      parameters:
+        - name: data_name
+          in: query
+          required: true
+          description: 数据名称
+          type: string
+        - name: data_type
+          in: query
+          required: true
+          description: 数据类型
+          type: string
+        - name: encode_type
+          in: query
+          required: true
+          description: 文件编码
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /task/add:
+    post:
+      tags:
+        - task
+      operationId: create_check_task
+      description: 创建手动检测任务
+      x-is-registered: 'N'
+      x-support-sdk: 'N'
+      produces:
+        - application/json
+      deprecated: true
+      parameters:
+        - in: body
+          name: CreateCheckTaskReq
+          description: 创建检测任务请求消息体
+          required: true
+          schema:
+            $ref: '#/definitions/CreateCheckTaskReq'
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 创建任务响应消息体
+          schema:
+            $ref: '#/definitions/CreateCheckTaskRsp'
+        '400':
+          description: Error response
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /task/list:
+    get:
+      tags:
+        - task
+      operationId: get_check_task_list
+      description: 获取检测任务列表
+      x-is-registered: 'N'
+      x-support-sdk: 'N'
+      produces:
+        - application/json
+      deprecated: true
+      parameters:
+        - name: sort
+          in: query
+          required: false
+          description: 排序
+          type: string
+          default: name
+          enum:
+            - time
+            - name
+        - name: direction
+          in: query
+          required: false
+          description: 排序方向
+          type: string
+          default: asc
+          enum:
+            - asc
+            - desc
+        - name: page
+          in: query
+          required: false
+          description: 当前页码
+          type: integer
+          format: int32
+          default: 1
+        - name: per_page
+          in: query
+          required: false
+          description: 每页的条目数
+          type: integer
+          format: int32
+          default: 50
+          minimum: 1
+          maximum: 50
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 用户检测任务列表响应消息体
+          schema:
+            $ref: '#/definitions/GetCheckTaskListRsp'
+        '400':
+          description: Error response
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /task/get:
+    post:
+      tags:
+        - task
+      description: 获取检测任务
+      operationId: get_check_task
+      deprecated: true
+      parameters:
+        - name: GetCheckTaskReq
+          in: body
+          required: true
+          description: 获取检测任务请求消息体
+          schema:
+            $ref: '#/definitions/CheckTaskReq'
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 获取检测任务响应消息体
+          schema:
+            $ref: '#/definitions/GetCheckTaskRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /task/execute:
+    post:
+      tags:
+        - task
+      description: 执行检测任务
+      operationId: execute_check_task
+      deprecated: true
+      parameters:
+        - name: CheckTaskReq
+          in: body
+          required: true
+          description: 执行检测任务请求消息体
+          schema:
+            $ref: '#/definitions/CheckTaskReq'
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 执行检测任务响应消息体
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /task/delete:
+    delete:
+      tags:
+        - task
+      description: 删除检测任务
+      operationId: delete_check_task
+      deprecated: true
+      parameters:
+        - name: DeleteCheckTaskReq
+          in: body
+          required: true
+          description: 删除检测任务请求消息体
+          schema:
+            $ref: '#/definitions/CheckTaskReq'
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 删除检测任务响应消息体
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /task/report/get:
+    post:
+      tags:
+        - report
+      operationId: get_check_task_report
+      description: 获取手动检测任务报告
+      produces:
+        - application/json
+      deprecated: true
+      parameters:
+        - name: CheckReportReq
+          in: body
+          required: false
+          description: 获取检测报告请求消息体
+          schema:
+            $ref: '#/definitions/CheckReportReq'
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 获取检测任务报告响应消息体
+          schema:
+            $ref: '#/definitions/GetCheckReportRsp'
+        '400':
+          description: Error response
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /task/report/delete:
+    delete:
+      tags:
+        - report
+      operationId: delete_check_task_report
+      description: 删除检测任务报告
+      produces:
+        - application/json
+      deprecated: true
+      parameters:
+        - name: DeleteCheckTaskReq
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/CheckTaskReq'
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Delete result
+          schema:
+            type: string
+        '400':
+          description: Error response
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /task/report/list:
+    get:
+      tags:
+        - report
+      description: 获取手动检测任务报告列表
+      operationId: get_check_task_report_list
+      deprecated: true
+      parameters:
+        - name: sort
+          in: query
+          required: false
+          description: 是否排序
+          type: string
+          default: name
+          enum:
+            - name
+            - time
+        - name: direction
+          in: query
+          required: false
+          description: 排序方向
+          type: string
+          default: asc
+          enum:
+            - asc
+            - desc
+        - name: page
+          in: query
+          required: false
+          description: 页码
+          type: integer
+          format: int32
+          default: 0
+        - name: per_page
+          in: query
+          required: false
+          description: 每页条目个数
+          type: integer
+          format: int32
+          default: 50
+          minimum: 1
+          maximum: 50
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 获取检测任务报告列表响应
+          schema:
+            $ref: '#/definitions/GetCheckReportListRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.task_controller
+  /result/list:
+    get:
+      tags:
+        - result
+      description: 获取检测结果列表
+      operationId: get_check_result_list
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: per_page
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: domain
+          in: query
+          required: false
+          description: 根据业务域进行筛选
+          type: string
+        - name: level
+          in: query
+          required: false
+          description: 根据告警等级筛选
+          type: string
+        - name: confirmed
+          in: query
+          required: false
+          description: 是否已确认
+          type: boolean
+        - name: sort
+          in: query
+          required: false
+          description: 根据time排序
+          type: string
+        - name: direction
+          in: query
+          required: false
+          description: asc 或desc
+          type: string
+      responses:
+        '200':
+          description: 获取检测结果响应消息体
+          schema:
+            $ref: '#/definitions/QueryDomainCheckResultListRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.result_controller
+  /result/domain/count:
+    get:
+      tags:
+        - result
+      description: 统计每个业务域的检测结果个数
+      operationId: count_domain_check_result
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+        - name: sort
+          in: query
+          required: false
+          description: 目前可选count
+          type: string
+        - name: direction
+          in: query
+          required: false
+          type: string
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+        - name: per_page
+          in: query
+          required: false
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: 获取检测结果个数响应消息体
+          schema:
+            $ref: '#/definitions/QueryCountResultRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.result_controller
+  /result/delete:
+    delete:
+      tags:
+        - result
+      description: 检测结果删除
+      operationId: delete_check_result
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+        - name: alert_list
+          in: formData
+          required: false
+          description: 告警列表
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/GeneralRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.result_controller
+  /result/confirm:
+    post:
+      tags:
+        - result
+      description: 检测结果确认
+      operationId: confirm_check_result
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+        - name: alert_id
+          in: query
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/GeneralRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.result_controller
+  '/workflow/execute/{workflow_id}':
+    post:
+      tags:
+        - workflow
+      description: 执行工作流
+      operationId: execute_workflow
+      parameters:
+        - name: workflow_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: true
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/GeneralRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+  /recommend/algorithm:
+    post:
+      tags:
+        - recommend
+      operationId: recommend_algorithm
+      deprecated: true
+      parameters:
+        - name: workflow_id
+          in: query
+          required: false
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+  /recommend/probe:
+    post:
+      tags:
+        - recommend
+      operationId: recommend_probe
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+        - name: server_list
+          in: body
+          required: false
+          description: 主机上的服务列表
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/RecommendProbeRsp'
+  '/workflow/stop/{workflow_id}':
+    post:
+      tags:
+        - workflow
+      description: 停止工作流
+      operationId: stop_workflow
+      parameters:
+        - name: workflow_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: true
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/GeneralRsp'
+  '/result/total/{alert_id}':
+    get:
+      tags:
+        - result
+      description: 获取该告警的所有信息
+      operationId: get_total_check_result
+      parameters:
+        - name: alert_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/QueryCheckResultRsp'
+  /result/total/count:
+    get:
+      tags:
+        - result
+      operationId: count_total_check_result
+      parameters:
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/QueryTotalCheckCountRsp'
+  /check/report/download:
+    get:
+      tags:
+        - report
+      description: 根据告警信息生成报告并下载
+      operationId: download_check_report
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: alert_id
+          in: query
+          required: false
+          description: 告警id
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 报告文件
+          schema:
+            type: file
+  '/algo/{algo_id}':
+    get:
+      tags:
+        - algorithm
+      operationId: query_algorithm
+      description: 获取某算法的各项属性
+      produces:
+        - application/json
+      parameters:
+        - name: algo_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: 算法信息
+          schema:
+            $ref: '#/definitions/QueryAlgorithmInfoRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.algorithm_controller
+    delete:
+      tags:
+        - algorithm
+      description: '移除算法,TODO'
+      operationId: del_algorithm
+      deprecated: true
+      parameters:
+        - name: algo_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.algorithm_controller
+  '/workflow/{workflow_id}':
+    delete:
+      tags:
+        - workflow
+      description: 删除工作流
+      operationId: delete_workflow
+      parameters:
+        - name: workflow_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/GeneralRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+    get:
+      tags:
+        - workflow
+      description: 获取工作流
+      operationId: query_workflow
+      parameters:
+        - name: workflow_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/QueryWorkflowRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+  '/result/domain/{alert_id}':
+    get:
+      tags:
+        - result
+      description: 获取该业务域的告警信息
+      operationId: get_domain_check_result
+      deprecated: true
+      parameters:
+        - name: alert_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/QueryDomainCheckResultRsp'
+  '/result/host/{alert_id}':
+    get:
+      tags:
+        - result
+      description: 获得告警信息中的主机详细信息
+      operationId: get_host_check_result
+      parameters:
+        - name: alert_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/QueryHostCheckResultRsp'
+  '/algo/model/{model_id}':
+    get:
+      tags:
+        - module
+      description: 获取model基础信息
+      operationId: get_model
+      parameters:
+        - name: model_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/QueryModelInfoRsp'
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.module_controller
+    delete:
+      tags:
+        - module
+      description: '删除模型,TODO'
+      operationId: del_model
+      deprecated: true
+      parameters:
+        - name: model_id
+          in: path
+          required: true
+          type: string
+        - name: access_token
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: string
+        '400':
+          description: ''
+          schema:
+            $ref: '#/definitions/ErrorRsp'
+      x-swagger-router-controller: aops_check.controllers.module_controller
+  /check/host/metric/data:
+    post:
+      tags:
+        - metric
+      description: 给定时间范围和指标信息，查看相关指标数据
+      operationId: query_metric_data
+      parameters:
+        - name: query_info
+          in: body
+          required: true
+          description: 查询列表
+          schema:
+            $ref: '#/definitions/QueryMetricDataInfo'
+        - name: access_token
+          in: header
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 查询数据结果
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+          examples:
+            application/json:
+              code: 200
+              msg: operation succeed
+              results:
+                metric1:
+                  'metric1{label1="label1_value1", label2="label2_value1", ...., }':
+                    - - 1665521492
+                      - '8'
+                    - - 1665521507
+                      - '0'
+                  'metric1{label1="label1_value2", label2="label2_value2", ...., }':
+                    - - 1665521492
+                      - '8'
+                    - - 1665521507
+                      - '0'
+                metric2:
+                  'metric2{label1="label1_value1", label2="label2_value1", ...., }':
+                    - - 1665521492
+                      - '8'
+                    - - 1665521507
+                      - '0'
+                  'metric2{label1="label1_value2", label2="label2_value2", ...., }':
+                    - - 1665521492
+                      - '8'
+                    - - 1665521507
+                      - '0'
+        '400':
+          description: ''
+          schema:
+            type: string
+          examples:
+            application/json:
+              error_code: stringst
+              error_msg: string
+  /check/host/metric/names:
+    get:
+      tags:
+        - metric
+      description: 查询主机指标名
+      operationId: query_metric_names
+      parameters:
+        - name: query_ip
+          in: query
+          required: true
+          description: 查询主机ip
+          type: string
+        - name: access_token
+          in: header
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 返回指标列表查询结果
+          schema:
+            items:
+              type: string
+            type: array
+          examples:
+            application/json:
+              code: 200
+              msg: operation succeed
+              results:
+                - metric1
+                - metric2
+        '400':
+          description: ''
+          schema:
+            type: string
+          examples:
+            application/json:
+              error_code: stringst
+              error_msg: string
+  /check/host/metric/list:
+    post:
+      tags:
+        - metric
+      description: 给定指标名，返回带标签的指标信息
+      operationId: query_metric_list
+      parameters:
+        - name: access_token
+          in: header
+          required: true
+          type: string
+        - name: metric_names
+          in: body
+          required: true
+          description: 指标名
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: 带标签的指标信息
+          schema:
+            type: array
+            items:
+              type: string
+          examples:
+            application/json:
+              code: 200
+              msg: operation succeed
+              results:
+                metric1:
+                  - >-
+                    metric1{label1="label1_value", label2="label2_value", ....,
+                    }
+                  - >-
+                    metric1{label1="label1_value", label2="label2_value", ....,
+                    }
+                metric2:
+                  - >-
+                    metric2{label1="label1_value", label2="label2_value", ....,
+                    }
+                  - >-
+                    metric2{label1="label1_value", label2="label2_value", ....,
+                    }
+        '400':
+          description: ''
+          schema:
+            type: string
+          examples:
+            application/json:
+              error_code: stringst
+              error_msg: string
+definitions:
+  ErrorRsp:
+    description: 失败时返回的错误对象
+    required:
+      - error_code
+      - error_msg
+    properties:
+      error_code:
+        description: 错误码
+        type: string
+        minLength: 8
+        maxLength: 36
+      error_msg:
+        description: 错误描述
+        type: string
+        minLength: 2
+        maxLength: 512
+  ModelInfo:
+    properties:
+      model_name:
+        type: string
+        description: 模型名称
+      algo_name:
+        type: string
+        description: 算法名称
+        example: asxxxxae
+      create_time:
+        type: integer
+        format: int32
+        description: 创建时间
+        example: 164677777
+      file_path:
+        type: string
+        description: 模型存储路径
+        example: /data/xxx-111
+      precision:
+        type: number
+        format: double
+        description: 精度
+        example: 90.00
+      tag:
+        type: string
+        description: 适用场景/类型id列表，通过逗号区分
+    type: object
+  QueryAlgorithmInfoListRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          total_page:
+            type: integer
+            format: int32
+          total_count:
+            type: integer
+            format: int32
+          algo_list:
+            type: array
+            items:
+              $ref: '#/definitions/AlgorithmMinInfo'
+  AlgorithmInfo:
+    description: 算法数据结构
+    allOf:
+      - $ref: '#/definitions/AlgorithmMinInfo'
+      - type: object
+        properties:
+          code:
+            type: string
+            description: 算法代码
+          requires:
+            type: array
+            items:
+              type: string
+            description: 算法代码中的依赖
+          input_shape:
+            type: array
+            items:
+              type: integer
+              format: int32
+            description: 输入的shape
+            example:
+              - 1
+              - 2
+          output_shape:
+            type: array
+            items:
+              type: integer
+              format: int32
+            description: 输出的shape
+            example:
+              - 1
+              - 2
+  QueryAppListInfoRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - required:
+          - total_count
+          - total_page
+          - app_list
+        type: object
+        properties:
+          total_count:
+            type: integer
+            format: int32
+            example: 1
+          total_page:
+            type: integer
+            format: int32
+            example: 1
+          app_list:
+            type: array
+            items:
+              $ref: '#/definitions/AppMinInfoWithId'
+            description: 结果
+  AppInfo:
+    description: app模板的信息
+    allOf:
+      - $ref: '#/definitions/AppMinInfo'
+      - type: object
+        properties:
+          api:
+            properties:
+              type:
+                type: string
+                description: api类型
+              address:
+                type: string
+                description: api地址
+  QueryModelListInfoRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - required:
+          - model_list
+        type: object
+        properties:
+          total_page:
+            type: integer
+            format: int32
+          total_count:
+            type: integer
+            format: int32
+          model_list:
+            type: array
+            items:
+              $ref: '#/definitions/ModelInfoWithId'
+  SingleItemCheck:
+    properties:
+      enabled:
+        type: boolean
+        description: 是否开启
+      recommend:
+        type: boolean
+        description: 是否支持推荐
+      module_info:
+        type: object
+        additionalProperties:
+          additionalProperties:
+            type: string
+          type: object
+        description: 主机各指标的模型算法
+    description: 未实例化的app模板中的单指标检测项
+    required:
+      - enabled
+      - recommend
+      - module_info
+  QueryWorkflowListRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          total_count:
+            type: integer
+            format: int32
+            example: 1
+          total_page:
+            type: integer
+            format: int32
+            example: 1
+          workflows:
+            type: array
+            items:
+              $ref: '#/definitions/WorkflowMinWithId'
+  GetCheckReportListRsp:
+    description: 获取手动检测报告结果响应
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          total_count:
+            type: integer
+            format: int32
+            description: 检测报告总个数
+            example: 2
+            minimum: 0
+          total_page:
+            type: integer
+            format: int32
+            description: 检测报告总页数
+            example: 1
+            minimum: 0
+          result:
+            type: array
+            items:
+              properties:
+                task_id:
+                  type: string
+                  description: 任务ID
+                  example: '"db590b9d3af5c8a908704ff5d71e1210"'
+                  minLength: 32
+                  maxLength: 32
+                report_id:
+                  type: string
+                  description: 报告ID
+                  example: '"2df0e9dd5368ab777d357402fecd9c1f"'
+                  minLength: 32
+                  maxLength: 32
+                time:
+                  type: integer
+                  format: int32
+                  description: 报告生成时间
+                  minimum: 0
+                  maximum: 3000000000
+            description: 检测报告结果
+            minItems: 0
+  CheckReportReq:
+    description: 获取或删除检测任务报告请求
+    properties:
+      report_list:
+        type: array
+        items:
+          type: string
+          example: '["d797b97db10b713aae44ef8813b33967"]'
+        description: 需要获取的任务报告列表
+        minItems: 0
+    required:
+      - report_list
+  GetCheckReportRsp:
+    description: 获取检测任务报告响应消息体
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - required:
+          - result
+        type: object
+        properties:
+          result:
+            type: array
+            items:
+              properties:
+                task_id:
+                  type: string
+                  description: 检测任务ID
+                  example: db590b9d3af5c8a908704ff5d71e1210
+                  minLength: 32
+                  maxLength: 32
+                task_name:
+                  type: string
+                  description: 检测任务名称
+                execute_time:
+                  type: integer
+                  format: int32
+                  description: 任务执行时间
+                  example: 2df0e9dd5368ab777d357402fecd9c1f
+                  minimum: 32
+                  maximum: 32
+                check_result:
+                  type: array
+                  items:
+                    properties:
+                      host_check_result:
+                        type: array
+                        items:
+                          properties:
+                            host_name:
+                              type: string
+                              description: 主机名称
+                            exception_metrics:
+                              type: array
+                              items:
+                                properties:
+                                  kpi_name:
+                                    type: string
+                                    description: 异常指标名称
+                                  occur_time:
+                                    type: string
+                                    description: 异常点时间
+                                required:
+                                  - kpi_name
+                                  - occur_time
+                              description: 异常指标列表
+                          required:
+                            - host_name
+                            - exception_metrics
+                        description: 单机异常检测
+                      cluster_diagnose_result:
+                        type: array
+                        items:
+                          properties:
+                            host_name:
+                              type: string
+                              description: 故障主机节点名称
+                            fault_metric_list:
+                              type: string
+                              description: 故障节点根因指标
+                          required:
+                            - host_name
+                            - fault_metric_list
+                        description: 集群故障定位结果
+                      fault_type:
+                        type: string
+                        description: 故障类型
+                      occurrence_time:
+                        type: string
+                        format: date-time
+                        description: 故障产生时间
+                    required:
+                      - host_check_result
+                      - cluster_diagnose_result
+                      - fault_type
+                      - occurrence_time
+                  description: 检测结果
+              required:
+                - task_id
+                - task_name
+                - execute_time
+                - check_result
+            description: 返回报告结果
+            minItems: 0
+  CreateCheckTaskReq:
+    description: 创建手动检测任务
+    properties:
+      task_name:
+        type: string
+        description: 任务名称
+        example: testtask1
+        minLength: 1
+        maxLength: 32
+      task_description:
+        type: string
+        description: 任务描述
+        example: this is a task description
+        minLength: 0
+        maxLength: 128
+      data_file_path:
+        type: string
+        description: 检测样本数据
+        example: 'D:/user/data/data.tar.gz'
+      workflow_app_id:
+        type: string
+        description: 工作流应用id
+        example: “f65ad296a66893cbe7b9b05f7110214d”
+        minLength: 32
+        maxLength: 32
+    required:
+      - task_name
+      - task_description
+      - data_file_path
+      - workflow_app_id
+  CreateCheckTaskRsp:
+    description: 创建检测任务响应消息体
+    properties:
+      task_id:
+        type: string
+        description: 任务ID
+  GetCheckTaskListRsp:
+    description: 获取检测任务列表的响应消息体
+    required:
+      - result
+    properties:
+      result:
+        type: array
+        items:
+          properties:
+            task_name:
+              type: string
+              description: 任务名称
+            task_id:
+              type: string
+              description: 任务ID
+            dataset_file_path:
+              type: string
+              description: 数据集路径
+            workflow_id:
+              type: string
+              description: 工作流ID
+          required:
+            - task_name
+            - task_id
+            - dataset_file_path
+            - workflow_id
+        description: 检测任务列表
+  CheckTaskReq:
+    description: 检测任务列表请求消息体
+    properties:
+      task_list:
+        type: array
+        items:
+          type: string
+        description: 检测任务ID列表
+    required:
+      - task_list
+  GetCheckTaskRsp:
+    description: 获取检测任务响应消息体
+    required:
+      - result
+    properties:
+      result:
+        type: array
+        items:
+          properties:
+            task_id:
+              type: string
+              description: 任务ID
+            task_name:
+              type: string
+              description: 任务名称
+            task_description:
+              type: string
+              description: 任务描述
+            dataset_file_path:
+              type: string
+              description: 数据集路径
+            workflow_id:
+              type: string
+              description: 工作流ID
+          required:
+            - task_id
+            - task_name
+            - task_description
+            - dataset_file_path
+            - workflow_id
+        description: 检测任务信息列表
+  SingleCheckResult:
+    properties:
+      time:
+        type: string
+        description: 单指标异常时间
+      metric_name:
+        type: string
+        description: 指标名称
+      label:
+        type: string
+        description: 指标标签
+      is_root:
+        type: boolean
+        description: 是否为根因
+  TotalChekResult:
+    allOf:
+      - $ref: '#/definitions/DomainCheckResult'
+      - type: object
+        properties:
+          hosts:
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/SingleCheckResult'
+            description: 主机异常详情
+  QueryDomainCheckResultListRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          total_count:
+            type: integer
+            format: int32
+          total_page:
+            type: integer
+            format: int32
+          result:
+            type: array
+            items:
+              $ref: '#/definitions/DomainCheckResult'
+  QueryCountResultRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          total_count:
+            type: string
+          total_page:
+            type: string
+          results:
+            type: array
+            items:
+              $ref: '#/definitions/DomainCount'
+  MultiItemCheck:
+    description: 未实例化的app模板的多指标检测项
+    properties:
+      enabled:
+        type: boolean
+        description: 是否开启
+      recommend:
+        type: boolean
+        description: 是否推荐
+      module_info:
+        type: object
+        additionalProperties:
+          type: string
+        description: 主机对应模型
+    required:
+      - enabled
+      - recommend
+      - module_info
+  ClusterDiag:
+    description: 未实例化的应用的集群诊断
+    properties:
+      enabled:
+        type: boolean
+        description: 是否开启
+      recommend:
+        type: boolean
+        description: 是否推荐
+      module_info:
+        type: string
+        description: 使用的集群模型名称
+    required:
+      - enabled
+      - recommend
+      - module_info
+  FilledSingleItemCheck:
+    description: 实例化后的应用的单指标推荐信息
+    properties: {}
+  FilledMultiItemCheck:
+    description: 实例化后的应用的多指标检测阶段的信息
+    properties: {}
+  DomainCount:
+    properties:
+      domain:
+        type: string
+        description: 业务域名称
+      count:
+        type: integer
+        format: int32
+  QueryTotalCheckCountRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          count:
+            type: integer
+            format: int32
+  GeneralRsp:
+    properties:
+      code:
+        type: integer
+        format: int32
+      msg:
+        type: string
+  QueryAlgorithmInfoRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          result:
+            $ref: '#/definitions/AlgorithmInfo'
+  QueryModelInfoRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          model:
+            $ref: '#/definitions/ModelInfoWithId'
+  AppMinInfo:
+    description: 最小应用信息，为列表显示所用
+    properties:
+      version:
+        type: string
+        description: 应用版本
+      app_name:
+        type: string
+        description: 应用名称
+      description:
+        type: string
+        description: 应用描述
+  QueryAppInfoRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          result:
+            $ref: '#/definitions/AppInfoWithId'
+  AlgorithmMinInfo:
+    description: 算法信息最小集，为列表显示所用
+    properties:
+      algo_id:
+        type: integer
+        format: int32
+        description: 算法id
+      algo_name:
+        type: string
+        description: 算法名称
+      field:
+        type: string
+        description: 算法应用阶段：如预处理、单指标检测、场景识别等
+      description:
+        type: string
+        description: 算法描述
+  QueryWorkflowRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          workflow:
+            $ref: '#/definitions/WorkflowInfo'
+  WorkflowMin:
+    description: workflow的最小信息集，为列表显示所用
+    properties:
+      workflow_name:
+        type: string
+        description: 工作流名称
+      description:
+        type: string
+        description: 工作流描述
+      status:
+        type: string
+        description: '工作流状态，可选running,hold, recommending'
+      app_name:
+        type: string
+        description: 应用名称
+      app_id:
+        type: string
+        description: 应用id
+      input:
+        description: 输入信息
+        properties:
+          domain:
+            type: string
+            description: 业务域名称
+          hosts:
+            type: array
+            items:
+              type: string
+            description: 主机id列表
+  DomainCheckResult:
+    properties:
+      alert_id:
+        type: string
+        description: 告警id
+      alert_name:
+        type: string
+        description: 告警名称
+      domain:
+        type: string
+        description: 业务域名称
+      time:
+        type: integer
+        format: int32
+        description: 告警时间
+      workflow_id:
+        type: string
+        description: 工作流id
+      level:
+        type: string
+        description: 告警等级
+      confirmed:
+        type: boolean
+        description: 是否已确认
+      workflow_name:
+        type: string
+        description: 工作流名称
+      host_num:
+        type: integer
+        format: int32
+        description: 主机数量
+  QueryCheckResultRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          result:
+            $ref: '#/definitions/TotalChekResult'
+  RecommendProbeRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          scene_name:
+            type: string
+            description: 场景
+          probe_list:
+            type: array
+            items:
+              type: string
+            description: 探针列表
+  ModelInfoWithId:
+    allOf:
+      - $ref: '#/definitions/ModelInfo'
+      - type: object
+        properties:
+          model_id:
+            type: string
+            description: 模型id
+  AppMinInfoWithId:
+    allOf:
+      - $ref: '#/definitions/AppMinInfo'
+      - type: object
+        properties:
+          app_id:
+            type: string
+            description: 应用id
+  WorkflowMinWithId:
+    allOf:
+      - $ref: '#/definitions/WorkflowMin'
+      - type: object
+        properties:
+          workflow_id:
+            type: string
+            description: 工作流id
+  AppInfoWithId:
+    allOf:
+      - $ref: '#/definitions/AppInfo'
+      - type: object
+        properties:
+          app_id:
+            type: string
+            description: 应用id
+  QueryHostCheckResultRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          result:
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/HostCheckResult'
+            description: 各主机单指标检测结果
+  QueryDomainCheckResultRsp:
+    allOf:
+      - $ref: '#/definitions/GeneralRsp'
+      - type: object
+        properties:
+          result:
+            $ref: '#/definitions/DomainCheckResult'
+  WorkflowCreateInfo:
+    allOf:
+      - $ref: '#/definitions/WorkflowMin'
+      - type: object
+        properties:
+          step:
+            type: integer
+            format: int32
+            description: 检测步长
+          period:
+            type: integer
+            format: int32
+            description: 检测周期
+          alert:
+            type: object
+            description: 告警配置
+  WorkflowAppExtraInfo:
+    properties:
+      singlecheck:
+        $ref: '#/definitions/SingleItemCheck'
+      multicheck:
+        $ref: '#/definitions/MultiItemCheck'
+      diag:
+        $ref: '#/definitions/ClusterDiag'
+  WorkflowInfo:
+    allOf:
+      - $ref: '#/definitions/WorkflowCreateInfo'
+      - type: object
+        properties:
+          workflow_id:
+            type: string
+            description: 工作流id
+          detail:
+            description: 应用算法配置详情
+            $ref: '#/definitions/WorkflowAppExtraInfo'
+          module_info:
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/ModelAlgoMapInfo'
+            description: 模型名称信息
+  ModelAlgoMapInfo:
+    properties:
+      model_name:
+        type: string
+        description: 模型名称
+      algo_name:
+        type: string
+        description: 算法名称
+      algo_id:
+        type: string
+        description: 算法id
+    type: object
+  HostCheckResult:
+    required:
+      - host_name
+      - host_ip
+      - is_root
+      - host_check_result
+    properties:
+      host_name:
+        type: string
+        description: 主机名
+      host_ip:
+        type: string
+        description: 主机ip
+      is_root:
+        type: boolean
+        description: 是否是根因节点
+      host_check_result:
+        type: array
+        items:
+          $ref: '#/definitions/SingleCheckResult'
+        description: 某主机的异常项
+  UpdateWorkflow:
+    type: object
+    description: 工作流更新的body体
+    required:
+      - workflow_id
+    properties:
+      workflow_id:
+        type: string
+        description: 工作流id
+      workflow_name:
+        type: string
+        description: 工作流名字
+      description:
+        type: string
+        description: 工作流描述
+      step:
+        type: integer
+        format: int32
+      period:
+        type: integer
+        format: int32
+      alert:
+        type: object
+      detail:
+        $ref: '#/definitions/WorkflowAppExtraInfo'
+  QueryModelList:
+    type: object
+    properties:
+      filter:
+        type: object
+        additionalProperties:
+          additionalProperties:
+            properties:
+              algo_name:
+                type: string
+              model_name:
+                type: string
+              tag:
+                type: string
+              field:
+                type: string
+                description: 算法的类别（singlecheck\multicheck\diag）
+          type: object
+      sort:
+        type: string
+        description: 现阶段只能为precision
+      direction:
+        type: string
+        description: asc/ desc
+      page:
+        type: integer
+        format: int32
+        description: 获取的第n页
+      per_page:
+        type: integer
+        format: int32
+        description: 每页的数据条数
+  QueryMetricDataInfo:
+    type: object
+    description: 指定查询信息
+    required:
+      - time_range
+      - query_info
+    properties:
+      time_range:
+        type: array
+        items:
+          type: integer
+          format: int32
+        example:
+          - 1665360266
+          - 1665371066
+        description: 时间范围
+      query_info:
+        description: 查询标签信息
+        properties:
+          metric1:
+            type: array
+            items:
+              type: string
+            example:
+              - 'metric1{label1="label1_value", label2="label2_value", ...., }'
+              - 'metric1{label1="label1_value", label2="label2_value", ...., }'
+          metric2:
+            type: array
+            items:
+              type: string
+            example:
+              - 'metric2{label1="label1_value", label2="label2_value", ...., }'
+              - 'metric2{label1="label1_value", label2="label2_value", ...., }'
+  QueryMetricDataResult:
+    type: object
+    description: 指定指标数据结果
+    properties:
+      code:
+        type: integer
+        format: int32
+        description: 响应码
+        example: null
+      msg:
+        type: string
+        description: 提示信息
+        example: ''
+      results:
+        type: object
+        description: 返回数据结果
+        example: ''
+  QueryMetricListResult:
+    type: object
+    description: 查询主机指标列表结果
+    required:
+      - code
+      - msg
+      - results
+    properties:
+      code:
+        type: integer
+        format: int32
+        description: 状态码
+      msg:
+        type: string
+        description: 信息
+      results:
+        type: object
+        additionalProperties:
+          items:
+            type: string
+          type: array
+        description: 查询结果
