@@ -1,0 +1,11 @@
+[OS-lts]
+name=OS-lts
+baseurl=http://119.3.219.20:82/openEuler:/22.03:/LTS:/SP1:/Epol/standard_$basearch/
+enabled=1
+gpgcheck=0
+
+[aops-install]
+name=aops-install
+baseurl=http://119.3.219.20:82/openEuler:/22.03:/LTS:/SP1/standard_$basearch/
+enabled=1
+gpgcheck=0
