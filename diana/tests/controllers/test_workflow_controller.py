@@ -69,7 +69,7 @@ class CreateWorkflowTestCase(unittest.TestCase):
             "app_id": "asd",
             "input": {
                 "domain": "host_group_1",
-                "hosts": ["host_id1", "host_id2"]
+                "hosts": [1, 2]
             },
             "step": 5,
             "period": 15,
@@ -86,7 +86,7 @@ class CreateWorkflowTestCase(unittest.TestCase):
             "app_id": "asd",
             "input": {
                 "domain": "host_group_1",
-                "hosts": ["host_id1", "host_id2"]
+                "hosts": [1, 2]
             },
             "step": 5,
             "period": 15,
@@ -109,7 +109,7 @@ class CreateWorkflowTestCase(unittest.TestCase):
             "app_id": "asd",
             "input": {
                 "domain": "host_group_1",
-                "hosts": ["host_id1", "host_id2"]
+                "hosts": [1, 2]
             },
             "step": 5,
             "period": 15,
@@ -132,7 +132,7 @@ class CreateWorkflowTestCase(unittest.TestCase):
             "app_id": "asd",
             "input": {
                 "domain": "host_group_1",
-                "hosts": ["host_id1", "host_id2"]
+                "hosts": [1, 2]
             },
             "step": 5,
             "period": 15,
@@ -409,7 +409,7 @@ class UpdateWorkflowTestCase(unittest.TestCase):
     def test_update_workflow_should_return_succeed_when_given_correct_params(self, mock_info):
         mock_info.return_value = {}
         args = {"detail": {}, "workflow_id": "123"}
-        with mock.patch("vulcanus.restful.response.operate") as mock_operate:
+        with mock.patch("diana.controllers.workflow_controller.operate") as mock_operate:
             mock_operate.return_value = SUCCEED
             response = client.post(UPDATE_WORKFLOW, json=args, headers=header_with_token).json
             self.assertEqual(response['code'], SUCCEED)

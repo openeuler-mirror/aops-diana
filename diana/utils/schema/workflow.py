@@ -20,7 +20,7 @@ from marshmallow import Schema, fields, validate
 
 class CreateWorkflowHostInfoSchema(Schema):
     domain = fields.String(required=True, validate=lambda s: len(s) > 0)
-    hosts = fields.List(fields.String, required=True, validate=lambda s: len(s) > 0)
+    hosts = fields.List(fields.Integer(), required=True, validate=lambda s: s > 0)
 
 
 class CreateWorkflowSchema(Schema):
@@ -85,4 +85,4 @@ class UpdateWorkflowSchema(Schema):
 
 
 class IfHostInWorkflowSchema(Schema):
-    host_list = fields.List(fields.String, required=True, validate=lambda s: len(s) > 0)
+    host_list = fields.List(fields.Integer(), required=True, validate=lambda s: s > 0)

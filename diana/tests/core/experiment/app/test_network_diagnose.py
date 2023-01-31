@@ -36,13 +36,13 @@ class MultiModel2:
 class NetworkDiagnoseTestCase(unittest.TestCase):
     def test_do_single_check_should_return_correct_value_when_input_is_normal(self):
         detail = {
-            "host1": {
+            1: {
                 "metric1": "model1",
                 "metric2": "model2"
             }
         }
         data = {
-            "host1": {
+            1: {
                 "metric1{l1=1}": [[1, 1], [2, 3]],
                 "metric2{l2=2}": [[1, 1]]
             }
@@ -54,17 +54,17 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
 
     def test_do_single_check_should_return_empty_when_metrics_is_none(self):
         detail = {
-            "host1": {
+            1: {
                 "metric1": "model1",
                 "metric2": "model2"
             }
         }
         data = {
-            "host1": {
+            1: {
                 "metric1{l1=1}": None,
                 "metric2{l2=1}": []
             },
-            "host2": None
+            2: None
         }
         app = NetworkDiagnoseApp()
         app.model = {'model1': SingleModel1, 'model2': SingleModel2}
@@ -72,12 +72,12 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
 
     def test_do_multi_check_should_return_correct_value_when_input_is_normal(self):
         detail = {
-            "host1": "model1",
-            "host2": "model2"
+            1: "model1",
+            2: "model2"
         }
         data = {
-            "host1": [{"metric_name": "metric1"}],
-            "host2": [{"metric_name": "metric2"}, {"metric_name": "metric3"}]
+            1: [{"metric_name": "metric1"}],
+            2: [{"metric_name": "metric2"}, {"metric_name": "metric3"}]
         }
         app = NetworkDiagnoseApp()
         app.model = {"model1": MultiModel1, "model2": MultiModel2}
@@ -85,18 +85,18 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
 
     def test_do_multi_check_should_return_all_when_detail_is_not_matched(self):
         detail = {
-            "host1": "model3",
-            "host3": "model2"
+            1: "model3",
+            3: "model2"
         }
         data = {
-            "host1": [{"metric_name": "metric1"}],
-            "host2": [{"metric_name": "metric2"}, {"metric_name": "metric3"}]
+            1: [{"metric_name": "metric1"}],
+            2: [{"metric_name": "metric2"}, {"metric_name": "metric3"}]
         }
         app = NetworkDiagnoseApp()
         app.model = {"model1": MultiModel1, "model2": MultiModel2}
         self.assertEqual(app.do_multi_check(detail, data), {
-            "host1": [{"metric_name": "metric1"}],
-            "host2": [{"metric_name": "metric2"}, {"metric_name": "metric3"}]
+            1: [{"metric_name": "metric1"}],
+            2: [{"metric_name": "metric2"}, {"metric_name": "metric3"}]
         })
 
     def test_do_diag_should_return_empty_when_model_is_none(self):
@@ -106,16 +106,16 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
 
     def test_format_result_should_return_correct_value_when_is_normal(self):
         multi_check_result = {
-            "host1": [{"metric_name": "m1", "metric_label": "l1"}, {"metric_name": "m2", "metric_label": "l2"},
+            1: [{"metric_name": "m1", "metric_label": "l1"}, {"metric_name": "m2", "metric_label": "l2"},
                       {"metric_name": "m3", "metric_label": "l3"}],
-            "host2": [{"metric_name": "m1", "metric_label": "l1"}, {"metric_name": "m2", "metric_label": "l2"}]
+            2: [{"metric_name": "m1", "metric_label": "l1"}, {"metric_name": "m2", "metric_label": "l2"}]
         }
         diag_result = "host1", "m2", "l2"
         expect_result = {
-            "host1": [{"metric_name": "m1", "metric_label": "l1", "is_root": False},
+            1: [{"metric_name": "m1", "metric_label": "l1", "is_root": False},
                       {"metric_name": "m2", "metric_label": "l2", "is_root": True},
                       {"metric_name": "m3", "metric_label": "l3", "is_root": False}],
-            "host2": [{"metric_name": "m1", "metric_label": "l1", "is_root": False},
+            2: [{"metric_name": "m1", "metric_label": "l1", "is_root": False},
                       {"metric_name": "m2", "metric_label": "l2", "is_root": False}]
         }
         app = NetworkDiagnoseApp()

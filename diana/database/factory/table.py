@@ -28,7 +28,7 @@ class WorkflowHostAssociation(Base, MyBase):
     """
     __tablename__ = "workflow_host"
 
-    host_id = Column(String(32), primary_key=True, nullable=False)
+    host_id = Column(Integer(), primary_key=True, nullable=False)
     host_name = Column(String(20), nullable=False)
     host_ip = Column(String(16), nullable=False)
     workflow_id = Column(String(32), ForeignKey('workflow.workflow_id', ondelete="CASCADE"),
@@ -111,7 +111,7 @@ class AlertHost(Base, MyBase):
     """
     __tablename__ = "alert_host"
 
-    host_id = Column(String(32), primary_key=True)
+    host_id = Column(Integer(), primary_key=True)
     alert_id = Column(String(32), ForeignKey('domain_check_result.alert_id', ondelete="CASCADE"),
                       primary_key=True)
     host_ip = Column(String(32), nullable=False)
@@ -125,7 +125,7 @@ class HostCheckResult(Base, MyBase):
     __tablename__ = "host_check_result"
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    host_id = Column(String(32), ForeignKey(
+    host_id = Column(Integer(), ForeignKey(
         'alert_host.host_id', ondelete="CASCADE"))
     alert_id = Column(String(32), ForeignKey('domain_check_result.alert_id', ondelete="CASCADE"))
     time = Column(Integer, nullable=False)

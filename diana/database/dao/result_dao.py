@@ -39,7 +39,7 @@ class ResultDao(MysqlProxy):
             int: status code
             dict:   e.g {
                         "result": {
-                        "host id": {
+                        1 : {  //host id
                         "host_ip": "ip address",
                         "host_name": "string",
                         "is_root": false
@@ -482,7 +482,7 @@ class ResultDao(MysqlProxy):
         insert alert host info into database
         Args:
             data: e.g. {
-                "host_id": "1",
+                "host_id": 1,
                 "alert_id": "1"
                 "host_ip": "",
                 "host_name": ""
@@ -508,7 +508,7 @@ class ResultDao(MysqlProxy):
         insert host check info into database
         Args:
             data: e.g. {
-                "host_id": "1",
+                "host_id": 1,
                 "time": "1660471200"
                 "is_root": False,
                 "metric_name": "",
