@@ -26,12 +26,12 @@ test_cases = [
     # input 1: normal
     {
         "time_range": [1658826729, 1658913129],
-        "host_list": [{"host_id": "id1", "public_ip": "172.168.128.164", "instance_port": 9100}]
+        "host_list": [{"host_id": 1, "public_ip": "172.168.128.164", "instance_port": 9100}]
     },
     # input 2: no port
     {
         "time_range": [1658826729, 1658913129],
-        "host_list": [{"host_id": "id1", "public_ip": "172.168.128.164"}]
+        "host_list": [{"host_id": 1, "public_ip": "172.168.128.164"}]
     },
     # input 3: empty host list
     {
@@ -41,9 +41,9 @@ test_cases = [
     # input 4: multi-host
     {
         "time_range": [1658826729, 1658913129],
-        "host_list": [{"host_id": "id1", "public_ip": "172.168.128.164", "instance_port": 9100},
-                      {"host_id": "id1", "public_ip": "172.168.128.164", "instance_port": 8080},
-                      {"host_id": "id2", "public_ip": "172.168.128.165"}]
+        "host_list": [{"host_id": 1, "public_ip": "172.168.128.164", "instance_port": 9100},
+                      {"host_id": 1, "public_ip": "172.168.128.164", "instance_port": 8080},
+                      {"host_id": 2, "public_ip": "172.168.128.165"}]
     }
 ]
 
@@ -165,7 +165,7 @@ raw_data_ret = [
 
 query_ret = [
     # ret 1: normal
-    {'id1': {
+    {1: {
         'go_gc_duration_seconds'
         '{instance="172.168.128.164:9100",quantile="0"}': [[1658913069, '0.00002582'],
                                                            [1658913084, '0.00002582'],
@@ -183,7 +183,7 @@ query_ret = [
                                                 [1658913129, '1']]}},
 
     # ret 2: 2 metric ret
-    {'id1': {
+    {1: {
         'promhttp_metric_handler_requests_total'
         '{code="503",instance="172.168.128.164:9100"}': [[1658913069, '28872'],
                                                          [1658913084, '28873'],
@@ -195,7 +195,7 @@ query_ret = [
                                                 [1658913129, '1']]}},
 
     # ret 3: no value in ret | no data
-    {'id1': {
+    {1: {
         'go_gc_duration_seconds'
         '{instance="172.168.128.164:9100",quantile="0"}': [[1658913069, '0.00002582'],
                                                            [1658913084, '0.00002582'],
@@ -207,7 +207,7 @@ query_ret = [
 
     # ret 4: multi-host
     {
-        'id1': {
+        1: {
             'go_gc_duration_seconds'
             '{instance="172.168.128.164:9100",quantile="0"}': [[1658913069, '0.00002582'],
                                                                [1658913084, '0.00002582'],
@@ -232,7 +232,7 @@ query_ret = [
             'promhttp_metric_handler_requests_total1{code="503",instance="172.168.128.164:8080"}': [],
             'up1{instance="172.168.128.164:8080"}': None
         },
-        'id2': {
+        2: {
             'go_gc_duration_seconds2'
             '{instance="172.168.128.165:9100",quantile="0"}': [[1658913069, '0.00002582'],
                                                                [1658913084, '0.00002582'],

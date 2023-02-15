@@ -39,7 +39,7 @@ class QueryCheckResultHost(BaseResponse):
                 {"code": int,
                 "msg": "string",
                 "result": {
-                    "host id": {
+                    1: {    // the key is host id
                         "host_ip": "ip address",
                         "host_name": "string",
                         "is_root": false

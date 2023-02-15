@@ -54,7 +54,7 @@ class CreateWorkflow(BaseResponse):
                     "app_id": "asd",
                     "input": {
                         "domain": "host_group_1",
-                        "hosts": ["host_id1", "host_id2"]
+                        "hosts": [1, 2]     // host id list
                     },
                     "step": 60,  // optional
                     "period": 900,  // optional

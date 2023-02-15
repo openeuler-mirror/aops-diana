@@ -152,7 +152,7 @@ class NetworkDiagnoseApp(App):
 
         return result
 
-    def do_multi_check(self, detail: Dict[str, str], data: Dict[str, List[str]]) -> Dict[Any, List[str]]:
+    def do_multi_check(self, detail: Dict[int, str], data: Dict[int, List[str]]) -> Dict[Any, List[str]]:
         """
         Args:
             detail: it's a map between metric and model. e.g.
@@ -199,8 +199,8 @@ class NetworkDiagnoseApp(App):
         return model.calculate(data)
 
     @staticmethod
-    def format_result(multi_check_result: Dict[str, List[Dict[str, str]]], diag_result: Tuple[str, str, str]) -> Dict[
-            str, List[Dict[str, str]]]:
+    def format_result(multi_check_result: Dict[int, List[Dict[str, str]]], diag_result: Tuple[str, str, str]) -> Dict[
+            int, List[Dict[str, str]]]:
         """
         Args:
             multi_check_result
