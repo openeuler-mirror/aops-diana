@@ -19,7 +19,7 @@ from diana.database.factory.table import HostCheckResult, AlertHost, DomainCheck
 from vulcanus.database.helper import sort_and_page
 from vulcanus.database.proxy import MysqlProxy
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.status import DATABASE_QUERY_ERROR, SUCCEED, NO_DATA, DATABASE_UPDATE_ERROR,\
+from vulcanus.restful.resp.state import DATABASE_QUERY_ERROR, SUCCEED, NO_DATA, DATABASE_UPDATE_ERROR,\
     DATABASE_INSERT_ERROR, DATABASE_DELETE_ERROR
 
 
@@ -201,7 +201,7 @@ class ResultDao(MysqlProxy):
             domain_info = self.session.query(
                 DomainCheckResult).filter(*filters).first()
             if not domain_info:
-                return  NO_DATA, dict()
+                return NO_DATA, dict()
             return SUCCEED, dict(result=domain_info.to_dict())
 
         res = {

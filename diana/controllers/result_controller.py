@@ -12,8 +12,7 @@
 # ******************************************************************************/
 import os
 from io import StringIO
-from flask import jsonify, Response, request
-from vulcanus.restful.status import DATABASE_CONNECT_ERROR
+from flask import Response, request
 from diana.database import SESSION
 from diana.database.dao.result_dao import ResultDao
 from diana.utils.schema.result import (
@@ -31,7 +30,8 @@ class QueryCheckResultHost(BaseResponse):
         Restful API: GET
     """
 
-    def get(self):
+    @BaseResponse.handle(schema=QueryCheckResultHostSchema, proxy=ResultDao(), session=SESSION)
+    def get(self, callback: ResultDao, **params):
         """
             Get check result by alert id
         Returns:
@@ -52,10 +52,8 @@ class QueryCheckResultHost(BaseResponse):
                         ...
                         ]}}}
         """
-        return jsonify(self.handle_request_db(QueryCheckResultHostSchema,
-                                              ResultDao(),
-                                              'query_result_host',
-                                              SESSION))
+        status_code, result = callback.query_result_host(params)
+        return self.response(code=status_code, data=result)
 
 
 class QueryCheckResultList(BaseResponse):
@@ -64,14 +62,13 @@ class QueryCheckResultList(BaseResponse):
         Restful API: GET
     """
 
-    def get(self):
+    @BaseResponse.handle(schema=QueryCheckResultListSchema, proxy=ResultDao(), session=SESSION)
+    def get(self, callback: ResultDao, **params):
         """
             get check result list from database
         """
-        return jsonify(self.handle_request_db(QueryCheckResultListSchema,
-                                              ResultDao(),
-                                              'query_result_list',
-                                              SESSION))
+        status_code, result = callback.query_result_list(params)
+        return self.response(code=status_code, data=result)
 
 
 class QueryResultTotalCount(BaseResponse):
@@ -80,12 +77,13 @@ class QueryResultTotalCount(BaseResponse):
         Restful API: GET
     """
 
-    def get(self):
+    @BaseResponse.handle(proxy=ResultDao(), session=SESSION)
+    def get(self, callback: ResultDao, **params):
         """
             get number of alerts from database
         """
-        return jsonify(
-            self.handle_request_db(None, ResultDao(), 'query_result_total_count', SESSION))
+        status_code, result = callback.query_result_total_count(params)
+        return self.response(code=status_code, data=result)
 
 
 class ConfirmCheckResult(BaseResponse):
@@ -94,14 +92,12 @@ class ConfirmCheckResult(BaseResponse):
         Restful API: POST
     """
 
-    def post(self):
+    @BaseResponse.handle(schema=CheckResultConfirmSchema, proxy=ResultDao(), session=SESSION)
+    def post(self, callback: ResultDao, **params):
         """
             confirm check result, modify confirmed value to True
         """
-        return jsonify(self.handle_request_db(CheckResultConfirmSchema,
-                                              ResultDao(),
-                                              'confirm_check_result',
-                                              SESSION))
+        return self.response(code=callback.confirm_check_result(params))
 
 
 class QueryDomainResultCount(BaseResponse):
@@ -110,11 +106,10 @@ class QueryDomainResultCount(BaseResponse):
         Restful API: GET
     """
 
-    def get(self):
-        return jsonify(self.handle_request_db(QueryResultDomainCountSchema,
-                                              ResultDao(),
-                                              'count_domain_check_result',
-                                              SESSION))
+    @BaseResponse.handle(schema=QueryResultDomainCountSchema, proxy=ResultDao(), session=SESSION)
+    def get(self, callback: ResultDao, **params):
+        status_code, result = callback.count_domain_check_result(params)
+        return self.response(code=status_code, data=result)
 
 
 class DownloadAlertReport(BaseResponse):
@@ -173,15 +168,14 @@ class DownloadAlertReport(BaseResponse):
             stream_content += _host + check_result
         return stream_content
 
-    def get(self):
+    @BaseResponse.handle(proxy=ResultDao(), session=SESSION)
+    def get(self, callback: ResultDao, **params):
         """
         Get file stream
         """
-        result_dao = ResultDao()
-        if not result_dao.connect(SESSION):
-            return jsonify(self.make_response(DATABASE_CONNECT_ERROR))
 
-        hosts = self.handle_request(None, result_dao, 'query_result_host')
-        domain_info = self.handle_request(None, result_dao, 'query_result_list')
-        stream_content = self._beautify_stream_content(hosts=hosts, domain=domain_info.get("result"))
-        return self._file_stream(content=stream_content, alert_id=request.args.get("alert_id",""))
+        _, hosts = callback.query_result_host(params)
+        _, domain_info = callback.query_result_list(params)
+        stream_content = self._beautify_stream_content(
+            hosts=hosts, domain=domain_info.get("result"))
+        return self._file_stream(content=stream_content, alert_id=request.args.get("alert_id", ""))

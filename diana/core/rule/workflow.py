@@ -22,10 +22,10 @@ import sqlalchemy
 
 from vulcanus.kafka.kafka_exception import ProducerInitError
 from vulcanus.kafka.producer import BaseProducer
-from vulcanus.restful.status import SUCCEED, PARTIAL_SUCCEED, DATABASE_INSERT_ERROR, \
+from vulcanus.restful.resp.state import SUCCEED, PARTIAL_SUCCEED, DATABASE_INSERT_ERROR, \
     TASK_EXECUTION_FAIL, DATABASE_QUERY_ERROR, DATABASE_CONNECT_ERROR
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.response import MyResponse
+from vulcanus.restful.response import BaseResponse
 from vulcanus.conf.constant import URL_FORMAT, QUERY_HOST_DETAIL
 from vulcanus.database.helper import operate
 
@@ -111,8 +111,10 @@ class Workflow:
         try:
             self._insert_domain(result_dao, alert_id, domain,
                                 alert_time, network_monitor_data, workflow["workflow_name"])
-            alert_host_ids = [host_id for host_id in network_monitor_data.get("host_result", dict()).keys()]
-            self._insert_alert_host(result_dao, workflow, alert_host_ids, alert_id)
+            alert_host_ids = [host_id for host_id in network_monitor_data.get(
+                "host_result", dict()).keys()]
+            self._insert_alert_host(
+                result_dao, workflow, alert_host_ids, alert_id)
 
             self._insert_host_check(
                 result_dao, network_monitor_data, alert_time, alert_id)
@@ -192,12 +194,12 @@ class Workflow:
             domain = workflow["input"]["domain"]
             for host_id, host in workflow["input"]["hosts"].items():
                 hosts.append(
-                    dict(host_id=host_id, public_ip=host.get('host_ip')))
+                    dict(host_id=host_id, host_ip=host.get('host_ip')))
         except KeyError:
             LOGGER.error("No valid 'hosts' are queried in workflow")
             return DATABASE_QUERY_ERROR
         return dict(workflow=workflow, hosts=hosts, domain=domain)
-    
+
     def _get_app_execute_result(self, time_range, hosts, workflow):
         data_dao = DataDao(configuration)
         if not data_dao.connect():
@@ -221,7 +223,8 @@ class Workflow:
         network_monitor_data = app.execute(model_info=workflow.get(
             "model_info"), detail=workflow.get("detail"), data=processed_data, time_range=time_range)
         if not network_monitor_data:
-            LOGGER.debug("No error message,workflow id: %s." % self.__workflow_id)
+            LOGGER.debug("No error message,workflow id: %s." %
+                         self.__workflow_id)
             return SUCCEED
 
         return network_monitor_data
@@ -237,12 +240,13 @@ class Workflow:
             int
         """
         workflow = self._get_workflow()
-        if isinstance(workflow,int):
+        if isinstance(workflow, int):
             return workflow
 
-        network_monitor_data = self._get_app_execute_result(time_range, workflow["hosts"], workflow["workflow"])
+        network_monitor_data = self._get_app_execute_result(
+            time_range, workflow["hosts"], workflow["workflow"])
         LOGGER.debug(network_monitor_data)
-        if isinstance(network_monitor_data,int):
+        if isinstance(network_monitor_data, int):
             return network_monitor_data
 
         storage_status, kafka_status = DATABASE_INSERT_ERROR, DATABASE_INSERT_ERROR
@@ -305,7 +309,8 @@ class Workflow:
         app_detail = Workflow.__get_app_detail(username, app_id, workflow_id)
 
         if assign_logic == "app":
-            workflow_detail = Workflow.__assign_by_app_logic(workflow_id, hosts_info, app_detail)
+            workflow_detail = Workflow.__assign_by_app_logic(
+                workflow_id, hosts_info, app_detail)
         else:
             workflow_detail = Workflow.__assign_by_builtin_logic(workflow_id, hosts_info,
                                                                  app_detail, steps)
@@ -319,11 +324,14 @@ class Workflow:
         support_steps = {"singlecheck", "multicheck", "diag"}
         app_proxy = AppDao(configuration)
         if not app_proxy.connect():
-            raise WorkflowModelAssignError("Connect to elasticsearch failed.", workflow_id)
+            raise WorkflowModelAssignError(
+                "Connect to elasticsearch failed.", workflow_id)
 
-        status_code, app_info = app_proxy.query_app({"username": username, "app_id": app_id})
+        status_code, app_info = app_proxy.query_app(
+            {"username": username, "app_id": app_id})
         if status_code != SUCCEED:
-            raise WorkflowModelAssignError("Query info of app '%s' failed." % app_id, workflow_id)
+            raise WorkflowModelAssignError(
+                "Query info of app '%s' failed." % app_id, workflow_id)
 
         try:
             steps = app_info["result"]["detail"].keys()
@@ -349,20 +357,23 @@ class Workflow:
         """
         manager_ip = configuration.zeus.get("IP")  # pylint: disable=E1101
         manager_port = configuration.zeus.get("PORT")  # pylint: disable=E1101
-        manager_url = URL_FORMAT % (manager_ip, manager_port, QUERY_HOST_DETAIL)
+        manager_url = URL_FORMAT % (
+            manager_ip, manager_port, QUERY_HOST_DETAIL)
         header = {
             "access_token": token,
             "Content-Type": "application/json; charset=UTF-8"
         }
         pyload = {"host_list": host_list, "basic": True}
 
-        response = MyResponse.get_response('POST', manager_url, pyload, header)
-        if response.get('code') != SUCCEED or not response.get("host_infos"):
-            raise WorkflowModelAssignError("Query host info of '%s' failed." % host_list, workflow_id)
+        response = BaseResponse.get_response(
+            'POST', manager_url, pyload, header)
+        if response.get('label') != SUCCEED or not response.get("data", dict()).get("host_infos"):
+            raise WorkflowModelAssignError(
+                "Query host info of '%s' failed." % host_list, workflow_id)
 
         result = {}
-        for host_info in response["host_infos"]:
-            result[host_info["host_id"]] = {"host_ip": host_info["public_ip"],
+        for host_info in response["data"]["host_infos"]:
+            result[host_info["host_id"]] = {"host_ip": host_info["host_ip"],
                                             "scene": host_info["scene"],
                                             "host_name": host_info["host_name"]}
         return result
@@ -372,7 +383,8 @@ class Workflow:
         """
         assign model by app logic
         """
-        workflow_detail = Workflow.__assign_model(workflow_id, hosts_info, app_detail)
+        workflow_detail = Workflow.__assign_model(
+            workflow_id, hosts_info, app_detail)
         return workflow_detail
 
     @staticmethod
@@ -388,7 +400,8 @@ class Workflow:
         if not steps:
             steps = app_detail.keys()
         new_app_detail = {step: None for step in steps}
-        result = Workflow.__assign_model(workflow_id, hosts_info, new_app_detail)
+        result = Workflow.__assign_model(
+            workflow_id, hosts_info, new_app_detail)
         return result
 
     @staticmethod
@@ -409,9 +422,11 @@ class Workflow:
         result = {}
         try:
             if "singlecheck" in step_detail:
-                result["singlecheck"] = Workflow.__assign_single_item_model(hosts_info, step_detail["singlecheck"])
+                result["singlecheck"] = Workflow.__assign_single_item_model(
+                    hosts_info, step_detail["singlecheck"])
             if "multicheck" in step_detail:
-                result["multicheck"] = Workflow.__assign_multi_item_model(hosts_info, step_detail["multicheck"])
+                result["multicheck"] = Workflow.__assign_multi_item_model(
+                    hosts_info, step_detail["multicheck"])
             if "diag" in step_detail:
                 result["diag"] = Workflow.__assign_cluster_diag_model()
         except ValueError as error:
@@ -453,7 +468,8 @@ class Workflow:
         """
         host_algo = {}
         for host_id, value in hosts_info.items():
-            host_algo[host_id] = ModelAssign.assign_multi_kpi_model(value["scene"], config)
+            host_algo[host_id] = ModelAssign.assign_multi_kpi_model(
+                value["scene"], config)
         return host_algo
 
     @staticmethod

@@ -22,7 +22,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from vulcanus.database.helper import judge_return_code, sort_and_page
 from vulcanus.database.proxy import MysqlProxy
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.status import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, \
+from vulcanus.restful.resp.state import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, \
     DATABASE_INSERT_ERROR, DATA_EXIST
 
 from diana.conf.constant import SYSTEM_USER

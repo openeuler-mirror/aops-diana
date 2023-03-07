@@ -30,7 +30,7 @@ from diana.utils.schema.default_mode import HostAddressSchema
 from diana.core.rule.default_workflow import DefaultWorkflow
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.response import BaseResponse
-from vulcanus.restful.status import SUCCEED
+from vulcanus.restful.resp.state import SUCCEED
 
 
 class Util:
@@ -72,7 +72,8 @@ class Util:
                                     "please check it and try again")
 
         except json.decoder.JSONDecodeError:
-            LOGGER.error('diana_default json file content structure is not what we expect')
+            LOGGER.error(
+                'diana_default json file content structure is not what we expect')
             raise ValueError("diana_default file content structure is not what we expect "
                              "please check it and try again")
 
@@ -93,7 +94,8 @@ class Util:
 
         if not period or not step:
             LOGGER.error("period or step may not be empty")
-            raise ValueError("period or step may not be empty, please check it and try again!")
+            raise ValueError(
+                "period or step may not be empty, please check it and try again!")
 
         if isinstance(period, int) and isinstance(step, int):
             return period, step
@@ -157,4 +159,5 @@ class DefaultScheduler(Scheduler):
         scheduler = APScheduler()
         scheduler.init_app(app)
         scheduler.start()
-        app.run(port=configuration.diana.get('PORT'), host=configuration.diana.get('IP'))
+        app.run(port=configuration.diana.get('PORT'),
+                host=configuration.diana.get('IP'))

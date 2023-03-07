@@ -10,8 +10,6 @@
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
-from flask import jsonify
-
 from diana.database import SESSION
 from diana.database.dao.algo_dao import AlgorithmDao
 from diana.utils.schema.algorithm import QueryAlgorithmListSchema, QueryAlgorithmSchema
@@ -23,8 +21,8 @@ class QueryAlgorithmList(BaseResponse):
         Interface for get algorithm list.
         Restful API: GET
     """
-
-    def get(self):
+    @BaseResponse.handle(schema=QueryAlgorithmListSchema, proxy=AlgorithmDao(), session=SESSION)
+    def get(self, callback: AlgorithmDao, **params):
         """
             Get algorithm info list
         Returns:
@@ -45,10 +43,8 @@ class QueryAlgorithmList(BaseResponse):
                     ]
                 }
         """
-        return jsonify(self.handle_request_db(QueryAlgorithmListSchema,
-                                              AlgorithmDao(),
-                                              'query_algorithm_list',
-                                              SESSION))
+        status_code, result = callback.query_algorithm_list(params)
+        return self.response(code=status_code, data=result)
 
 
 class QueryAlgorithm(BaseResponse):
@@ -57,7 +53,8 @@ class QueryAlgorithm(BaseResponse):
         Restful API: GET
     """
 
-    def get(self):
+    @BaseResponse.handle(schema=QueryAlgorithmSchema, proxy=AlgorithmDao, session=SESSION)
+    def get(self, callback: AlgorithmDao, **params):
         """
             Get algorithm info
         Returns:
@@ -73,7 +70,5 @@ class QueryAlgorithm(BaseResponse):
                         }
                     }
         """
-        return jsonify(self.handle_request_db(QueryAlgorithmSchema,
-                                              AlgorithmDao(),
-                                              'query_algorithm',
-                                              SESSION))
+        status_code, result = callback.query_algorithm(params)
+        return self.response(code=status_code, data=result)

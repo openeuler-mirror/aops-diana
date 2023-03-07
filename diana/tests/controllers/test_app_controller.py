@@ -20,12 +20,14 @@ from unittest import mock
 from flask import Flask
 from flask_restful import Api
 from flask.blueprints import Blueprint
+from diana.database.dao.app_dao import AppDao
 
-from vulcanus.restful.status import PARAM_ERROR, TOKEN_ERROR, DATABASE_CONNECT_ERROR, SUCCEED
+from vulcanus.restful.resp.state import PARAM_ERROR, TOKEN_ERROR, DATABASE_CONNECT_ERROR, SUCCEED
 
-import diana
 from diana.conf.constant import CREATE_APP, QUERY_APP, QUERY_APP_LIST
 from diana.url import SPECIFIC_URLS
+from vulcanus.restful.response import BaseResponse
+
 
 API = Api()
 for view, url in SPECIFIC_URLS['APP_URLS']:
@@ -69,7 +71,7 @@ class AppControllerTestCase(unittest.TestCase):
         }
         response = client.post(CREATE_APP, json=args,
                                headers=header_with_token).json
-        self.assertEqual(response['code'], PARAM_ERROR)
+        self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_create_app_should_return_token_error_when_input_wrong_token(self):
         args = {
@@ -82,9 +84,11 @@ class AppControllerTestCase(unittest.TestCase):
             "detail": {}
         }
         response = client.post(CREATE_APP, json=args, headers=header).json
-        self.assertEqual(response['code'], TOKEN_ERROR)
+        self.assertEqual(response['label'], TOKEN_ERROR)
 
-    def test_create_app_should_return_database_error_when_database_is_wrong(self):
+    @mock.patch.object(BaseResponse, 'verify_token')
+    @mock.patch.object(AppDao, 'connect')
+    def test_create_app_should_return_database_error_when_database_is_wrong(self, mock_connect, mock_token):
         args = {
             "app_name": "app1",
             "description": "xx",
@@ -94,13 +98,15 @@ class AppControllerTestCase(unittest.TestCase):
             },
             "detail": {}
         }
-        with mock.patch("diana.controllers.app_controller.operate") as mock_operate:
-            mock_operate.return_value = DATABASE_CONNECT_ERROR
-            response = client.post(CREATE_APP, json=args,
-                                   headers=header_with_token).json
-            self.assertEqual(response['code'], DATABASE_CONNECT_ERROR)
+        mock_connect.return_value = False
+        mock_token.return_value = SUCCEED
+        response = client.post(CREATE_APP, json=args,
+                               headers=header_with_token).json
+        self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
-    def test_create_app_should_return_app_id_when_correct(self):
+    @mock.patch.object(BaseResponse, 'verify_args')
+    @mock.patch.object(BaseResponse, 'verify_token')
+    def test_create_app_should_return_app_id_when_correct(self, mock_token, mock_args):
         args = {
             "app_name": "app1",
             "description": "xx",
@@ -108,14 +114,15 @@ class AppControllerTestCase(unittest.TestCase):
                 "type": "api",
                 "address": "execute"
             },
-            "detail": {}
+            "detail": {},
+            "username": "admin"
         }
-        with mock.patch("diana.controllers.app_controller.operate") as mock_operate:
-            mock_operate.return_value = SUCCEED
-            response = client.post(CREATE_APP, json=args,
-                                   headers=header_with_token).json
-            self.assertEqual(response['code'], SUCCEED)
-            self.assertIn('app_id', response.keys())
+        mock_token.return_value = SUCCEED
+        mock_args.return_value = SUCCEED
+        response = client.post(CREATE_APP, json=args,
+                               headers=header_with_token).json
+        self.assertEqual(response['label'], SUCCEED)
+        self.assertIn('app_id', response.keys())
 
     def test_query_app_list_should_return_error_when_request_method_is_wrong(self):
         response = client.post(QUERY_APP_LIST).json
@@ -125,26 +132,26 @@ class AppControllerTestCase(unittest.TestCase):
     def test_query_app_list_should_return_param_error_when_input_wrong_param(self):
         response = client.get(
             QUERY_APP_LIST + "?page=1&per_page='1'", headers=header_with_token).json
-        self.assertEqual(response['code'], PARAM_ERROR)
+        self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_query_app_list_should_return_token_error_when_input_wrong_token(self):
         response = client.get(
             QUERY_APP_LIST + "?page=1&per_page=2", headers=header).json
-        self.assertEqual(response['code'], TOKEN_ERROR)
+        self.assertEqual(response['label'], TOKEN_ERROR)
 
     def test_query_app_list_should_return_database_error_when_database_is_wrong(self):
         with mock.patch("vulcanus.restful.response.operate") as mock_operate:
             mock_operate.return_value = DATABASE_CONNECT_ERROR
             response = client.get(
                 QUERY_APP_LIST + "?page=1&per_page=2", headers=header_with_token).json
-            self.assertEqual(response['code'], DATABASE_CONNECT_ERROR)
+            self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     def test_query_app_list_should_return_succeed_when_correct(self):
         with mock.patch("vulcanus.restful.response.operate") as mock_operate:
             mock_operate.return_value = SUCCEED
             response = client.get(
                 QUERY_APP_LIST + "?page=1&per_page=2", headers=header_with_token).json
-            self.assertEqual(response['code'], SUCCEED)
+            self.assertEqual(response['label'], SUCCEED)
 
     def test_query_app_should_return_error_when_request_method_is_wrong(self):
         response = client.post(QUERY_APP).json
@@ -154,25 +161,27 @@ class AppControllerTestCase(unittest.TestCase):
     def test_query_app_should_return_param_error_when_input_wrong_param(self):
         response = client.get(QUERY_APP + "?app=1",
                               headers=header_with_token).json
-        self.assertEqual(response['code'], PARAM_ERROR)
+        self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_query_app_should_return_token_error_when_input_wrong_token(self):
         response = client.get(QUERY_APP + "?app_id='1'", headers=header).json
-        self.assertEqual(response['code'], TOKEN_ERROR)
+        self.assertEqual(response['label'], TOKEN_ERROR)
 
-    def test_query_app_should_return_database_error_when_database_is_wrong(self):
-        with mock.patch("vulcanus.restful.response.operate") as mock_operate:
-            mock_operate.return_value = DATABASE_CONNECT_ERROR
-            response = client.get(QUERY_APP + "?app_id='2'",
-                                  headers=header_with_token).json
-            self.assertEqual(response['code'], DATABASE_CONNECT_ERROR)
+    @mock.patch.object(BaseResponse, 'verify_token')
+    def test_query_app_should_return_database_error_when_database_is_wrong(self, mock_token):
+        mock_token.return_value = SUCCEED
+        response = client.get(QUERY_APP + "?app_id='2'",
+                              headers=header_with_token).json
+        self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
-    def test_query_app_should_return_succeed_when_correct(self):
-        with mock.patch("vulcanus.restful.response.operate") as mock_operate:
-            mock_operate.return_value = SUCCEED
-            response = client.get(QUERY_APP + "?app_id='3'",
-                                  headers=header_with_token).json
-            self.assertEqual(response['code'], SUCCEED)
+    @mock.patch.object(BaseResponse, 'verify_token')
+    @mock.patch.object(AppDao, 'connect')
+    def test_query_app_should_return_succeed_when_correct(self, mock_connect, mock_token):
+        mock_connect.return_value = True
+        mock_token.return_value = SUCCEED
+        response = client.get(QUERY_APP + "?app_id='3'",
+                              headers=header_with_token).json
+        self.assertEqual(response['label'], SUCCEED)
 
 
 if __name__ == '__main__':

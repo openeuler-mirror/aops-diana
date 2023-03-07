@@ -24,7 +24,7 @@ from diana.database.dao.data_dao import DataDao
 from diana.errors.workflow_error import WorkflowModelAssignError
 from diana.conf import configuration
 from diana.conf.constant import ALGO_LIST
-from vulcanus.restful.status import SUCCEED, DATABASE_CONNECT_ERROR, DATABASE_QUERY_ERROR,\
+from vulcanus.restful.resp.state import SUCCEED, DATABASE_CONNECT_ERROR, DATABASE_QUERY_ERROR,\
     TASK_EXECUTION_FAIL, PARTIAL_SUCCEED
 from diana.core.experiment.app import App
 from vulcanus.log.log import LOGGER
@@ -95,7 +95,7 @@ class DefaultWorkflow:
         host_list = list()
         for host_ip in hosts:
             host_list.append(
-                {"host_id": host_ip["ip"], "public_ip": host_ip["ip"], "instance_port": host_ip["port"]})
+                {"host_id": host_ip["ip"], "host_ip": host_ip["ip"], "instance_port": host_ip["port"]})
         return host_list
 
     def _get_app_execute_result(self, time_range):

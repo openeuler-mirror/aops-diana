@@ -19,7 +19,7 @@ from typing import Dict, Optional, Tuple
 
 from vulcanus.database.proxy import ElasticsearchProxy
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.status import (
+from vulcanus.restful.resp.state import (
     SUCCEED,
     DATABASE_INSERT_ERROR,
     DATABASE_QUERY_ERROR,

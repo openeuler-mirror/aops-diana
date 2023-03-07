@@ -18,11 +18,11 @@ Description:
 import uuid
 import time
 from typing import Dict, Tuple
-from flask import jsonify, request
+from flask import request
 
 from vulcanus.database.helper import operate
 from vulcanus.restful.response import BaseResponse
-from vulcanus.restful.status import SUCCEED, WORKFLOW_ASSIGN_MODEL_FAIL, DATABASE_CONNECT_ERROR
+from vulcanus.restful.resp.state import SUCCEED, WORKFLOW_ASSIGN_MODEL_FAIL, DATABASE_CONNECT_ERROR
 from vulcanus.log.log import LOGGER
 
 from diana.conf import configuration
@@ -41,8 +41,7 @@ class CreateWorkflow(BaseResponse):
     Create workflow interface, it's a post request.
     """
 
-    @staticmethod
-    def _handle(args: dict) -> Tuple[int, Dict[str, str]]:
+    def _handle(self, args: dict) -> Tuple[int, Dict[str, str]]:
         """
         Args:
             args: dict of workflow info, e.g.
@@ -66,7 +65,7 @@ class CreateWorkflow(BaseResponse):
         access_token = request.headers.get('access_token')
         try:
             host_infos, detail = Workflow.assign_model(args["username"], access_token, args["app_id"],
-                                            args["input"]["hosts"], "app")
+                                                       args["input"]["hosts"], "app")
         except (WorkflowModelAssignError, KeyError) as error:
             LOGGER.debug(error)
             return WORKFLOW_ASSIGN_MODEL_FAIL, result
@@ -85,14 +84,16 @@ class CreateWorkflow(BaseResponse):
         # change host id list to host info dict
         args["input"]["hosts"] = host_infos
 
-        status = operate(WorkflowDao(configuration), args, 'insert_workflow', SESSION)
+        status = operate(WorkflowDao(configuration),
+                         args, 'insert_workflow', SESSION)
         if status != SUCCEED:
             return status, result
 
         result['workflow_id'] = workflow_id
         return status, result
 
-    def post(self):
+    @BaseResponse.handle(schema=CreateWorkflowSchema)
+    def post(self, **params):
         """
         It's post request, step:
             1.verify token;
@@ -100,7 +101,8 @@ class CreateWorkflow(BaseResponse):
             3.add default args
             4.insert into database
         """
-        return jsonify(self.handle_request(CreateWorkflowSchema, self))
+        status_code, result = self._handle(params)
+        return self.response(code=status_code, data=result)
 
 
 class QueryWorkflow(BaseResponse):
@@ -108,16 +110,20 @@ class QueryWorkflow(BaseResponse):
     Query workflow interface, it's a get request.
     """
 
-    def get(self):
+    @BaseResponse.handle(schema=QueryWorkflowSchema)
+    def get(self, **params):
         """
         It's get request, step:
             1.verify token
             2.verify args
             3.get workflow from database
         """
-        return jsonify(self.handle_request_db(QueryWorkflowSchema,
-                                              WorkflowDao(configuration),
-                                              "get_workflow", SESSION))
+        workflow_proxy = WorkflowDao(configuration)
+        if not workflow_proxy.connect(SESSION):
+            return self.response(code=DATABASE_CONNECT_ERROR)
+
+        status_code, result = workflow_proxy.get_workflow(params)
+        return self.response(code=status_code, data=result)
 
 
 class QueryWorkflowList(BaseResponse):
@@ -125,24 +131,28 @@ class QueryWorkflowList(BaseResponse):
     Query workflow interface, it's a post request.
     """
 
-    def post(self):
+    @BaseResponse.handle(schema=QueryWorkflowListSchema)
+    def post(self, **params):
         """
         It's post request, step:
             1.verify token
             2.verify args
             3.get workflow list from database
         """
-        return jsonify(self.handle_request_db(QueryWorkflowListSchema,
-                                              WorkflowDao(configuration),
-                                              "get_workflow_list", SESSION))
+        workflow_proxy = WorkflowDao(configuration)
+        if not workflow_proxy.connect(SESSION):
+            return self.response(code=DATABASE_CONNECT_ERROR)
+
+        status_code, result = workflow_proxy.get_workflow_list(params)
+        return self.response(code=status_code, data=result)
 
 
 class ExecuteWorkflow(BaseResponse):
     """
     Execute workflow interface, it's a post request
     """
-    @staticmethod
-    def _handle(args: dict) -> int:
+
+    def _handle(self, args: dict) -> int:
         """
         Args:
             args: dict of workflow id, e.g.
@@ -169,10 +179,12 @@ class ExecuteWorkflow(BaseResponse):
             return SUCCEED
 
         workflow_proxy.update_workflow_status(workflow_id, "running")
-        check_scheduler.start_workflow(workflow_id, username, workflow_info["step"])
+        check_scheduler.start_workflow(
+            workflow_id, username, workflow_info["step"])
         return SUCCEED
 
-    def post(self):
+    @BaseResponse.handle(schema=ExecuteWorkflowSchema)
+    def post(self, **params):
         """
         It's a post request, step
             1.verify token
@@ -180,15 +192,15 @@ class ExecuteWorkflow(BaseResponse):
             3.check workflow exists or not, check status and change to running
             4.execute workflow
         """
-        return jsonify(self.handle_request(ExecuteWorkflowSchema, self))
+        return self.response(code=self._handle(params))
 
 
 class StopWorkflow(BaseResponse):
     """
     Stop workflow interface, it's a post request
     """
-    @staticmethod
-    def _handle(args: dict) -> int:
+
+    def _handle(self, args: dict) -> int:
         """
         Args:
             args: dict of workflow id, e.g.
@@ -217,7 +229,8 @@ class StopWorkflow(BaseResponse):
         check_scheduler.stop_workflow(workflow_id)
         return SUCCEED
 
-    def post(self):
+    @BaseResponse.handle(schema=StopWorkflowSchema)
+    def post(self, **params):
         """
         It's a post request, step
             1.verify token
@@ -225,7 +238,7 @@ class StopWorkflow(BaseResponse):
             3.check workflow exists or not, check status and change to hold
             4.stop workflow
         """
-        return jsonify(self.handle_request(StopWorkflowSchema, self))
+        return self.response(code=self._handle(params))
 
 
 class DeleteWorkflow(BaseResponse):
@@ -233,7 +246,8 @@ class DeleteWorkflow(BaseResponse):
     Delete workflow interface, it's a delete request.
     """
 
-    def delete(self):
+    @BaseResponse.handle(schema=DeleteWorkflowSchema)
+    def delete(self, **params):
         """
         It's delete request, step:
             1.verify token
@@ -241,17 +255,19 @@ class DeleteWorkflow(BaseResponse):
             3.check if workflow running
             4.delete workflow from database
         """
-        return jsonify(self.handle_request_db(DeleteWorkflowSchema,
-                                              WorkflowDao(configuration),
-                                              "delete_workflow", SESSION))
+        workflow_proxy = WorkflowDao(configuration)
+        if not workflow_proxy.connect(SESSION):
+            return self.response(code=DATABASE_CONNECT_ERROR)
+
+        return self.response(code=workflow_proxy.delete_workflow(params))
 
 
 class UpdateWorkflow(BaseResponse):
     """
     Update workflow interface, it's a post request.
     """
-    @staticmethod
-    def _handle(args: dict):
+
+    def _handle(self, args: dict):
         """
         create new model info based on the detail info given by request
         Args:
@@ -273,17 +289,19 @@ class UpdateWorkflow(BaseResponse):
         model_info = Workflow.get_model_info(args["detail"])
         args["model_info"] = model_info
 
-        status = operate(WorkflowDao(configuration), args, 'update_workflow', SESSION)
+        status = operate(WorkflowDao(configuration),
+                         args, 'update_workflow', SESSION)
         return status
 
-    def post(self):
+    @BaseResponse.handle(schema=UpdateWorkflowSchema)
+    def post(self, **params):
         """
         It's post request, step:
             1.verify token
             2.verify args
             3.update workflow in database
         """
-        return jsonify(self.handle_request(UpdateWorkflowSchema, self))
+        return self.response(code=self._handle(params))
 
 
 class IfHostInWorkflow(BaseResponse):
@@ -291,13 +309,17 @@ class IfHostInWorkflow(BaseResponse):
     if hosts exist workflow
     """
 
-    def post(self):
+    @BaseResponse.handle(schema=IfHostInWorkflowSchema)
+    def post(self, **params):
         """
         It's get request, step:
             1.verify token
             2.verify args
             3.check if host in a workflow
         """
-        return jsonify(self.handle_request_db(IfHostInWorkflowSchema,
-                                              WorkflowDao(configuration),
-                                              "if_host_in_workflow", SESSION))
+        workflow_proxy = WorkflowDao(configuration)
+        if not workflow_proxy.connect(SESSION):
+            return self.response(code=DATABASE_CONNECT_ERROR)
+        status_code, result = workflow_proxy.if_host_in_workflow(params)
+
+        return self.response(code=status_code, data=result)

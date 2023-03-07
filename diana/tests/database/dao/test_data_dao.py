@@ -18,7 +18,7 @@ Description: Test Data dao
 import unittest
 from unittest.mock import Mock, MagicMock
 from prometheus_api_client import PrometheusConnect, PrometheusApiClientException
-from vulcanus.restful.status import SUCCEED, PARAM_ERROR, PARTIAL_SUCCEED
+from vulcanus.restful.resp.state import SUCCEED, PARAM_ERROR, PARTIAL_SUCCEED
 from diana.database.dao.data_dao import DataDao
 from diana.conf import configuration
 
@@ -26,12 +26,12 @@ test_cases = [
     # input 1: normal
     {
         "time_range": [1658826729, 1658913129],
-        "host_list": [{"host_id": 1, "public_ip": "172.168.128.164", "instance_port": 9100}]
+        "host_list": [{"host_id": 1, "host_ip": "172.168.128.164", "instance_port": 9100}]
     },
     # input 2: no port
     {
         "time_range": [1658826729, 1658913129],
-        "host_list": [{"host_id": 1, "public_ip": "172.168.128.164"}]
+        "host_list": [{"host_id": 1, "host_ip": "172.168.128.164"}]
     },
     # input 3: empty host list
     {
@@ -41,9 +41,10 @@ test_cases = [
     # input 4: multi-host
     {
         "time_range": [1658826729, 1658913129],
-        "host_list": [{"host_id": 1, "public_ip": "172.168.128.164", "instance_port": 9100},
-                      {"host_id": 1, "public_ip": "172.168.128.164", "instance_port": 8080},
-                      {"host_id": 2, "public_ip": "172.168.128.165"}]
+        "host_list": [{"host_id": 1, "host_ip": "172.168.128.164", "instance_port": 9100},
+                      {"host_id": 1, "host_ip": "172.168.128.164",
+                          "instance_port": 8080},
+                      {"host_id": 2, "host_ip": "172.168.128.165"}]
     }
 ]
 
@@ -168,9 +169,12 @@ query_ret = [
     {1: {
         'go_gc_duration_seconds'
         '{instance="172.168.128.164:9100",quantile="0"}': [[1658913069, '0.00002582'],
-                                                           [1658913084, '0.00002582'],
-                                                           [1658913099, '0.00002582'],
-                                                           [1658913114, '0.00002738'],
+                                                           [1658913084,
+                                                               '0.00002582'],
+                                                           [1658913099,
+                                                               '0.00002582'],
+                                                           [1658913114,
+                                                               '0.00002738'],
                                                            [1658913129, '0.00002738']],
         'promhttp_metric_handler_requests_total'
         '{code="503",instance="172.168.128.164:9100"}': [[1658913069, '28872'],
@@ -179,7 +183,8 @@ query_ret = [
                                                          [1658913114, '28875'],
                                                          [1658913129, '28876']],
         'up{instance="172.168.128.164:9100"}': [[1658913069, '1'], [1658913084, '1'],
-                                                [1658913099, '1'], [1658913114, '1'],
+                                                [1658913099, '1'], [
+                                                    1658913114, '1'],
                                                 [1658913129, '1']]}},
 
     # ret 2: 2 metric ret
@@ -191,16 +196,20 @@ query_ret = [
                                                          [1658913114, '28875'],
                                                          [1658913129, '28876']],
         'up{instance="172.168.128.164:9100"}': [[1658913069, '1'], [1658913084, '1'],
-                                                [1658913099, '1'], [1658913114, '1'],
+                                                [1658913099, '1'], [
+                                                    1658913114, '1'],
                                                 [1658913129, '1']]}},
 
     # ret 3: no value in ret | no data
     {1: {
         'go_gc_duration_seconds'
         '{instance="172.168.128.164:9100",quantile="0"}': [[1658913069, '0.00002582'],
-                                                           [1658913084, '0.00002582'],
-                                                           [1658913099, '0.00002582'],
-                                                           [1658913114, '0.00002738'],
+                                                           [1658913084,
+                                                               '0.00002582'],
+                                                           [1658913099,
+                                                               '0.00002582'],
+                                                           [1658913114,
+                                                               '0.00002738'],
                                                            [1658913129, '0.00002738']],
         'promhttp_metric_handler_requests_total{code="503",instance="172.168.128.164:9100"}': [],
         'up{instance="172.168.128.164:9100"}': None}},
@@ -210,9 +219,12 @@ query_ret = [
         1: {
             'go_gc_duration_seconds'
             '{instance="172.168.128.164:9100",quantile="0"}': [[1658913069, '0.00002582'],
-                                                               [1658913084, '0.00002582'],
-                                                               [1658913099, '0.00002582'],
-                                                               [1658913114, '0.00002738'],
+                                                               [1658913084,
+                                                                   '0.00002582'],
+                                                               [1658913099,
+                                                                   '0.00002582'],
+                                                               [1658913114,
+                                                                   '0.00002738'],
                                                                [1658913129, '0.00002738']],
             'promhttp_metric_handler_requests_total'
             '{code="503",instance="172.168.128.164:9100"}': [[1658913069, '28872'],
@@ -221,13 +233,17 @@ query_ret = [
                                                              [1658913114, '28875'],
                                                              [1658913129, '28876']],
             'up{instance="172.168.128.164:9100"}': [[1658913069, '1'], [1658913084, '1'],
-                                                    [1658913099, '1'], [1658913114, '1'],
+                                                    [1658913099, '1'], [
+                                                        1658913114, '1'],
                                                     [1658913129, '1']],
             'go_gc_duration_seconds1'
             '{instance="172.168.128.164:8080",quantile="0"}': [[1658913069, '0.00002582'],
-                                                               [1658913084, '0.00002582'],
-                                                               [1658913099, '0.00002582'],
-                                                               [1658913114, '0.00002738'],
+                                                               [1658913084,
+                                                                   '0.00002582'],
+                                                               [1658913099,
+                                                                   '0.00002582'],
+                                                               [1658913114,
+                                                                   '0.00002738'],
                                                                [1658913129, '0.00002738']],
             'promhttp_metric_handler_requests_total1{code="503",instance="172.168.128.164:8080"}': [],
             'up1{instance="172.168.128.164:8080"}': None
@@ -235,9 +251,12 @@ query_ret = [
         2: {
             'go_gc_duration_seconds2'
             '{instance="172.168.128.165:9100",quantile="0"}': [[1658913069, '0.00002582'],
-                                                               [1658913084, '0.00002582'],
-                                                               [1658913099, '0.00002582'],
-                                                               [1658913114, '0.00002738'],
+                                                               [1658913084,
+                                                                   '0.00002582'],
+                                                               [1658913099,
+                                                                   '0.00002582'],
+                                                               [1658913114,
+                                                                   '0.00002738'],
                                                                [1658913129, '0.00002738']],
             'promhttp_metric_handler_requests_total2{code="503",instance="172.168.128.165:9100"}': [],
             'up2{instance="172.168.128.165:9100"}': None
@@ -259,8 +278,10 @@ class DataDaoTestcase(unittest.TestCase):
         self.dao.close()
 
     def test_query_data_should_return_succeed_when_input_is_normal(self):
-        self.dao._prom.custom_query = MagicMock(return_value=metric_list_ret[0])
-        self.dao._prom.custom_query_range = MagicMock(side_effect=raw_data_ret[0])
+        self.dao._prom.custom_query = MagicMock(
+            return_value=metric_list_ret[0])
+        self.dao._prom.custom_query_range = MagicMock(
+            side_effect=raw_data_ret[0])
 
         ret, data_list = self.dao.query_data(test_cases[0]["time_range"],
                                              test_cases[0]["host_list"])
@@ -268,8 +289,10 @@ class DataDaoTestcase(unittest.TestCase):
         self.assertDictEqual(data_list, query_ret[0])
 
     def test_query_data_should_return_succeed_when_host_without_port(self):
-        self.dao._prom.custom_query = MagicMock(return_value=metric_list_ret[0])
-        self.dao._prom.custom_query_range = MagicMock(side_effect=raw_data_ret[0])
+        self.dao._prom.custom_query = MagicMock(
+            return_value=metric_list_ret[0])
+        self.dao._prom.custom_query_range = MagicMock(
+            side_effect=raw_data_ret[0])
 
         ret, data_list = self.dao.query_data(test_cases[1]["time_range"],
                                              test_cases[1]["host_list"])
@@ -284,12 +307,13 @@ class DataDaoTestcase(unittest.TestCase):
 
     def test_query_data_should_return_None_when_no_metric_get(self):
         self.dao._prom.custom_query = MagicMock(return_value=[])
-        self.dao._prom.custom_query_range = MagicMock(side_effect=raw_data_ret[0])
+        self.dao._prom.custom_query_range = MagicMock(
+            side_effect=raw_data_ret[0])
 
         ret, data_list = self.dao.query_data(test_cases[1]["time_range"],
                                              test_cases[1]["host_list"])
         self.assertEqual(PARTIAL_SUCCEED, ret)
-        self.assertDictEqual(data_list, {'id1': None})
+        self.assertDictEqual(data_list, {1: None})
 
     def test_query_data_should_return_None_when_metric_list_failed(self):
         self.dao._prom.custom_query = MagicMock(return_value=None)
@@ -297,11 +321,13 @@ class DataDaoTestcase(unittest.TestCase):
         ret, data_list = self.dao.query_data(test_cases[0]["time_range"],
                                              test_cases[0]["host_list"])
         self.assertEqual(PARTIAL_SUCCEED, ret)
-        self.assertDictEqual(data_list, {'id1': None})
+        self.assertDictEqual(data_list, {1: None})
 
     def test_query_data_should_return_None_when_metric_list_invalid(self):
-        self.dao._prom.custom_query = MagicMock(return_value=metric_list_ret[1])
-        self.dao._prom.custom_query_range = MagicMock(side_effect=raw_data_ret[1])
+        self.dao._prom.custom_query = MagicMock(
+            return_value=metric_list_ret[1])
+        self.dao._prom.custom_query_range = MagicMock(
+            side_effect=raw_data_ret[1])
 
         ret, data_list = self.dao.query_data(test_cases[0]["time_range"],
                                              test_cases[0]["host_list"])
@@ -309,24 +335,31 @@ class DataDaoTestcase(unittest.TestCase):
         self.assertDictEqual(data_list, query_ret[1])
 
     def test_query_data_should_raise_when_metric_list_exception(self):
-        self.dao._prom.custom_query = MagicMock(return_value=PrometheusApiClientException)
-        self.dao._prom.custom_query_range = MagicMock(side_effect=raw_data_ret[0])
+        self.dao._prom.custom_query = MagicMock(
+            return_value=PrometheusApiClientException)
+        self.dao._prom.custom_query_range = MagicMock(
+            side_effect=raw_data_ret[0])
 
-        self.dao.query_data(test_cases[0]["time_range"], test_cases[0]["host_list"])
+        self.dao.query_data(
+            test_cases[0]["time_range"], test_cases[0]["host_list"])
         self.assertRaises(PrometheusApiClientException)
 
     def test_query_data_should_raise_when_raw_data_exception(self):
-        self.dao._prom.custom_query = MagicMock(return_value=metric_list_ret[0])
-        self.dao._prom.custom_query_range = MagicMock(side_effect=PrometheusApiClientException)
+        self.dao._prom.custom_query = MagicMock(
+            return_value=metric_list_ret[0])
+        self.dao._prom.custom_query_range = MagicMock(
+            side_effect=PrometheusApiClientException)
 
-        self.dao.query_data(test_cases[0]["time_range"], test_cases[0]["host_list"])
+        self.dao.query_data(
+            test_cases[0]["time_range"], test_cases[0]["host_list"])
         self.assertRaises(PrometheusApiClientException)
 
     def test_query_data_should_return_id_key_when_mutihost(self):
         self.dao._prom.custom_query = MagicMock(side_effect=[metric_list_ret[0],
                                                              metric_list_ret[2],
                                                              metric_list_ret[3]])
-        self.dao._prom.custom_query_range = MagicMock(side_effect=raw_data_ret[3])
+        self.dao._prom.custom_query_range = MagicMock(
+            side_effect=raw_data_ret[3])
 
         ret, data_list = self.dao.query_data(test_cases[3]["time_range"],
                                              test_cases[3]["host_list"])

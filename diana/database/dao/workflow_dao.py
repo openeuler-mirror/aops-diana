@@ -26,7 +26,7 @@ from elasticsearch import ElasticsearchException
 from vulcanus.database.helper import sort_and_page
 from vulcanus.database.proxy import ElasticsearchProxy, MysqlProxy
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.status import (
+from vulcanus.restful.resp.state import (
     SUCCEED,
     DATABASE_INSERT_ERROR,
     DATABASE_QUERY_ERROR,
@@ -132,7 +132,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         username = data["username"]
 
         if self._if_workflow_name_exists(workflow_name, username):
-            LOGGER.debug("Insert workflow failed due to workflow name already exists.")
+            LOGGER.debug(
+                "Insert workflow failed due to workflow name already exists.")
             return DATA_EXIST
 
         data.pop("alert")
@@ -152,7 +153,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         workflow_id = data["workflow_id"]
         try:
             self._insert_workflow_host_table(workflow_id, hosts_info)
-            status_code = self._insert_workflow_into_es(username, workflow_id, detail, model_info)
+            status_code = self._insert_workflow_into_es(
+                username, workflow_id, detail, model_info)
             if status_code != SUCCEED:
                 raise ElasticsearchException("Insert workflow '%s' in to elasticsearch failed."
                                              % workflow_id)
@@ -225,7 +227,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             "model_info": model_info
         }
 
-        res = ElasticsearchProxy.insert(self, index, data, document_id=workflow_id)
+        res = ElasticsearchProxy.insert(
+            self, index, data, document_id=workflow_id)
         if res:
             LOGGER.info("Add workflow '%s' info into es succeed.", workflow_id)
             return SUCCEED
@@ -298,12 +301,14 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             "result": []
         }
 
-        workflow_query = self._query_workflow_list(data["username"], data.get("filter"))
+        workflow_query = self._query_workflow_list(
+            data["username"], data.get("filter"))
         total_count = len(workflow_query.all())
         if not total_count:
             return result
 
-        direction, page, per_page = data.get('direction'), data.get('page'), data.get('per_page')
+        direction, page, per_page = data.get(
+            'direction'), data.get('page'), data.get('per_page')
         if data.get("sort"):
             sort_column = getattr(Workflow, data["sort"])
         else:
@@ -313,7 +318,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
 
         workflow_id_list = [row.workflow_id for row in processed_query]
         workflow_host = self._get_workflow_hosts(workflow_id_list)
-        result['result'] = self.__process_workflow_list_info(processed_query, workflow_host)
+        result['result'] = self.__process_workflow_list_info(
+            processed_query, workflow_host)
         result['total_page'] = total_page
         result['total_count'] = total_count
         return result
@@ -374,7 +380,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
 
         workflow_host = defaultdict(dict)
         for row in hosts_query:
-            workflow_host[row.workflow_id][row.host_id] = {"host_ip": row.host_ip, "host_name": row.host_name}
+            workflow_host[row.workflow_id][row.host_id] = {
+                "host_ip": row.host_ip, "host_name": row.host_name}
 
         return dict(workflow_host)
 
@@ -427,7 +434,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             return status_code, result
         except SQLAlchemyError as error:
             LOGGER.error(error)
-            LOGGER.error("Get all users' workflow list failed due to internal error.")
+            LOGGER.error(
+                "Get all users' workflow list failed due to internal error.")
             return DATABASE_QUERY_ERROR, result
 
     def _get_all_workflow_list(self, status: str) -> Tuple[int, dict]:
@@ -523,7 +531,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         Returns:
             int, dict
         """
-        basic_info = self._get_workflow_basic_info(data["username"], data["workflow_id"])
+        basic_info = self._get_workflow_basic_info(
+            data["username"], data["workflow_id"])
         status_code, detail_info = self._get_workflow_detail_info(data)
         if status_code != SUCCEED:
             return status_code, {}
@@ -632,14 +641,16 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         except (SQLAlchemyError, ElasticsearchException) as error:
             self.session.rollback()
             LOGGER.error(error)
-            LOGGER.error("Updating workflow info failed due to internal error.")
+            LOGGER.error(
+                "Updating workflow info failed due to internal error.")
             return DATABASE_UPDATE_ERROR
 
     def _update_workflow(self, data):
         """
         update workflow basic info into mysql, detail info into elasticsearch
         """
-        workflow_exist = self._if_workflow_id_exists(data["workflow_id"], data["username"])
+        workflow_exist = self._if_workflow_id_exists(
+            data["workflow_id"], data["username"])
         if not workflow_exist:
             return NO_DATA
 
@@ -713,7 +724,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
 
         username = data["username"]
         workflow_id = data["workflow_id"]
-        filters = {Workflow.workflow_id == workflow_id, Workflow.username == username}
+        filters = {Workflow.workflow_id ==
+                   workflow_id, Workflow.username == username}
         self.session.query(Workflow).filter(*filters).delete()
 
         query_body = self._general_body()
@@ -725,7 +737,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             LOGGER.debug("Delete workflow from elasticsearch succeed.")
             return SUCCEED
 
-        LOGGER.error("Delete workflow from elasticsearch failed due to internal error.")
+        LOGGER.error(
+            "Delete workflow from elasticsearch failed due to internal error.")
         return DATABASE_DELETE_ERROR
 
     def _if_workflow_running(self, data) -> int:
@@ -735,11 +748,14 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         username = data["username"]
         workflow_id = data["workflow_id"]
 
-        filters = {Workflow.username == username, Workflow.workflow_id == workflow_id}
-        workflow_query = self.session.query(Workflow.status).filter(*filters).one()
+        filters = {Workflow.username == username,
+                   Workflow.workflow_id == workflow_id}
+        workflow_query = self.session.query(
+            Workflow.status).filter(*filters).one()
 
         if workflow_query.status in ("running", "recommending"):
-            LOGGER.info("Delete workflow '%s' failed because it's still %s" % (workflow_id, workflow_query.status))
+            LOGGER.info("Delete workflow '%s' failed because it's still %s" % (
+                workflow_id, workflow_query.status))
             return True
         return False
 
@@ -772,7 +788,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             return SUCCEED, {"result": result}
         except SQLAlchemyError as error:
             LOGGER.error(error)
-            LOGGER.error("Query if a host exists in a workflow failed due to internal error.")
+            LOGGER.error(
+                "Query if a host exists in a workflow failed due to internal error.")
             return DATABASE_QUERY_ERROR, result
 
     def _query_host_in_workflow(self, data):
