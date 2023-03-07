@@ -21,10 +21,12 @@ from flask import Flask
 from flask_restful import Api
 from flask.blueprints import Blueprint
 
-from vulcanus.restful.status import PARAM_ERROR, TOKEN_ERROR, DATABASE_CONNECT_ERROR, SUCCEED
+from vulcanus.restful.resp.state import SUCCEED, PARAM_ERROR, TOKEN_ERROR
 
 from diana.conf.constant import IDENTIFY_SCENE
 from diana.url import SPECIFIC_URLS
+from vulcanus.restful.response import BaseResponse
+
 
 API = Api()
 for view, url in SPECIFIC_URLS['SCENE_URLS']:
@@ -70,8 +72,9 @@ class SceneControllerTestCase(unittest.TestCase):
                 ]
             }
         }
-        response = client.post(IDENTIFY_SCENE, json=args, headers=header_with_token).json
-        self.assertEqual(response['code'], PARAM_ERROR)
+        response = client.post(IDENTIFY_SCENE, json=args,
+                               headers=header_with_token).json
+        self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_get_scene_should_return_token_error_when_input_wrong_token(self):
         args = {
@@ -87,9 +90,10 @@ class SceneControllerTestCase(unittest.TestCase):
             }
         }
         response = client.post(IDENTIFY_SCENE, json=args, headers=header).json
-        self.assertEqual(response['code'], TOKEN_ERROR)
+        self.assertEqual(response['label'], TOKEN_ERROR)
 
-    def test_get_scene_should_return_scene_when_given_correct_params(self):
+    @mock.patch.object(BaseResponse, 'verify_token')
+    def test_get_scene_should_return_scene_when_given_correct_params(self, mock_token):
         args = {
             "applications": ["nginx"],
             "collect_items": {
@@ -102,5 +106,7 @@ class SceneControllerTestCase(unittest.TestCase):
                 ]
             }
         }
-        response = client.post(IDENTIFY_SCENE, json=args, headers=header_with_token).json
-        self.assertEqual(response['code'], SUCCEED)
+        mock_token.return_value = SUCCEED
+        response = client.post(IDENTIFY_SCENE, json=args,
+                               headers=header_with_token).json
+        self.assertEqual(response['label'], SUCCEED)

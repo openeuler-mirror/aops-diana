@@ -20,7 +20,7 @@ from importlib import import_module
 from typing import Dict, List, Any
 
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.status import SUCCEED
+from vulcanus.restful.resp.state import SUCCEED
 from diana.conf.constant import ALGO_LIST
 from diana.core.experiment.model import load_model
 from diana.database import SESSION
@@ -136,7 +136,8 @@ class App:
                 return False
 
         for model_id, path_info in models.items():
-            model = load_model(model_id, path_info['model_path'], path_info['algo_path'])
+            model = load_model(
+                model_id, path_info['model_path'], path_info['algo_path'])
             if model is None:
                 return False
             self.model[model_id] = model

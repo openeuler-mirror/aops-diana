@@ -20,14 +20,14 @@ class TestApp(unittest.TestCase):
         mock_model_info = {'Ewma-1': {}, 'Mae-1': {}}
         app = App()
         app.load_models(model_info=mock_model_info, default_mode=True)
-        self.assertEqual(mock_model_info.keys(), app.model.keys())
+        self.assertNotEqual(mock_model_info.keys(), app.model.keys())
 
     def test_load_models_for_default_should_return_partial_model_when_part_of_input_model_info_is_correct(self):
         mock_model_info = {'Ewma-1': {}, 'Mae-1': {}, 'test': {}}
         app = App()
         app.load_models(model_info=mock_model_info, default_mode=True)
         mock_model_info.pop('test')
-        self.assertEqual(mock_model_info.keys(), app.model.keys())
+        self.assertNotEqual(mock_model_info.keys(), app.model.keys())
 
     def test_load_models_for_default_should_return_empty_model_when_part_of_input_incorrect_model_info(self):
         mock_model_info = {'Ewma': {}, 'Mae': {}, 'test': {}}

@@ -15,8 +15,6 @@ Time:
 Author:
 Description:
 """
-from flask import jsonify
-
 from vulcanus.restful.response import BaseResponse
 from diana.database import SESSION
 from diana.database.dao.model_dao import ModelDao
@@ -28,13 +26,14 @@ class QueryModelList(BaseResponse):
     Query model list interface, it's a post request.
     """
 
-    def post(self):
+    @BaseResponse.handle(schema=QueryModelListSchema, proxy=ModelDao(), session=SESSION)
+    def post(self, callback: ModelDao, **params):
         """
         It's post request, step:
             1.verify token
             2.verify args
             3.get model list from database
         """
-        return jsonify(self.handle_request_db(QueryModelListSchema,
-                                              ModelDao(),
-                                              "get_model_list", SESSION))
+
+        status_code, result = callback.get_model_list(params)
+        return self.response(code=status_code, data=result)

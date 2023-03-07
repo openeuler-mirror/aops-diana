@@ -21,7 +21,7 @@ import datetime
 from prometheus_api_client import PrometheusApiClientException
 from vulcanus.database.proxy import PromDbProxy
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.status import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, PARAM_ERROR, PARTIAL_SUCCEED
+from vulcanus.restful.resp.state import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, PARAM_ERROR, PARTIAL_SUCCEED
 
 
 class DataDao(PromDbProxy):
@@ -99,14 +99,14 @@ class DataDao(PromDbProxy):
         """
 
         query_ip = query_ip["query_ip"]
-        query_host = {"host_id": "query_host_id", "public_ip": query_ip}
-        
+        query_host = {"host_id": "query_host_id", "host_ip": query_ip}
+
         query_metric_names = []
         res = {
             'results': query_metric_names
         }
 
-        host_ip = query_host["public_ip"]
+        host_ip = query_host["host_ip"]
         host_port = query_host.get("instance_port", self.default_instance_port)
 
         ret, metric_list = self.query_metric_list_of_host(host_ip, host_port)
@@ -120,7 +120,6 @@ class DataDao(PromDbProxy):
                 query_metric_names.append(metric)
 
         return ret, res
-    
 
     def query_metric_list(self, data: Dict[str, str]) -> Tuple[int, dict]:
         """
@@ -152,34 +151,32 @@ class DataDao(PromDbProxy):
         query_ip = data.get('query_ip')
         query_metric = data.get('metric_names')
 
-        query_host = {"host_id": "query_host_id", "public_ip": query_ip}
-        
+        query_host = {"host_id": "query_host_id", "host_ip": query_ip}
+
         query_metric_list = {}
         res = {
             'results': query_metric_list
         }
 
-        host_ip = query_host["public_ip"]
+        host_ip = query_host["host_ip"]
         host_port = query_host.get("instance_port", self.default_instance_port)
 
         ret, metric_list = self.query_metric_list_of_host(host_ip, host_port, )
 
         if ret != SUCCEED:
             LOGGER.warning("Host metric list query error")
-            return ret, res   
-
+            return ret, res
 
         for query_metric_name in query_metric:
             query_metric_list[query_metric_name] = []
             for metric in metric_list:
                 metric_name = metric.split('{')[0]
                 if metric_name != query_metric_name:
-                   continue 
+                    continue
                 query_metric_list[query_metric_name].append(metric)
 
         return ret, res
-    
-    
+
     def query_metric_data(self, data: Dict[str, str]) -> Tuple[int, dict]:
         """
         Query metric data
@@ -232,11 +229,11 @@ class DataDao(PromDbProxy):
         query_ip = data.get('query_ip')
         query_info = data.get('query_info')
 
-        query_host = {"host_id": "query_host_id", "public_ip": query_ip}
+        query_host = {"host_id": "query_host_id", "host_ip": query_ip}
 
-        host_ip = query_host["public_ip"]
+        host_ip = query_host["host_ip"]
         host_port = query_host.get("instance_port", self.default_instance_port)
-        
+
         query_host_list = [query_host]
         query_data = {}
         res = {
@@ -250,7 +247,7 @@ class DataDao(PromDbProxy):
         query_range_seconds = time_range[1] - time_range[0]
         total_query_times = query_range_seconds/query_range_step
 
-        while(total_query_times > 11000):
+        while (total_query_times > 11000):
             query_range_step += 15
             total_query_times = query_range_seconds/query_range_step
 
@@ -258,27 +255,26 @@ class DataDao(PromDbProxy):
             if key_a in thedict:
                 thedict[key_a].update({key_b: val})
             else:
-                thedict.update({key_a:{key_b: val}})
+                thedict.update({key_a: {key_b: val}})
 
         if not query_info:
             return SUCCEED, res
-        
+
         for metric_name, metric_list in query_info.items():
             if not metric_list:
-                _, metric_list = self.query_metric_list_of_host(host_ip, host_port, metric_name)
+                _, metric_list = self.query_metric_list_of_host(
+                    host_ip, host_port, metric_name)
             if not metric_list:
                 query_data[metric_name] = []
             for metric_info in metric_list:
                 data_status, monitor_data = self.query_data(
-            time_range=time_range, host_list=query_host_list, metric=metric_info, adjusted_range_step=query_range_step)
+                    time_range=time_range, host_list=query_host_list, metric=metric_info, adjusted_range_step=query_range_step)
                 values = []
                 if data_status == SUCCEED:
                     values = monitor_data[query_host["host_id"]][metric_info]
                 add_two_dim_dict(query_data, metric_name, metric_info, values)
-        
 
         return SUCCEED, res
-
 
     def query_data(self, time_range: List[int], host_list: list, metric: Optional[str] = None, adjusted_range_step: Optional[int] = None) -> Tuple[int, Dict]:
         """
@@ -286,9 +282,9 @@ class DataDao(PromDbProxy):
         Args:
             time_range(list): time range
             host_list(list): host list, If the port is not specified, the default value is used
-                [{"host_id": "id1", "public_ip": "172.168.128.164", "instance_port": 9100},
-                 {"host_id": "id1", "public_ip": "172.168.128.164", "instance_port": 8080},
-                 {"host_id": "id2", "public_ip": "172.168.128.165"}]
+                [{"host_id": "id1", "host_ip": "172.168.128.164", "instance_port": 9100},
+                 {"host_id": "id1", "host_ip": "172.168.128.164", "instance_port": 8080},
+                 {"host_id": "id2", "host_ip": "172.168.128.165"}]
 
         Returns:
             ret(int): query ret
@@ -312,17 +308,19 @@ class DataDao(PromDbProxy):
         status = SUCCEED
         for host in host_list:
             host_id = host["host_id"]
-            host_ip = host["public_ip"]
+            host_ip = host["host_ip"]
             host_port = host.get("instance_port", self.default_instance_port)
             if host_id not in host_data_list.keys():
                 host_data_list[host_id] = None
 
-            ret, metric_list = self.query_metric_list_of_host(host_ip, host_port, metric)
+            ret, metric_list = self.query_metric_list_of_host(
+                host_ip, host_port, metric)
             if ret != SUCCEED:
                 status = PARTIAL_SUCCEED
                 host_data_list[host_id] = None
                 continue
-            ret, data_list = self.__query_data_by_host(metric_list, time_range, adjusted_range_step)
+            ret, data_list = self.__query_data_by_host(
+                metric_list, time_range, adjusted_range_step)
             if ret != SUCCEED:
                 status = PARTIAL_SUCCEED
             if not host_data_list[host_id]:
@@ -331,7 +329,6 @@ class DataDao(PromDbProxy):
                 host_data_list[host_id].update(data_list)
 
         return status, host_data_list
-
 
     def __parse_metric_data(self, metric_data: List) -> List[str]:
         """
@@ -385,8 +382,8 @@ class DataDao(PromDbProxy):
         if metric is not None:
             if metric.find('{') != -1:
                 query_str = metric
-            else :
-                query_str = metric + query_str         
+            else:
+                query_str = metric + query_str
         try:
             data = self._prom.custom_query(
                 query=query_str
@@ -394,13 +391,14 @@ class DataDao(PromDbProxy):
             if not data:
                 if query_str.startswith('{'):
                     LOGGER.error("Query metric list result is empty. "
-                                "Can not get metric list of host %s:%s " % (host_ip, host_port))
+                                 "Can not get metric list of host %s:%s " % (host_ip, host_port))
                 return NO_DATA, []
             metric_list = self.__parse_metric_data(data)
             return SUCCEED, metric_list
 
         except (ValueError, TypeError, PrometheusApiClientException) as error:
-            LOGGER.error("host %s:%d Prometheus query metric list failed. %s" % (host_ip, host_port, error))
+            LOGGER.error("host %s:%d Prometheus query metric list failed. %s" % (
+                host_ip, host_port, error))
             return DATABASE_QUERY_ERROR, []
 
     def __query_data_by_host(self, metrics_list: List[str], time_range: List[int], adjusted_range_step: Optional[int] = None) -> Tuple[int, Dict]:
@@ -441,8 +439,8 @@ class DataDao(PromDbProxy):
                 )
                 if not data or "values" not in data[0]:
                     LOGGER.debug("Query data result is empty. "
-                                "metric %s in %d-%d doesn't record in the prometheus " % (
-                                    metric, time_range[0], time_range[1]))
+                                 "metric %s in %d-%d doesn't record in the prometheus " % (
+                                     metric, time_range[0], time_range[1]))
                     data_list[metric] = None
                     ret = PARTIAL_SUCCEED
                     continue

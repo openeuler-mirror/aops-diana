@@ -15,20 +15,19 @@ Time:
 Author:
 Description:
 """
-from typing import Dict, Tuple
-from flask import jsonify
-
 from vulcanus.restful.response import BaseResponse
-from vulcanus.restful.status import SUCCEED
+from vulcanus.restful.resp.state import SUCCEED
 
 from diana.core.experiment.algorithm.scene_identify.package_weight import PackageWeightIdentify
 from diana.utils.schema.scene import IdentifySceneSchema
 
 
 class RecognizeScene(BaseResponse):
-    @staticmethod
-    def _handle(args: Dict) -> Tuple[int, Dict]:
+
+    @BaseResponse.handle(schema=IdentifySceneSchema)
+    def post(self, **params):
         """
+        call scene identification algorithm to identify a host's scene
         identify scene and recommend collect items
         Args:
             args: host info. e.g.
@@ -45,17 +44,11 @@ class RecognizeScene(BaseResponse):
                     }
                 }
         """
-        result = {}
-        applications = args["applications"]
-        collect_items = args["collect_items"]
+        result = dict()
+        applications = params["applications"]
+        collect_items = params["collect_items"]
         identify_algo = PackageWeightIdentify(applications, collect_items)
         scene, reco_collect_items = identify_algo.get_scene()
         result["scene_name"] = scene
         result["collect_items"] = reco_collect_items
-        return SUCCEED, result
-
-    def post(self):
-        """
-        call scene identification algorithm to identify a host's scene
-        """
-        return jsonify(self.handle_request(IdentifySceneSchema, self))
+        return self.response(code=SUCCEED, data=result)

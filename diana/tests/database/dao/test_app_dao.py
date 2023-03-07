@@ -2,7 +2,7 @@ import time
 import unittest
 from unittest.mock import Mock
 
-from vulcanus.restful.status import SUCCEED, DATA_EXIST, NO_DATA
+from vulcanus.restful.resp.state import SUCCEED, DATA_EXIST, NO_DATA
 
 from diana.conf.constant import APP_INDEX
 from diana.database.dao.app_dao import AppDao

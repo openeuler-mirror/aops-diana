@@ -21,10 +21,9 @@ from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 
 from vulcanus.database.helper import sort_and_page
-from vulcanus.restful.status import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA
+from vulcanus.restful.resp.state import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, DATABASE_INSERT_ERROR, DATA_EXIST
 from vulcanus.database.proxy import MysqlProxy
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.status import DATABASE_INSERT_ERROR, DATA_EXIST
 from diana.database.factory.table import Algorithm
 from diana.conf.constant import SYSTEM_USER
 
@@ -116,7 +115,8 @@ class AlgorithmDao(MysqlProxy):
         }
         algo_query = self._query_algo_list(filters)
         total_count = len(algo_query.all())
-        algo_info_list, total_page = sort_and_page(algo_query, None, None, per_page, page)
+        algo_info_list, total_page = sort_and_page(
+            algo_query, None, None, per_page, page)
         res['algo_list'] = self._algo_rows_to_dict(algo_info_list)
         res['total_page'] = total_page
         res['total_count'] = total_count

@@ -16,12 +16,9 @@ Author:
 Description:
 """
 import uuid
-from typing import Dict, Tuple
-from flask import jsonify
 
-from vulcanus.database.helper import operate
 from vulcanus.restful.response import BaseResponse
-from vulcanus.restful.status import SUCCEED
+from vulcanus.restful.resp.state import SUCCEED
 
 from diana.conf import configuration
 from diana.database.dao.app_dao import AppDao
@@ -37,22 +34,8 @@ class CreateApp(BaseResponse):
     Create app interface, it's a post request.
     """
 
-    @staticmethod
-    def _handle(args: Dict) -> Tuple[int, Dict[str, str]]:
-        """
-        1.generate uuid
-        2.insert into database
-        """
-        result = {}
-        app_id = str(uuid.uuid1()).replace('-', '')
-        args['app_id'] = app_id
-        status = operate(AppDao(configuration), args, 'create_app')
-        if status == SUCCEED:
-            result['app_id'] = app_id
-
-        return status, result
-
-    def post(self):
+    @BaseResponse.handle(schema=CreateAppSchema, proxy=AppDao(configuration))
+    def post(self, callback: AppDao, **params):
         """
         It's post request, step:
             1.verify token;
@@ -60,7 +43,14 @@ class CreateApp(BaseResponse):
             3.generate uuid
             4.insert into database
         """
-        return jsonify(self.handle_request(CreateAppSchema, self))
+        result = dict()
+        app_id = str(uuid.uuid1()).replace('-', '')
+        params['app_id'] = app_id
+        status = callback.create_app(params)
+        if status == SUCCEED:
+            result['app_id'] = app_id
+
+        return self.response(code=status, data=result)
 
 
 class QueryAppList(BaseResponse):
@@ -68,16 +58,16 @@ class QueryAppList(BaseResponse):
     Query app list interface, it's a get request.
     """
 
-    def get(self):
+    @BaseResponse.handle(schema=QueryAppListSchema, proxy=AppDao(configuration))
+    def get(self, callback: AppDao, **params):
         """
         It's get request, step:
             1.verify token
             2.verify args
             3.insert into database
         """
-        return jsonify(self.handle_request_db(QueryAppListSchema,
-                                              AppDao(configuration),
-                                              'query_app_list'))
+        status_code, result = callback.query_app_list(params)
+        return self.response(code=status_code, data=result)
 
 
 class QueryApp(BaseResponse):
@@ -85,13 +75,13 @@ class QueryApp(BaseResponse):
     Query app interface, it's a get request.
     """
 
-    def get(self):
+    @BaseResponse.handle(schema=QueryAppSchema, proxy=AppDao(configuration))
+    def get(self, callback: AppDao, **param):
         """
         It's get request, step:
             1.verify token
             2.verify args
             3.insert into database
         """
-        return jsonify(self.handle_request_db(QueryAppSchema,
-                                              AppDao(configuration),
-                                              "query_app"))
+        status_code, result = callback.query_app(param)
+        return self.response(code=status_code, data=result)
