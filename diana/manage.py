@@ -15,10 +15,6 @@ Time:
 Author:
 Description: Manager that start check
 """
-import redis
-from redis import RedisError
-from vulcanus.database.proxy import RedisProxy
-
 from diana.conf import configuration
 from diana.errors.startup_error import StartupError
 from diana.mode import mode
@@ -27,28 +23,12 @@ from diana.mode.default_scheduler import DefaultScheduler
 from diana.mode.executor import Executor
 
 
-def run(mode_name: str):
+def main():
     try:
-        app = mode.build(mode_name)
+        app = mode.build(configuration.diana.get('MODE'))
         app.run()
     except StartupError as error:
         print(error)
-
-
-def init_redis_connect():
-    """
-    Init redis connect
-    """
-    try:
-        redis_connect = RedisProxy(configuration)
-        redis_connect.connect()
-    except (RedisError, redis.ConnectionError):
-        raise RedisError("redis connect error.")
-
-
-def main():
-    init_redis_connect()
-    run(configuration.diana.get('MODE'))
 
 
 if __name__ == "__main__":

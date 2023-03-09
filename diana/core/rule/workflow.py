@@ -15,6 +15,7 @@ Time:
 Author:
 Description:
 """
+from flask import g
 import time
 from typing import Dict, Tuple
 
@@ -29,7 +30,6 @@ from vulcanus.restful.response import BaseResponse
 from vulcanus.conf.constant import URL_FORMAT, QUERY_HOST_DETAIL
 from vulcanus.database.helper import operate
 
-from diana.database import SESSION
 from diana.conf import configuration
 from diana.errors.workflow_error import WorkflowExecuteError, WorkflowModelAssignError
 from diana.database.dao.data_dao import DataDao
@@ -104,7 +104,7 @@ class Workflow:
 
     def add_workflow_alert(self, network_monitor_data: dict, workflow: dict, domain: str, alert_time: str) -> int:
         result_dao = ResultDao()
-        if not result_dao.connect(SESSION):
+        if not result_dao.connect(g.session):
             LOGGER.error("Connect mysql fail when insert built-in algorithm.")
             raise sqlalchemy.exc.SQLAlchemyError("Connect mysql failed.")
         alert_id = alert_time + "-" + domain
@@ -177,7 +177,7 @@ class Workflow:
 
     def _get_workflow(self):
         workflow_dao = WorkflowDao(configuration)
-        if not workflow_dao.connect(SESSION):
+        if not workflow_dao.connect(g.session):
             LOGGER.error("Connect mysql fail when insert built-in algorithm.")
             return DATABASE_CONNECT_ERROR
 
@@ -523,5 +523,5 @@ class Workflow:
             model_set.add(workflow_detail["diag"])
 
         data = {"model_list": list(model_set)}
-        status, result = operate(ModelDao(), data, "get_model_algo", SESSION)
+        status, result = operate(ModelDao(), data, "get_model_algo", g.session)
         return result

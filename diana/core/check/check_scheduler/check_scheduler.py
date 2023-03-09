@@ -17,9 +17,8 @@ Description:
 """
 from typing import Optional
 from threading import Lock
-from flask import Flask
+from flask import Flask, g
 from diana.conf import configuration
-from diana.database import SESSION
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.core.check.check_scheduler.task_keeper import CheckTaskKeeper
 from diana.core.check.check_scheduler.time_keeper import time_keeper_manager
@@ -50,7 +49,7 @@ class CheckScheduler:
 
         """
         workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(SESSION):
+        if not workflow_proxy.connect(g.session):
             LOGGER.error("Connect to workflow_proxy failed.")
             return DATABASE_CONNECT_ERROR, {}
         status, result = workflow_proxy.get_all_workflow_list("running")

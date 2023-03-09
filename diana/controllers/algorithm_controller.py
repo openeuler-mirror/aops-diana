@@ -10,7 +10,6 @@
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
-from diana.database import SESSION
 from diana.database.dao.algo_dao import AlgorithmDao
 from diana.utils.schema.algorithm import QueryAlgorithmListSchema, QueryAlgorithmSchema
 from vulcanus.restful.response import BaseResponse
@@ -21,7 +20,7 @@ class QueryAlgorithmList(BaseResponse):
         Interface for get algorithm list.
         Restful API: GET
     """
-    @BaseResponse.handle(schema=QueryAlgorithmListSchema, proxy=AlgorithmDao(), session=SESSION)
+    @BaseResponse.handle(schema=QueryAlgorithmListSchema, proxy=AlgorithmDao())
     def get(self, callback: AlgorithmDao, **params):
         """
             Get algorithm info list
@@ -53,7 +52,7 @@ class QueryAlgorithm(BaseResponse):
         Restful API: GET
     """
 
-    @BaseResponse.handle(schema=QueryAlgorithmSchema, proxy=AlgorithmDao, session=SESSION)
+    @BaseResponse.handle(schema=QueryAlgorithmSchema, proxy=AlgorithmDao)
     def get(self, callback: AlgorithmDao, **params):
         """
             Get algorithm info
