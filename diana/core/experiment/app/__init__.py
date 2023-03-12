@@ -15,6 +15,7 @@ Time:
 Author:
 Description:
 """
+from flask import g
 from copy import deepcopy
 from importlib import import_module
 from typing import Dict, List, Any
@@ -23,7 +24,6 @@ from vulcanus.log.log import LOGGER
 from vulcanus.restful.resp.state import SUCCEED
 from diana.conf.constant import ALGO_LIST
 from diana.core.experiment.model import load_model
-from diana.database import SESSION
 from diana.database.dao.model_dao import ModelDao
 
 
@@ -126,7 +126,7 @@ class App:
 
         else:
             model_dao = ModelDao()
-            if not model_dao.connect(SESSION):
+            if not model_dao.connect(g.session):
                 LOGGER.error("connect to database fail")
                 return False
 
