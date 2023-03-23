@@ -15,14 +15,11 @@ Time:
 Author:
 Description:
 """
-from typing import NoReturn
-
 from flask import Flask, g
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.scoping import scoped_session
 from flask_apscheduler import APScheduler
 from diana import BLUE_POINT
-from diana.conf import configuration
 from diana.init import init
 from diana.mode import mode
 from diana.mode.scheduler import Scheduler
@@ -41,7 +38,7 @@ class ConfigurableScheduler(Scheduler):
         return "configurable"
 
     @staticmethod
-    def run() -> NoReturn:
+    def run():
         """
         Init elasticsearch and run a flask app.
         """
@@ -57,11 +54,8 @@ class ConfigurableScheduler(Scheduler):
             g.session.remove()
             return response
 
-        @app.before_first_request
-        def init_service():
-            g.session = scoped_session(sessionmaker(bind=ENGINE))
-            init()
-            check_scheduler.start_all_workflow(app)
+        init()
+        check_scheduler.start_all_workflow(app)
 
         apscheduler = APScheduler()
         apscheduler.init_app(app)
@@ -71,6 +65,4 @@ class ConfigurableScheduler(Scheduler):
             api.init_app(app)
             app.register_blueprint(blue)
 
-        ip = configuration.diana.get('IP')
-        port = configuration.diana.get('PORT')
-        app.run(port=port, host=ip)
+        return app

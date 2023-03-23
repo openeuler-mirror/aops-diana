@@ -19,12 +19,12 @@ import uuid
 import time
 from typing import Dict, Tuple
 from flask import request, g
-
 from vulcanus.database.helper import operate
 from vulcanus.restful.response import BaseResponse
 from vulcanus.restful.resp.state import SUCCEED, WORKFLOW_ASSIGN_MODEL_FAIL, DATABASE_CONNECT_ERROR
 from vulcanus.log.log import LOGGER
 
+from diana.database import session_maker
 from diana.conf import configuration
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.core.rule.workflow import Workflow
@@ -84,7 +84,7 @@ class CreateWorkflow(BaseResponse):
         args["input"]["hosts"] = host_infos
 
         status = operate(WorkflowDao(configuration),
-                         args, 'insert_workflow', g.session)
+                         args, 'insert_workflow', session_maker())
         if status != SUCCEED:
             return status, result
 
@@ -118,7 +118,7 @@ class QueryWorkflow(BaseResponse):
             3.get workflow from database
         """
         workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(g.session):
+        if not workflow_proxy.connect(session_maker()):
             return self.response(code=DATABASE_CONNECT_ERROR)
 
         status_code, result = workflow_proxy.get_workflow(params)
@@ -139,7 +139,7 @@ class QueryWorkflowList(BaseResponse):
             3.get workflow list from database
         """
         workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(g.session):
+        if not workflow_proxy.connect(session_maker()):
             return self.response(code=DATABASE_CONNECT_ERROR)
 
         status_code, result = workflow_proxy.get_workflow_list(params)
@@ -163,7 +163,7 @@ class ExecuteWorkflow(BaseResponse):
         workflow_id = args["workflow_id"]
         username = args["username"]
         workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(g.session):
+        if not workflow_proxy.connect(session_maker()):
             return DATABASE_CONNECT_ERROR
 
         status_code, result = workflow_proxy.get_workflow(args)
@@ -210,7 +210,7 @@ class StopWorkflow(BaseResponse):
         """
         workflow_id = args["workflow_id"]
         workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(g.session):
+        if not workflow_proxy.connect(session_maker()):
             return DATABASE_CONNECT_ERROR
 
         status_code, result = workflow_proxy.get_workflow(args)
@@ -255,7 +255,7 @@ class DeleteWorkflow(BaseResponse):
             4.delete workflow from database
         """
         workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(g.session):
+        if not workflow_proxy.connect(session_maker()):
             return self.response(code=DATABASE_CONNECT_ERROR)
 
         return self.response(code=workflow_proxy.delete_workflow(params))
@@ -289,7 +289,7 @@ class UpdateWorkflow(BaseResponse):
         args["model_info"] = model_info
 
         status = operate(WorkflowDao(configuration),
-                         args, 'update_workflow', g.session)
+                         args, 'update_workflow', session_maker())
         return status
 
     @BaseResponse.handle(schema=UpdateWorkflowSchema)
@@ -317,7 +317,7 @@ class IfHostInWorkflow(BaseResponse):
             3.check if host in a workflow
         """
         workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(g.session):
+        if not workflow_proxy.connect(session_maker()):
             return self.response(code=DATABASE_CONNECT_ERROR)
         status_code, result = workflow_proxy.if_host_in_workflow(params)
 

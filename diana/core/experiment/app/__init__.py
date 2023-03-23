@@ -25,6 +25,7 @@ from vulcanus.restful.resp.state import SUCCEED
 from diana.conf.constant import ALGO_LIST
 from diana.core.experiment.model import load_model
 from diana.database.dao.model_dao import ModelDao
+from diana.database import session_maker
 
 
 class App:
@@ -126,7 +127,7 @@ class App:
 
         else:
             model_dao = ModelDao()
-            if not model_dao.connect(g.session):
+            if not model_dao.connect(session_maker()):
                 LOGGER.error("connect to database fail")
                 return False
 

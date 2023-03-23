@@ -25,11 +25,10 @@ from diana.mode.executor import Executor
 
 def main():
     try:
-        app = mode.build(configuration.diana.get('MODE'))
-        app.run()
+        scheduler_mode = mode.build(configuration.diana.get('MODE'))
+        return scheduler_mode.run()
     except StartupError as error:
         print(error)
 
 
-if __name__ == "__main__":
-    main()
+app = main()

@@ -154,7 +154,7 @@ class DefaultScheduler(Scheduler):
         return "default"
 
     @staticmethod
-    def run() -> NoReturn:
+    def run():
         app = Flask(__name__)
         app.config.from_object(Config())
 
@@ -170,5 +170,4 @@ class DefaultScheduler(Scheduler):
         scheduler = APScheduler()
         scheduler.init_app(app)
         scheduler.start()
-        app.run(port=configuration.diana.get('PORT'),
-                host=configuration.diana.get('IP'))
+        return app
