@@ -36,6 +36,11 @@ mysql = {
     "POOL_RECYCLE": 7200
 }
 
+redis = {
+    "IP": "127.0.0.1",
+    "PORT": 6379
+}
+
 elasticsearch = {
     "IP": "127.0.0.1",
     "PORT": 9200,
@@ -45,7 +50,7 @@ elasticsearch = {
 prometheus = {
     "IP": "127.0.0.1",
     "PORT": 9090,
-    "QUERY_RANGE_STEP" : "15s"
+    "QUERY_RANGE_STEP": "15s"
 }
 
 agent = {

@@ -1,0 +1,28 @@
+#!/bin/bash
+. /usr/bin/aops-vulcanus
+
+MANAGER_CONSTANT="diana"
+MANAGER_CONFIG_FILE=$SYS_PATH/diana.ini
+
+function main() {
+  if [ "${OPERATION}" = "start" ]; then
+    mode=$(get_config "${MANAGER_CONFIG_FILE}" "diana" "mode")
+    if [ "${mode}" = "executor" ]; then
+        start_executor_mode
+        exit 0
+    fi
+    create_config_file "${MANAGER_CONFIG_FILE}" "diana"
+    check_es_installed "${MANAGER_CONFIG_FILE}"
+  fi
+  start_or_stop_service "${MANAGER_CONSTANT}"
+  exit $?
+}
+
+function start_executor_mode() {
+  start_file_dir=$(find /usr/lib/python*/site-packages -maxdepth 1 -name diana | head -n 1)
+  start_file=$start_file_dir/manage.py
+  python3 $start_file
+  echo "[INFO] start execute ${start_file}"
+}
+
+main

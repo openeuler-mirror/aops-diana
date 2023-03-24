@@ -15,7 +15,6 @@ Time:
 Author:
 Description:
 """
-from flask import g
 import sqlalchemy
 import uuid
 from copy import deepcopy
@@ -26,6 +25,7 @@ from vulcanus.restful.resp.state import DATABASE_INSERT_ERROR
 from diana.conf.constant import SYSTEM_USER, ALGO_LIST
 from diana.database.dao.algo_dao import AlgorithmDao
 from diana.database.dao.model_dao import ModelDao
+from diana.database import session_maker
 
 
 def init_algo_and_model():
@@ -33,12 +33,12 @@ def init_algo_and_model():
     add built in algorithm info into database
     """
     algo_proxy = AlgorithmDao()
-    if not algo_proxy.connect(g.session):
+    if not algo_proxy.connect(session_maker()):
         LOGGER.error("Connect mysql fail when insert built-in algorithm.")
         raise sqlalchemy.exc.SQLAlchemyError("Connect mysql failed.")
 
     model_proxy = ModelDao()
-    if not model_proxy.connect(g.session):
+    if not model_proxy.connect(session_maker()):
         LOGGER.error("Connect mysql fail when insert built-in model.")
         raise sqlalchemy.exc.SQLAlchemyError("Connect mysql failed.")
 
