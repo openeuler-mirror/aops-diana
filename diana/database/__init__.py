@@ -29,7 +29,4 @@ def session_maker():
     """
     The session object of the database link
     """
-    try:
-        return g.session
-    except RuntimeError:
-        return scoped_session(sessionmaker(bind=ENGINE))
+    return scoped_session(sessionmaker(bind=ENGINE))
