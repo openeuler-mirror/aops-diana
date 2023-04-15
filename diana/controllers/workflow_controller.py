@@ -18,13 +18,12 @@ Description:
 import uuid
 import time
 from typing import Dict, Tuple
-from flask import request, g
-from vulcanus.database.helper import operate
+from flask import request
+import sqlalchemy
 from vulcanus.restful.response import BaseResponse
 from vulcanus.restful.resp.state import SUCCEED, WORKFLOW_ASSIGN_MODEL_FAIL, DATABASE_CONNECT_ERROR
 from vulcanus.log.log import LOGGER
 
-from diana.database import session_maker
 from diana.conf import configuration
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.core.rule.workflow import Workflow
@@ -82,9 +81,13 @@ class CreateWorkflow(BaseResponse):
         args["model_info"] = model_info
         # change host id list to host info dict
         args["input"]["hosts"] = host_infos
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status = workflow_proxy.insert_workflow(args)
+        except sqlalchemy.exc.SQLAlchemyError:
+            return DATABASE_CONNECT_ERROR, result
 
-        status = operate(WorkflowDao(configuration),
-                         args, 'insert_workflow', session_maker())
         if status != SUCCEED:
             return status, result
 
@@ -117,12 +120,14 @@ class QueryWorkflow(BaseResponse):
             2.verify args
             3.get workflow from database
         """
-        workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(session_maker()):
-            return self.response(code=DATABASE_CONNECT_ERROR)
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status_code, result = workflow_proxy.get_workflow(params)
 
-        status_code, result = workflow_proxy.get_workflow(params)
-        return self.response(code=status_code, data=result)
+            return self.response(code=status_code, data=result)
+        except sqlalchemy.exc.SQLAlchemyError:
+            return self.response(code=DATABASE_CONNECT_ERROR)
 
 
 class QueryWorkflowList(BaseResponse):
@@ -138,12 +143,14 @@ class QueryWorkflowList(BaseResponse):
             2.verify args
             3.get workflow list from database
         """
-        workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(session_maker()):
-            return self.response(code=DATABASE_CONNECT_ERROR)
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status_code, result = workflow_proxy.get_workflow_list(params)
 
-        status_code, result = workflow_proxy.get_workflow_list(params)
-        return self.response(code=status_code, data=result)
+            return self.response(code=status_code, data=result)
+        except sqlalchemy.exc.SQLAlchemyError:
+            return self.response(code=DATABASE_CONNECT_ERROR)
 
 
 class ExecuteWorkflow(BaseResponse):
@@ -162,24 +169,27 @@ class ExecuteWorkflow(BaseResponse):
         """
         workflow_id = args["workflow_id"]
         username = args["username"]
-        workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(session_maker()):
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status_code, result = workflow_proxy.get_workflow(args)
+
+                if status_code != SUCCEED:
+                    return status_code
+
+                workflow_info = result["result"]
+                if workflow_info["status"] != "hold":
+                    LOGGER.info("Workflow '%s' cannot execute with status '%s'." %
+                                (workflow_id, workflow_info["status"]))
+                    return SUCCEED
+
+                workflow_proxy.update_workflow_status(workflow_id, "running")
+                check_scheduler.start_workflow(
+                    workflow_id, username, workflow_info["step"])
+
+        except sqlalchemy.exc.SQLAlchemyError:
             return DATABASE_CONNECT_ERROR
 
-        status_code, result = workflow_proxy.get_workflow(args)
-
-        if status_code != SUCCEED:
-            return status_code
-
-        workflow_info = result["result"]
-        if workflow_info["status"] != "hold":
-            LOGGER.info("Workflow '%s' cannot execute with status '%s'." %
-                        (workflow_id, workflow_info["status"]))
-            return SUCCEED
-
-        workflow_proxy.update_workflow_status(workflow_id, "running")
-        check_scheduler.start_workflow(
-            workflow_id, username, workflow_info["step"])
         return SUCCEED
 
     @BaseResponse.handle(schema=ExecuteWorkflowSchema)
@@ -209,24 +219,27 @@ class StopWorkflow(BaseResponse):
                 }
         """
         workflow_id = args["workflow_id"]
-        workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(session_maker()):
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status_code, result = workflow_proxy.get_workflow(args)
+
+                if status_code != SUCCEED:
+                    return status_code
+
+                workflow_info = result["result"]
+                if workflow_info["status"] != "running":
+                    LOGGER.info("Workflow '%s' cannot stop with status '%s'." %
+                                (workflow_id, workflow_info["status"]))
+                    return SUCCEED
+
+                workflow_proxy.update_workflow_status(workflow_id, "hold")
+                check_scheduler.stop_workflow(workflow_id)
+
+        except sqlalchemy.exc.SQLAlchemyError:
             return DATABASE_CONNECT_ERROR
-
-        status_code, result = workflow_proxy.get_workflow(args)
-
-        if status_code != SUCCEED:
-            return status_code
-
-        workflow_info = result["result"]
-        if workflow_info["status"] != "running":
-            LOGGER.info("Workflow '%s' cannot stop with status '%s'." %
-                        (workflow_id, workflow_info["status"]))
+        else:
             return SUCCEED
-
-        workflow_proxy.update_workflow_status(workflow_id, "hold")
-        check_scheduler.stop_workflow(workflow_id)
-        return SUCCEED
 
     @BaseResponse.handle(schema=StopWorkflowSchema)
     def post(self, **params):
@@ -254,11 +267,14 @@ class DeleteWorkflow(BaseResponse):
             3.check if workflow running
             4.delete workflow from database
         """
-        workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(session_maker()):
-            return self.response(code=DATABASE_CONNECT_ERROR)
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status = workflow_proxy.delete_workflow(params)
+            return self.response(code=status)
 
-        return self.response(code=workflow_proxy.delete_workflow(params))
+        except sqlalchemy.exc.SQLAlchemyError:
+            return self.response(code=DATABASE_CONNECT_ERROR)
 
 
 class UpdateWorkflow(BaseResponse):
@@ -287,10 +303,14 @@ class UpdateWorkflow(BaseResponse):
         """
         model_info = Workflow.get_model_info(args["detail"])
         args["model_info"] = model_info
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status = workflow_proxy.update_workflow(args)
+            return status
 
-        status = operate(WorkflowDao(configuration),
-                         args, 'update_workflow', session_maker())
-        return status
+        except sqlalchemy.exc.SQLAlchemyError:
+            return DATABASE_CONNECT_ERROR
 
     @BaseResponse.handle(schema=UpdateWorkflowSchema)
     def post(self, **params):
@@ -316,9 +336,14 @@ class IfHostInWorkflow(BaseResponse):
             2.verify args
             3.check if host in a workflow
         """
-        workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(session_maker()):
-            return self.response(code=DATABASE_CONNECT_ERROR)
-        status_code, result = workflow_proxy.if_host_in_workflow(params)
 
-        return self.response(code=status_code, data=result)
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status_code, result = workflow_proxy.if_host_in_workflow(
+                    params)
+
+            return self.response(code=status_code, data=result)
+
+        except sqlalchemy.exc.SQLAlchemyError:
+            return self.response(code=DATABASE_CONNECT_ERROR)

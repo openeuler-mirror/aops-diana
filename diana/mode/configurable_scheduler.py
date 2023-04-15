@@ -15,16 +15,13 @@ Time:
 Author:
 Description:
 """
-from flask import Flask, g
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.scoping import scoped_session
+from flask import Flask
 from flask_apscheduler import APScheduler
 from diana import BLUE_POINT
 from diana.init import init
 from diana.mode import mode
 from diana.mode.scheduler import Scheduler
 from diana.core.check.check_scheduler.check_scheduler import check_scheduler
-from diana.database import ENGINE
 
 
 @mode.register('configurable')
@@ -45,18 +42,7 @@ class ConfigurableScheduler(Scheduler):
 
         app = Flask(__name__)
 
-        @app.before_request
-        def create_dbsession():
-            g.session = scoped_session(sessionmaker(bind=ENGINE))
-
-        @app.teardown_request
-        def remove_dbsession(response):
-            g.session.remove()
-            return response
-
         init()
-        check_scheduler.start_all_workflow(app)
-
         apscheduler = APScheduler()
         apscheduler.init_app(app)
         apscheduler.start()
@@ -65,4 +51,5 @@ class ConfigurableScheduler(Scheduler):
             api.init_app(app)
             app.register_blueprint(blue)
 
+        check_scheduler.start_all_workflow(app)
         return app

@@ -34,7 +34,7 @@ class CreateApp(BaseResponse):
     Create app interface, it's a post request.
     """
 
-    @BaseResponse.handle(schema=CreateAppSchema, proxy=AppDao(configuration))
+    @BaseResponse.handle(schema=CreateAppSchema, proxy=AppDao, config=configuration)
     def post(self, callback: AppDao, **params):
         """
         It's post request, step:
@@ -58,7 +58,7 @@ class QueryAppList(BaseResponse):
     Query app list interface, it's a get request.
     """
 
-    @BaseResponse.handle(schema=QueryAppListSchema, proxy=AppDao(configuration))
+    @BaseResponse.handle(schema=QueryAppListSchema, proxy=AppDao, config=configuration)
     def get(self, callback: AppDao, **params):
         """
         It's get request, step:
@@ -75,7 +75,7 @@ class QueryApp(BaseResponse):
     Query app interface, it's a get request.
     """
 
-    @BaseResponse.handle(schema=QueryAppSchema, proxy=AppDao(configuration))
+    @BaseResponse.handle(schema=QueryAppSchema, proxy=AppDao, config=configuration)
     def get(self, callback: AppDao, **param):
         """
         It's get request, step:

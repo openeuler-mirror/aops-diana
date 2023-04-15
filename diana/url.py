@@ -86,12 +86,13 @@ SPECIFIC_URLS = {
         (result_controller.ConfirmCheckResult, CHECK_RESULT_CONFIRM),
         (result_controller.QueryDomainResultCount, QUERY_DOMAIN_COUNT),
         (result_controller.DownloadAlertReport, DOWNLOAD_HOST_CHECK_RESULT),
-    ],
-    'METRIC': [
-        (metric_controller.QueryHostMetricNames, QUERY_METRIC_NAMES),
-        (metric_controller.QueryHostMetricData, QUERY_METRIC_DATA),
-        (metric_controller.QueryHostMetricList, QUERY_METRIC_LIST),
-    ],
+    ]
+    # The route is moved to zeus, and the diana service is not present for the time being
+    # 'METRIC': [
+    #     (metric_controller.QueryHostMetricNames, QUERY_METRIC_NAMES),
+    #     (metric_controller.QueryHostMetricData, QUERY_METRIC_DATA),
+    #     (metric_controller.QueryHostMetricList, QUERY_METRIC_LIST),
+    # ],
 }
 
 for _, value in SPECIFIC_URLS.items():

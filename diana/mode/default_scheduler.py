@@ -19,10 +19,8 @@ import json
 import time
 from typing import NoReturn, List, Dict
 
-from flask import Flask, g
+from flask import Flask
 from flask_apscheduler import APScheduler
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.scoping import scoped_session
 from diana.mode import mode
 from diana.mode.scheduler import Scheduler
 from diana.conf import configuration
@@ -32,7 +30,6 @@ from diana.core.rule.default_workflow import DefaultWorkflow
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.response import BaseResponse
 from vulcanus.restful.resp.state import SUCCEED
-from diana.database import ENGINE
 
 
 class Util:
@@ -157,15 +154,6 @@ class DefaultScheduler(Scheduler):
     def run():
         app = Flask(__name__)
         app.config.from_object(Config())
-
-        @app.before_request
-        def create_dbsession():
-            g.session = scoped_session(sessionmaker(bind=ENGINE))
-
-        @app.teardown_request
-        def remove_dbsession(response):
-            g.session.remove()
-            return response
 
         scheduler = APScheduler()
         scheduler.init_app(app)
