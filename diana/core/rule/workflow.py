@@ -15,7 +15,6 @@ Time:
 Author:
 Description:
 """
-from flask import g
 import time
 from typing import Dict, Tuple
 
@@ -28,9 +27,7 @@ from vulcanus.restful.resp.state import SUCCEED, PARTIAL_SUCCEED, DATABASE_INSER
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.response import BaseResponse
 from vulcanus.conf.constant import URL_FORMAT, QUERY_HOST_DETAIL
-from vulcanus.database.helper import operate
 
-from diana.database import session_maker
 from diana.conf import configuration
 from diana.errors.workflow_error import WorkflowExecuteError, WorkflowModelAssignError
 from diana.database.dao.data_dao import DataDao
@@ -104,30 +101,31 @@ class Workflow:
                     raise WorkflowExecuteError
 
     def add_workflow_alert(self, network_monitor_data: dict, workflow: dict, domain: str, alert_time: str) -> int:
-        result_dao = ResultDao()
-        if not result_dao.connect(session_maker()):
+        try:
+            alert_id = alert_time + "-" + domain
+            with ResultDao(configuration) as resultdao_proxy:
+                try:
+                    self._insert_domain(resultdao_proxy, alert_id, domain,
+                                        alert_time, network_monitor_data, workflow["workflow_name"])
+                    alert_host_ids = [host_id for host_id in network_monitor_data.get(
+                        "host_result", dict()).keys()]
+                    self._insert_alert_host(
+                        resultdao_proxy, workflow, alert_host_ids, alert_id)
+
+                    self._insert_host_check(
+                        resultdao_proxy, network_monitor_data, alert_time, alert_id)
+
+                    LOGGER.debug("Insert the success, workflow name: %s workflow id: %s" % (
+                        workflow["workflow_name"], self.__workflow_id))
+                    return SUCCEED
+                except WorkflowExecuteError:
+                    if resultdao_proxy.delete_alert(alert_id=alert_id) != SUCCEED:
+                        LOGGER.error(
+                            "Failed to delete the domain info, alert_id: %s." % alert_id)
+                    return DATABASE_INSERT_ERROR
+        except sqlalchemy.exc.SQLAlchemyError:
             LOGGER.error("Connect mysql fail when insert built-in algorithm.")
             raise sqlalchemy.exc.SQLAlchemyError("Connect mysql failed.")
-        alert_id = alert_time + "-" + domain
-        try:
-            self._insert_domain(result_dao, alert_id, domain,
-                                alert_time, network_monitor_data, workflow["workflow_name"])
-            alert_host_ids = [host_id for host_id in network_monitor_data.get(
-                "host_result", dict()).keys()]
-            self._insert_alert_host(
-                result_dao, workflow, alert_host_ids, alert_id)
-
-            self._insert_host_check(
-                result_dao, network_monitor_data, alert_time, alert_id)
-
-            LOGGER.debug("Insert the success, workflow name: %s workflow id: %s" % (
-                workflow["workflow_name"], self.__workflow_id))
-            return SUCCEED
-        except WorkflowExecuteError:
-            if result_dao.delete_alert(alert_id=alert_id) != SUCCEED:
-                LOGGER.error(
-                    "Failed to delete the domain info, alert_id: %s." % alert_id)
-            return DATABASE_INSERT_ERROR
 
     @staticmethod
     def _kafka_alert_host_msg(workflow) -> dict:
@@ -177,13 +175,14 @@ class Workflow:
             return TASK_EXECUTION_FAIL
 
     def _get_workflow(self):
-        workflow_dao = WorkflowDao(configuration)
-        if not workflow_dao.connect(session_maker()):
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status_code, workflow = workflow_proxy.get_workflow(
+                    data=dict(username=self.__username, workflow_id=self.__workflow_id))
+        except sqlalchemy.exc.SQLAlchemyError:
             LOGGER.error("Connect mysql fail when insert built-in algorithm.")
             return DATABASE_CONNECT_ERROR
-
-        status_code, workflow = workflow_dao.get_workflow(
-            data=dict(username=self.__username, workflow_id=self.__workflow_id))
 
         if status_code != SUCCEED:
             return DATABASE_QUERY_ERROR
@@ -524,6 +523,10 @@ class Workflow:
             model_set.add(workflow_detail["diag"])
 
         data = {"model_list": list(model_set)}
-        status, result = operate(
-            ModelDao(), data, "get_model_algo", session_maker())
-        return result
+        try:
+            with ModelDao(configuration) as modeldao_proxy:
+                _, result = modeldao_proxy.get_model_algo(data)
+
+            return result
+        except sqlalchemy.exc.SQLAlchemyError:
+            return dict()

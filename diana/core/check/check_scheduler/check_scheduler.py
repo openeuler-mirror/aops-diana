@@ -17,8 +17,8 @@ Description:
 """
 from typing import Optional
 from threading import Lock
-from flask import Flask, g
-from diana.database import session_maker
+from flask import Flask
+import sqlalchemy
 from diana.conf import configuration
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.core.check.check_scheduler.task_keeper import CheckTaskKeeper
@@ -49,15 +49,18 @@ class CheckScheduler:
             tuple(int, dict): status, result
 
         """
-        workflow_proxy = WorkflowDao(configuration)
-        if not workflow_proxy.connect(session_maker()):
+        try:
+            with WorkflowDao(configuration) as workflow_proxy:
+                workflow_proxy.connect()
+                status, result = workflow_proxy.get_all_workflow_list(
+                    "running")
+        except sqlalchemy.exc.SQLAlchemyError:
             LOGGER.error("Connect to workflow_proxy failed.")
             return DATABASE_CONNECT_ERROR, {}
-        status, result = workflow_proxy.get_all_workflow_list("running")
-        workflow_proxy.close()
         if status != SUCCEED:
             LOGGER.error("get_workflow_list failed.")
             return status, {}
+
         return status, result
 
     def start_all_workflow(self, app: Optional[Flask]) -> int:

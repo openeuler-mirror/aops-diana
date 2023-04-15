@@ -53,14 +53,14 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             host(str)
             port(int)
         """
-        MysqlProxy.__init__(self)
+        MysqlProxy.__init__(self, configuration)
         ElasticsearchProxy.__init__(self, configuration, host, port)
 
-    def connect(self, session):
+    def connect(self):
         """
         connect to msyql and elasticsearch
         """
-        return MysqlProxy.connect(self, session) and ElasticsearchProxy.connect(self)
+        return ElasticsearchProxy.connect(self)
 
     def insert_workflow(self, data: dict) -> int:
         """

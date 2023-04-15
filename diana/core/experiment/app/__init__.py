@@ -15,17 +15,17 @@ Time:
 Author:
 Description:
 """
-from flask import g
 from copy import deepcopy
 from importlib import import_module
 from typing import Dict, List, Any
+import sqlalchemy
 
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.resp.state import SUCCEED
 from diana.conf.constant import ALGO_LIST
 from diana.core.experiment.model import load_model
 from diana.database.dao.model_dao import ModelDao
-from diana.database import session_maker
+from diana.conf import configuration
 
 
 class App:
@@ -126,14 +126,14 @@ class App:
             models = self._load_models_for_default(model_info)
 
         else:
-            model_dao = ModelDao()
-            if not model_dao.connect(session_maker()):
-                LOGGER.error("connect to database fail")
-                return False
-
-            model_list = list(model_info.keys())
-            status_code, models = model_dao.get_model(model_list)
-            if status_code != SUCCEED:
+            try:
+                with ModelDao(configuration) as modeldao_proxy:
+                    model_list = list(model_info.keys())
+                    status_code, models = modeldao_proxy.get_model(model_list)
+                if status_code != SUCCEED:
+                    return False
+            except sqlalchemy.exc.SQLAlchemyError:
+                LOGGER.error("connect to database fail.")
                 return False
 
         for model_id, path_info in models.items():

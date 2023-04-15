@@ -18,6 +18,7 @@ Description:
 from vulcanus.restful.response import BaseResponse
 from diana.database.dao.model_dao import ModelDao
 from diana.utils.schema.model import QueryModelListSchema
+from diana.conf import configuration
 
 
 class QueryModelList(BaseResponse):
@@ -25,7 +26,7 @@ class QueryModelList(BaseResponse):
     Query model list interface, it's a post request.
     """
 
-    @BaseResponse.handle(schema=QueryModelListSchema, proxy=ModelDao())
+    @BaseResponse.handle(schema=QueryModelListSchema, proxy=ModelDao, config=configuration)
     def post(self, callback: ModelDao, **params):
         """
         It's post request, step:
