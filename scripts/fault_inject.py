@@ -89,9 +89,14 @@ def chaos_inject_network(host, port, params, time_out, fault_node, fault_type):
     
     file_name = CONFIG['fault_inject_file']
 
-    file_handle = open(file_name, mode='a+')
-    file_handle.write('' + str(inject_timestamp) + ' ' + str(inject_end_timestamp) + ' ' + 'node' + ' ' + get_node_name(str(fault_node)) + ' ' + get_fault_type_name(str(fault_type)) + '\n')
-    file_handle.close()
+    try:
+        file_handle = open(file_name, mode='a+')
+        file_handle.write(
+            '' + str(inject_timestamp) + ' ' + str(inject_end_timestamp) + ' ' + 'node' + ' ' + get_node_name(
+                str(fault_node)) + ' ' + get_fault_type_name(str(fault_type)) + '\n')
+        file_handle.close()
+    except PermissionError:
+        pass
 
     result = json.loads(response.text).get('result')
     print(inject_time_format + ' inject network fault ' + get_fault_type_name(str(fault_type)) + ' in ' + get_node_name(str(fault_node)) + ' successfully...')
@@ -227,9 +232,14 @@ def iptables_fault(target_host, cmd, fault_node, fault_type, time_out, check_tpc
     inject_time_format = datetime.datetime.strftime(inject_time, "%Y-%m-%d %H:%M:%S")
     inject_end_time = inject_time + datetime.timedelta(seconds = time_out)
     inject_end_timestamp = int(inject_end_time.timestamp())
-    file_handle = open(file_name, mode='a+')
-    file_handle.write('' + str(inject_timestamp) + ' ' + str(inject_end_timestamp) + ' ' + 'node' + ' ' + get_node_name(str(fault_node)) + ' ' + get_fault_type_name(str(fault_type)) + '\n')
-    file_handle.close()
+    try:
+        file_handle = open(file_name, mode='a+')
+        file_handle.write(
+            '' + str(inject_timestamp) + ' ' + str(inject_end_timestamp) + ' ' + 'node' + ' ' + get_node_name(
+                str(fault_node)) + ' ' + get_fault_type_name(str(fault_type)) + '\n')
+        file_handle.close()
+    except PermissionError:
+        pass
 
     print(inject_time_format + ' iptables inject network fault ' + get_fault_type_name(str(fault_type)) + ' in ' + get_node_name(str(fault_node)) + ' successfully...')
     logging.info(inject_time_format + ' iptables inject network fault ' + get_fault_type_name(str(fault_type)) + ' in ' + get_node_name(str(fault_node)) + ' successfully...')

@@ -33,5 +33,6 @@ def filtering(series: pd.Series, moving_window: int = 30,
 def adtk_preprocess(series: pd.Series, strategy_name, **kwargs):
     if strategy_name == 'DoubleRollingAggregate':
         preprocessed_series = DoubleRollingAggregate(**kwargs).transform(series)
-
-    return preprocessed_series
+        return preprocessed_series
+    else:
+        raise Exception("strategy_name is not 'DoubleRollingAggregate'")
