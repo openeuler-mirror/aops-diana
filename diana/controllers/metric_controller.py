@@ -17,7 +17,6 @@ from diana.conf import configuration
 
 
 class QueryHostMetricNames(BaseResponse):
-
     @BaseResponse.handle(schema=QueryHostMetricNamesSchema, proxy=DataDao, config=configuration)
     def get(self, callback: DataDao, **params):
         status_code, result = callback.query_metric_names(params)
@@ -25,7 +24,6 @@ class QueryHostMetricNames(BaseResponse):
 
 
 class QueryHostMetricData(BaseResponse):
-
     @BaseResponse.handle(schema=QueryHostMetricDataSchema, proxy=DataDao, config=configuration)
     def post(self, callback: DataDao, **params):
         status_code, result = callback.query_metric_data(params)
@@ -33,7 +31,6 @@ class QueryHostMetricData(BaseResponse):
 
 
 class QueryHostMetricList(BaseResponse):
-
     @BaseResponse.handle(schema=QueryHostMetricListSchema, proxy=DataDao, config=configuration)
     def post(self, callback: DataDao, **params):
         status_code, result = callback.query_metric_list(params)

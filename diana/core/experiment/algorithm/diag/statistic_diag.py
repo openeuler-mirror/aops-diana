@@ -20,8 +20,7 @@ from typing import Dict, List, Tuple, Optional
 
 from diana.core.experiment.algorithm import Algorithm
 
-metric_score = {
-}
+metric_score = {}
 
 
 class StatisticDiag(Algorithm):
@@ -32,6 +31,7 @@ class StatisticDiag(Algorithm):
     3. count the fault score according to weighted abnormal.
     4. choose the top-1 host and metric.
     """
+
     __slots__ = ['__candidate_num', "__min_candidate_num"]
 
     def __init__(self, candidate_num: int = 5):
@@ -43,7 +43,8 @@ class StatisticDiag(Algorithm):
         if self.__candidate_num <= self.__min_candidate_num:
             raise ValueError(
                 f"candidate num {self.__candidate_num} is inappropriate, \
-                it should be larger than {self.__min_candidate_num}")
+                it should be larger than {self.__min_candidate_num}"
+            )
 
     @property
     def candidate_num(self) -> int:
@@ -59,7 +60,7 @@ class StatisticDiag(Algorithm):
             "algo_name": "statistics_diag",
             "field": "diag",
             "description": "It's a statistic diagnose method",
-            "path": "diana.core.experiment.algorithm.diag.statistic_diag.StatisticDiag"
+            "path": "diana.core.experiment.algorithm.diag.statistic_diag.StatisticDiag",
         }
         return data
 

@@ -25,8 +25,15 @@ from vulcanus.restful.resp.state import PARAM_ERROR, TOKEN_ERROR, DATABASE_CONNE
 
 from diana.core.rule.workflow import Workflow, WorkflowDao
 from diana.core.check.check_scheduler.check_scheduler import check_scheduler
-from diana.conf.constant import CREATE_WORKFLOW, QUERY_WORKFLOW, QUERY_WORKFLOW_LIST, EXECUTE_WORKFLOW, \
-    STOP_WORKFLOW, DELETE_WORKFLOW, UPDATE_WORKFLOW
+from diana.conf.constant import (
+    CREATE_WORKFLOW,
+    QUERY_WORKFLOW,
+    QUERY_WORKFLOW_LIST,
+    EXECUTE_WORKFLOW,
+    STOP_WORKFLOW,
+    DELETE_WORKFLOW,
+    UPDATE_WORKFLOW,
+)
 from diana.url import SPECIFIC_URLS
 from vulcanus.restful.response import BaseResponse
 
@@ -42,13 +49,8 @@ app.register_blueprint(DIANA)
 
 app.testing = True
 client = app.test_client()
-header = {
-    "Content-Type": "application/json; charset=UTF-8"
-}
-header_with_token = {
-    "Content-Type": "application/json; charset=UTF-8",
-    "access_token": "81fe"
-}
+header = {"Content-Type": "application/json; charset=UTF-8"}
+header_with_token = {"Content-Type": "application/json; charset=UTF-8", "access_token": "81fe"}
 
 
 class CreateWorkflowTestCase(unittest.TestCase):
@@ -59,8 +61,7 @@ class CreateWorkflowTestCase(unittest.TestCase):
     def test_create_workflow_should_return_error_when_request_method_is_wrong(self):
         args = {}
         response = client.get(CREATE_WORKFLOW, json=args).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_create_workflow_should_return_error_when_input_wrong_params(self):
         args = {
@@ -68,16 +69,12 @@ class CreateWorkflowTestCase(unittest.TestCase):
             "description": "a long description",
             "app_name": "app1",
             "app_id": "asd",
-            "input": {
-                "domain": "host_group_1",
-                "hosts": [1, 2]
-            },
+            "input": {"domain": "host_group_1", "hosts": [1, 2]},
             "step": 5,
             "period": 15,
-            "alert": {}
+            "alert": {},
         }
-        response = client.post(CREATE_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(CREATE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_create_workflow_should_return_token_error_when_input_wrong_token(self):
@@ -86,13 +83,10 @@ class CreateWorkflowTestCase(unittest.TestCase):
             "description": "a long description",
             "app_name": "app1",
             "app_id": "asd",
-            "input": {
-                "domain": "host_group_1",
-                "hosts": [1, 2]
-            },
+            "input": {"domain": "host_group_1", "hosts": [1, 2]},
             "step": 5,
             "period": 15,
-            "alert": {}
+            "alert": {},
         }
         response = client.post(CREATE_WORKFLOW, json=args, headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
@@ -100,7 +94,9 @@ class CreateWorkflowTestCase(unittest.TestCase):
     @mock.patch.object(Workflow, 'get_model_info')
     @mock.patch.object(Workflow, 'assign_model')
     @mock.patch.object(BaseResponse, 'verify_token')
-    def test_create_workflow_should_return_database_error_when_database_is_wrong(self, mock_token, mock_assign, mock_info):
+    def test_create_workflow_should_return_database_error_when_database_is_wrong(
+        self, mock_token, mock_assign, mock_info
+    ):
         mock_assign.return_value = {}, {}
         mock_token.return_value = SUCCEED
         mock_info.return_value = {}
@@ -109,16 +105,12 @@ class CreateWorkflowTestCase(unittest.TestCase):
             "description": "a long description",
             "app_name": "app1",
             "app_id": "asd",
-            "input": {
-                "domain": "host_group_1",
-                "hosts": [1, 2]
-            },
+            "input": {"domain": "host_group_1", "hosts": [1, 2]},
             "step": 5,
             "period": 15,
-            "alert": {}
+            "alert": {},
         }
-        response = client.post(CREATE_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(CREATE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     @mock.patch.object(Workflow, 'get_model_info')
@@ -133,16 +125,12 @@ class CreateWorkflowTestCase(unittest.TestCase):
             "description": "a long description",
             "app_name": "app1",
             "app_id": "asd",
-            "input": {
-                "domain": "host_group_1",
-                "hosts": [1, 2]
-            },
+            "input": {"domain": "host_group_1", "hosts": [1, 2]},
             "step": 5,
             "period": 15,
-            "alert": {}
+            "alert": {},
         }
-        response = client.post(CREATE_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(CREATE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
         self.assertIn('workflow_id', response.keys())
 
@@ -155,17 +143,14 @@ class QueryWorkflowTestCase(unittest.TestCase):
     def test_query_workflow_should_return_error_when_request_method_is_wrong(self):
         args = {}
         response = client.post(QUERY_WORKFLOW, json=args).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_query_workflow_should_return_param_error_when_input_wrong_param(self):
-        response = client.get(QUERY_WORKFLOW + "?workflow=1",
-                              headers=header_with_token).json
+        response = client.get(QUERY_WORKFLOW + "?workflow=1", headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_query_workflow_should_return_token_error_when_input_wrong_token(self):
-        response = client.get(
-            QUERY_WORKFLOW + "?workflow_id='1'", headers=header).json
+        response = client.get(QUERY_WORKFLOW + "?workflow_id='1'", headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_args')
@@ -173,8 +158,7 @@ class QueryWorkflowTestCase(unittest.TestCase):
     def test_query_workflow_should_return_database_error_when_database_is_wrong(self, mock_token, mock_args):
         mock_token.return_value = SUCCEED
         mock_args.return_value = SUCCEED
-        response = client.get(QUERY_WORKFLOW + "?workflow_id='2'&username=admin",
-                              headers=header_with_token).json
+        response = client.get(QUERY_WORKFLOW + "?workflow_id='2'&username=admin", headers=header_with_token).json
         self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_args')
@@ -182,8 +166,7 @@ class QueryWorkflowTestCase(unittest.TestCase):
     def test_query_workflow_should_return_succeed_when_correct(self, mock_token, mock_args):
         mock_token.return_value = SUCCEED
         mock_args.return_value = SUCCEED
-        response = client.get(QUERY_WORKFLOW + "?workflow_id='3'&username=admin",
-                              headers=header_with_token).json
+        response = client.get(QUERY_WORKFLOW + "?workflow_id='3'&username=admin", headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
 
 
@@ -195,19 +178,16 @@ class QueryWorkflowListTestCase(unittest.TestCase):
     def test_query_workflow_list_should_return_error_when_request_method_is_wrong(self):
         args = {}
         response = client.get(QUERY_WORKFLOW_LIST, json=args).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_query_workflow_list_should_return_param_error_when_input_wrong_param(self):
         args = {"test": []}
-        response = client.post(QUERY_WORKFLOW_LIST,
-                               json=args, headers=header_with_token).json
+        response = client.post(QUERY_WORKFLOW_LIST, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_query_workflow_list_should_return_token_error_when_input_wrong_token(self):
         args = {}
-        response = client.post(QUERY_WORKFLOW_LIST,
-                               json=args, headers=header).json
+        response = client.post(QUERY_WORKFLOW_LIST, json=args, headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_args')
@@ -216,8 +196,7 @@ class QueryWorkflowListTestCase(unittest.TestCase):
         args = {"username": "admin"}
         mock_args.return_value = SUCCEED
         mock_token.return_value = SUCCEED
-        response = client.post(QUERY_WORKFLOW_LIST,
-                               json=args, headers=header_with_token).json
+        response = client.post(QUERY_WORKFLOW_LIST, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_args')
@@ -228,17 +207,12 @@ class QueryWorkflowListTestCase(unittest.TestCase):
             "direction": "asc",
             "page": 1,
             "per_page": 2,
-            "filter": {
-                "domain": ["test"],
-                "app": ["test"],
-                "status": ["hold"]
-            },
-            "username": "admin"
+            "filter": {"domain": ["test"], "app": ["test"], "status": ["hold"]},
+            "username": "admin",
         }
         mock_args.return_value = SUCCEED
         mock_token.return_value = SUCCEED
-        response = client.post(QUERY_WORKFLOW_LIST,
-                               json=args, headers=header_with_token).json
+        response = client.post(QUERY_WORKFLOW_LIST, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
 
 
@@ -250,19 +224,16 @@ class ExecuteWorkflowTestCase(unittest.TestCase):
     def test_execute_workflow_should_return_error_when_request_method_is_wrong(self):
         args = {"workflow_id": "123456789"}
         response = client.get(EXECUTE_WORKFLOW, json=args).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_execute_workflow_should_return_param_error_when_input_wrong_param(self):
         args = {"test": []}
-        response = client.post(EXECUTE_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(EXECUTE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_execute_workflow_should_return_token_error_when_input_wrong_token(self):
         args = {"workflow_id": "123456789"}
-        response = client.post(
-            EXECUTE_WORKFLOW, json=args, headers=header).json
+        response = client.post(EXECUTE_WORKFLOW, json=args, headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_args')
@@ -273,22 +244,22 @@ class ExecuteWorkflowTestCase(unittest.TestCase):
         mock_args.return_value = SUCCEED
         with mock.patch("diana.database.dao.workflow_dao.WorkflowDao.connect") as mock_connect:
             mock_connect.return_value = False
-            response = client.post(
-                EXECUTE_WORKFLOW, json=args, headers=header_with_token).json
+            response = client.post(EXECUTE_WORKFLOW, json=args, headers=header_with_token).json
             self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     @mock.patch.object(WorkflowDao, 'get_workflow')
     @mock.patch.object(WorkflowDao, "connect")
     @mock.patch.object(BaseResponse, 'verify_args')
     @mock.patch.object(BaseResponse, 'verify_token')
-    def test_execute_workflow_should_return_error_when_get_workflow_failed(self, mock_token, mock_args, mock_connect, mock_get):
+    def test_execute_workflow_should_return_error_when_get_workflow_failed(
+        self, mock_token, mock_args, mock_connect, mock_get
+    ):
         mock_connect.return_value = True
         mock_token.return_value = SUCCEED
         mock_args.return_value = SUCCEED
         mock_get.return_value = DATABASE_QUERY_ERROR, {}
         args = {"workflow_id": "123456789", "username": "admin"}
-        response = client.post(EXECUTE_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(EXECUTE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], DATABASE_QUERY_ERROR)
 
     @mock.patch.object(check_scheduler, "start_workflow")
@@ -296,30 +267,31 @@ class ExecuteWorkflowTestCase(unittest.TestCase):
     @mock.patch.object(WorkflowDao, 'get_workflow')
     @mock.patch.object(BaseResponse, 'verify_args')
     @mock.patch.object(BaseResponse, 'verify_token')
-    def test_execute_workflow_should_return_succeed_when_workflow_is_onhold(self, mock_token, mock_args, mock_get, mock_update, mock_start):
+    def test_execute_workflow_should_return_succeed_when_workflow_is_onhold(
+        self, mock_token, mock_args, mock_get, mock_update, mock_start
+    ):
         mock_token.return_value = SUCCEED
         mock_args.return_value = SUCCEED
-        mock_get.return_value = SUCCEED, {
-            "result": {"status": "hold", "step": 10}}
+        mock_get.return_value = SUCCEED, {"result": {"status": "hold", "step": 10}}
         mock_update.return_value = None
         mock_start.return_value = None
         args = {"workflow_id": "123456789", "username": "admin"}
-        response = client.post(EXECUTE_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(EXECUTE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
 
     @mock.patch.object(WorkflowDao, 'get_workflow')
     @mock.patch.object(WorkflowDao, "connect")
     @mock.patch.object(BaseResponse, 'verify_args')
     @mock.patch.object(BaseResponse, 'verify_token')
-    def test_execute_workflow_should_return_succeed_when_workflow_isnot_onhold(self, mock_token, mock_args, mock_connect, mock_get):
+    def test_execute_workflow_should_return_succeed_when_workflow_isnot_onhold(
+        self, mock_token, mock_args, mock_connect, mock_get
+    ):
         mock_connect.return_value = True
         mock_token.return_value = SUCCEED
         mock_args.return_value = SUCCEED
         mock_get.return_value = SUCCEED, {"result": {"status": "not_hold"}}
         args = {"workflow_id": "123456789", "username": "admin"}
-        response = client.post(EXECUTE_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(EXECUTE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
 
 
@@ -331,13 +303,11 @@ class StopWorkflowTestCase(unittest.TestCase):
     def test_stop_workflow_should_return_error_when_request_method_is_wrong(self):
         args = {"workflow_id": "123456789"}
         response = client.get(STOP_WORKFLOW, json=args).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_stop_workflow_should_return_param_error_when_input_wrong_param(self):
         args = {"test": []}
-        response = client.post(STOP_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(STOP_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_execute_workflow_should_return_token_error_when_input_wrong_token(self):
@@ -351,8 +321,7 @@ class StopWorkflowTestCase(unittest.TestCase):
         mock_token.return_value = SUCCEED
         with mock.patch("diana.database.dao.workflow_dao.WorkflowDao.connect") as mock_connect:
             mock_connect.return_value = False
-            response = client.post(
-                STOP_WORKFLOW, json=args, headers=header_with_token).json
+            response = client.post(STOP_WORKFLOW, json=args, headers=header_with_token).json
             self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     @mock.patch.object(WorkflowDao, 'get_workflow')
@@ -363,8 +332,7 @@ class StopWorkflowTestCase(unittest.TestCase):
         mock_token.return_value = SUCCEED
         mock_get.return_value = DATABASE_QUERY_ERROR, {}
         args = {"workflow_id": "123456789"}
-        response = client.post(STOP_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(STOP_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], DATABASE_QUERY_ERROR)
 
     @mock.patch.object(check_scheduler, "stop_workflow")
@@ -372,15 +340,16 @@ class StopWorkflowTestCase(unittest.TestCase):
     @mock.patch.object(WorkflowDao, 'get_workflow')
     @mock.patch.object(WorkflowDao, "connect")
     @mock.patch.object(BaseResponse, 'verify_token')
-    def test_stop_workflow_should_return_succeed_when_workflow_is_onhold(self, mock_token, mock_connect, mock_get, mock_update, mock_start):
+    def test_stop_workflow_should_return_succeed_when_workflow_is_onhold(
+        self, mock_token, mock_connect, mock_get, mock_update, mock_start
+    ):
         mock_connect.return_value = True
         mock_token.return_value = SUCCEED
         mock_get.return_value = SUCCEED, {"result": {"status": "running"}}
         mock_update.return_value = None
         mock_start.return_value = None
         args = {"workflow_id": "123456789"}
-        response = client.post(STOP_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(STOP_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
 
     @mock.patch.object(WorkflowDao, 'get_workflow')
@@ -391,8 +360,7 @@ class StopWorkflowTestCase(unittest.TestCase):
         mock_token.return_value = SUCCEED
         mock_get.return_value = SUCCEED, {"result": {"status": "not_running"}}
         args = {"workflow_id": "123456789"}
-        response = client.post(STOP_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(STOP_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
 
 
@@ -403,21 +371,17 @@ class DeleteWorkflowTestCase(unittest.TestCase):
 
     def test_delete_workflow_should_return_error_when_request_method_is_wrong(self):
         args = {"workflow_id": "123456789"}
-        response = client.post(DELETE_WORKFLOW, json=args,
-                               headers=header_with_token).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        response = client.post(DELETE_WORKFLOW, json=args, headers=header_with_token).json
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_delete_workflow_should_return_param_error_when_input_wrong_param(self):
         args = {"test": []}
-        response = client.delete(
-            DELETE_WORKFLOW, json=args, headers=header_with_token).json
+        response = client.delete(DELETE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_delete_workflow_should_return_token_error_when_input_wrong_token(self):
         args = {"workflow_id": "123456789"}
-        response = client.delete(
-            DELETE_WORKFLOW, json=args, headers=header).json
+        response = client.delete(DELETE_WORKFLOW, json=args, headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_token')
@@ -426,8 +390,7 @@ class DeleteWorkflowTestCase(unittest.TestCase):
         mock_token.return_value = SUCCEED
         with mock.patch("diana.database.dao.workflow_dao.WorkflowDao.connect") as mock_connect:
             mock_connect.return_value = False
-            response = client.delete(
-                DELETE_WORKFLOW, json=args, headers=header_with_token).json
+            response = client.delete(DELETE_WORKFLOW, json=args, headers=header_with_token).json
             self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_args')
@@ -436,8 +399,7 @@ class DeleteWorkflowTestCase(unittest.TestCase):
         args = {"workflow_id": "123456789", "username": "admin"}
         mock_token.return_value = SUCCEED
         mock_args.return_value = SUCCEED
-        response = client.delete(
-            DELETE_WORKFLOW, json=args, headers=header_with_token).json
+        response = client.delete(DELETE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
 
 
@@ -448,15 +410,12 @@ class UpdateWorkflowTestCase(unittest.TestCase):
 
     def test_update_workflow_should_return_error_when_request_method_is_wrong(self):
         args = {"detail": {}, "workflow_id": "123"}
-        response = client.get(UPDATE_WORKFLOW, json=args,
-                              headers=header_with_token).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        response = client.get(UPDATE_WORKFLOW, json=args, headers=header_with_token).json
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_update_workflow_should_return_param_error_when_input_wrong_param(self):
         args = {"test": []}
-        response = client.post(UPDATE_WORKFLOW, json=args,
-                               headers=header_with_token).json
+        response = client.post(UPDATE_WORKFLOW, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_update_workflow_should_return_token_error_when_input_wrong_token(self):
@@ -470,8 +429,7 @@ class UpdateWorkflowTestCase(unittest.TestCase):
         args = {"detail": {}, "workflow_id": "123"}
         with mock.patch("diana.database.dao.workflow_dao.WorkflowDao.connect") as mock_connect:
             mock_connect.return_value = False
-            response = client.post(
-                UPDATE_WORKFLOW, json=args, headers=header_with_token).json
+            response = client.post(UPDATE_WORKFLOW, json=args, headers=header_with_token).json
             self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     @mock.patch.object(Workflow, 'get_model_info')
@@ -480,6 +438,5 @@ class UpdateWorkflowTestCase(unittest.TestCase):
         args = {"detail": {}, "workflow_id": "123"}
         with mock.patch("diana.controllers.workflow_controller.operate") as mock_operate:
             mock_operate.return_value = SUCCEED
-            response = client.post(
-                UPDATE_WORKFLOW, json=args, headers=header_with_token).json
+            response = client.post(UPDATE_WORKFLOW, json=args, headers=header_with_token).json
             self.assertEqual(response['label'], SUCCEED)

@@ -24,9 +24,7 @@ from diana.core.experiment.app.network_diagnose import NetworkDiagnoseApp
 from diana.core.experiment.app.mysql_network_diagnose import MysqlNetworkDiagnoseApp
 from diana.database.dao.app_dao import AppDao
 
-default_app = [
-    MysqlNetworkDiagnoseApp
-]
+default_app = [MysqlNetworkDiagnoseApp]
 
 
 def init_app():
@@ -38,8 +36,7 @@ def init_app():
         info = app().info
         status_code = dao.create_app(info)
         if status_code == DATA_EXIST:
-            LOGGER.warning(
-                f"The app {info['app_name']} has existed, choose to ignore")
+            LOGGER.warning(f"The app {info['app_name']} has existed, choose to ignore")
         elif status_code != SUCCEED:
             LOGGER.error(f"Import default app {info['app_name']} fail")
 

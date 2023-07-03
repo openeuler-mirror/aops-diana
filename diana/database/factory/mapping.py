@@ -21,60 +21,24 @@ MAPPINGS = {
     APP_INDEX: {
         "mappings": {
             "properties": {
-                "username": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                },
-                "app_id": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                },
-                "app_name": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                },
-                "version": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                },
-                "description": {
-                    "type": "text"
-                },
-                "api": {
-                    "type": "nested",
-                    "properties": {
-                        "type": {
-                            "type": "text"
-                        },
-                        "address": {
-                            "type": "text"
-                        }
-                    }
-                },
-                "detail": {
-                    "type": "object"
-                }
+                "username": {"type": "keyword", "ignore_above": 256},
+                "app_id": {"type": "keyword", "ignore_above": 256},
+                "app_name": {"type": "keyword", "ignore_above": 256},
+                "version": {"type": "keyword", "ignore_above": 256},
+                "description": {"type": "text"},
+                "api": {"type": "nested", "properties": {"type": {"type": "text"}, "address": {"type": "text"}}},
+                "detail": {"type": "object"},
             }
         }
     },
     WORKFLOW_INDEX: {
         "mappings": {
             "properties": {
-                "username": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                },
-                "workflow_id": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                },
-                "detail": {
-                    "type": "object"
-                },
-                "model_info": {
-                    "type": "object"
-                }
+                "username": {"type": "keyword", "ignore_above": 256},
+                "workflow_id": {"type": "keyword", "ignore_above": 256},
+                "detail": {"type": "object"},
+                "model_info": {"type": "object"},
             }
         }
-    }
+    },
 }

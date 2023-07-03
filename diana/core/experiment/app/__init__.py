@@ -64,10 +64,7 @@ class App:
         models = {}
         for algo in algo_list:
             for model in algo['models']:
-                models[model['model_id']] = {
-                    'model_path': model['file_path'],
-                    'algo_module': algo['algo_module']
-                }
+                models[model['model_id']] = {'model_path': model['file_path'], 'algo_module': algo['algo_module']}
         return models
 
     def _load_models_for_default(self, model_info: Dict[str, dict]) -> Dict[str, dict]:
@@ -106,10 +103,7 @@ class App:
                 class_ = getattr(algo_module, class_name)
                 algo_path = deepcopy(class_().info)['path']
 
-            models[model_id] = {
-                'model_path': all_model[model_id]['model_path'],
-                'algo_path': algo_path
-            }
+            models[model_id] = {'model_path': all_model[model_id]['model_path'], 'algo_path': algo_path}
 
         return models
 
@@ -137,8 +131,7 @@ class App:
                 return False
 
         for model_id, path_info in models.items():
-            model = load_model(
-                model_id, path_info['model_path'], path_info['algo_path'])
+            model = load_model(model_id, path_info['model_path'], path_info['algo_path'])
             if model is None:
                 return False
             self.model[model_id] = model

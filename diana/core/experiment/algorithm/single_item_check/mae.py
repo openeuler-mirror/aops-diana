@@ -18,7 +18,6 @@ from diana.core.experiment.algorithm.base_algo import BaseSingleItemAlgorithm
 
 
 class Mae(BaseSingleItemAlgorithm):
-
     def __init__(self, var_times: float = 0.25, window: int = 5) -> None:
         self._var_times = var_times
         self._window = window
@@ -29,7 +28,7 @@ class Mae(BaseSingleItemAlgorithm):
             "algo_name": "mae",
             "field": "singlecheck",
             "description": "It's a single item check method using mae algorithm.",
-            "path": "diana.core.experiment.algorithm.single_item_check.mae.Mae"
+            "path": "diana.core.experiment.algorithm.single_item_check.mae.Mae",
         }
         return data
 
@@ -79,5 +78,5 @@ class Mae(BaseSingleItemAlgorithm):
                 count += 1
                 continue
             variance += (data[index] - moving_average[index]) ** 2
-        variance /= (len(data) - count + 1)
+        variance /= len(data) - count + 1
         return variance

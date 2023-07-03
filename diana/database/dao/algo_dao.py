@@ -76,9 +76,11 @@ class AlgorithmDao(MysqlProxy):
         Returns:
             bool
         """
-        name_count = self.session.query(func.count(Algorithm.algo_name)) \
-            .filter(Algorithm.algo_name == algo_name, Algorithm.username.in_([username, SYSTEM_USER])) \
+        name_count = (
+            self.session.query(func.count(Algorithm.algo_name))
+            .filter(Algorithm.algo_name == algo_name, Algorithm.username.in_([username, SYSTEM_USER]))
             .scalar()
+        )
         if name_count:
             return True
         return False
@@ -108,15 +110,10 @@ class AlgorithmDao(MysqlProxy):
         if data.get('field'):
             filters.add(Algorithm.field == data.get('field'))
 
-        res = {
-            'total_count': 0,
-            'total_page': 0,
-            'algo_list': []
-        }
+        res = {'total_count': 0, 'total_page': 0, 'algo_list': []}
         algo_query = self._query_algo_list(filters)
         total_count = len(algo_query.all())
-        algo_info_list, total_page = sort_and_page(
-            algo_query, None, None, per_page, page)
+        algo_info_list, total_page = sort_and_page(algo_query, None, None, per_page, page)
         res['algo_list'] = self._algo_rows_to_dict(algo_info_list)
         res['total_page'] = total_page
         res['total_count'] = total_count
@@ -132,13 +129,14 @@ class AlgorithmDao(MysqlProxy):
         Returns:
             sqlalchemy.orm.query.Query
         """
-        return self.session.query(Algorithm.algo_id, Algorithm.algo_name, Algorithm.field,
-                                  Algorithm.description).filter(*filters)
+        return self.session.query(
+            Algorithm.algo_id, Algorithm.algo_name, Algorithm.field, Algorithm.description
+        ).filter(*filters)
 
     @staticmethod
     def _algo_rows_to_dict(rows):
         """
-            turn queried rows to list of dict
+        turn queried rows to list of dict
         """
         res = []
         for row in rows:
@@ -146,7 +144,7 @@ class AlgorithmDao(MysqlProxy):
                 "algo_id": row.algo_id,
                 "algo_name": row.algo_name,
                 "field": row.field,
-                "description": row.description
+                "description": row.description,
             }
             res.append(algo_info)
         return res
@@ -168,8 +166,7 @@ class AlgorithmDao(MysqlProxy):
         """
         res = {"result": {}}
         try:
-            algo_info = self.session.query(Algorithm).filter(
-                Algorithm.algo_id == data['algo_id']).all()
+            algo_info = self.session.query(Algorithm).filter(Algorithm.algo_id == data['algo_id']).all()
             self.session.commit()
         except SQLAlchemyError as error:
             LOGGER.error(error)
@@ -185,7 +182,7 @@ class AlgorithmDao(MysqlProxy):
                 "algo_id": data['algo_id'],
                 "algo_name": algo_info.algo_name,
                 "field": algo_info.field,
-                "description": algo_info.description
+                "description": algo_info.description,
             }
         }
 

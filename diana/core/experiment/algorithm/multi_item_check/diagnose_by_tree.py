@@ -36,7 +36,7 @@ class Diagnose(BaseMultiItemAlgorithmOne):
             "algo_name": "diag_tree",
             "field": "multicheck",
             "description": "It's an diagnose tree method based on expert experience.",
-            "path": "diana.core.experiment.algorithm.multi_item_check.diagnose_by_tree.Diagnose"
+            "path": "diana.core.experiment.algorithm.multi_item_check.diagnose_by_tree.Diagnose",
         }
         return data
 

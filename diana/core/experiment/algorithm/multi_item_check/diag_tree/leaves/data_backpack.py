@@ -114,8 +114,7 @@ class DataBackpack:
         """
         if self._pre_check(index, data_name):
             return self.data_vector[data_name][index][0]
-        raise CheckExpressionError("Invalid index %s and data_name %s "
-                                   "to find timestamp" % (index, data_name))
+        raise CheckExpressionError("Invalid index %s and data_name %s " "to find timestamp" % (index, data_name))
 
     def get_data_value(self, index, data_name):
         """
@@ -132,8 +131,7 @@ class DataBackpack:
 
         """
         if not self._pre_check(index, data_name):
-            raise CheckExpressionError("Invalid index %s and data_name %s "
-                                       "to find data value" % (index, data_name))
+            raise CheckExpressionError("Invalid index %s and data_name %s " "to find data value" % (index, data_name))
 
         value = self.data_vector[data_name][index][1]
         if isinstance(value, str) and DataBackpack._is_number(value):

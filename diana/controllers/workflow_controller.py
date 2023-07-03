@@ -27,9 +27,16 @@ from vulcanus.log.log import LOGGER
 from diana.conf import configuration
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.core.rule.workflow import Workflow
-from diana.utils.schema.workflow import CreateWorkflowSchema, QueryWorkflowSchema, \
-    QueryWorkflowListSchema, DeleteWorkflowSchema, UpdateWorkflowSchema, IfHostInWorkflowSchema, \
-    ExecuteWorkflowSchema, StopWorkflowSchema
+from diana.utils.schema.workflow import (
+    CreateWorkflowSchema,
+    QueryWorkflowSchema,
+    QueryWorkflowListSchema,
+    DeleteWorkflowSchema,
+    UpdateWorkflowSchema,
+    IfHostInWorkflowSchema,
+    ExecuteWorkflowSchema,
+    StopWorkflowSchema,
+)
 from diana.errors.workflow_error import WorkflowModelAssignError
 from diana.core.check.check_scheduler.check_scheduler import check_scheduler
 
@@ -62,8 +69,9 @@ class CreateWorkflow(BaseResponse):
 
         access_token = request.headers.get('access_token')
         try:
-            host_infos, detail = Workflow.assign_model(args["username"], access_token, args["app_id"],
-                                                       args["input"]["hosts"], "app")
+            host_infos, detail = Workflow.assign_model(
+                args["username"], access_token, args["app_id"], args["input"]["hosts"], "app"
+            )
         except (WorkflowModelAssignError, KeyError) as error:
             LOGGER.debug(error)
             return WORKFLOW_ASSIGN_MODEL_FAIL, result
@@ -179,13 +187,13 @@ class ExecuteWorkflow(BaseResponse):
 
                 workflow_info = result["result"]
                 if workflow_info["status"] != "hold":
-                    LOGGER.info("Workflow '%s' cannot execute with status '%s'." %
-                                (workflow_id, workflow_info["status"]))
+                    LOGGER.info(
+                        "Workflow '%s' cannot execute with status '%s'." % (workflow_id, workflow_info["status"])
+                    )
                     return SUCCEED
 
                 workflow_proxy.update_workflow_status(workflow_id, "running")
-                check_scheduler.start_workflow(
-                    workflow_id, username, workflow_info["step"])
+                check_scheduler.start_workflow(workflow_id, username, workflow_info["step"])
 
         except sqlalchemy.exc.SQLAlchemyError:
             return DATABASE_CONNECT_ERROR
@@ -229,8 +237,7 @@ class StopWorkflow(BaseResponse):
 
                 workflow_info = result["result"]
                 if workflow_info["status"] != "running":
-                    LOGGER.info("Workflow '%s' cannot stop with status '%s'." %
-                                (workflow_id, workflow_info["status"]))
+                    LOGGER.info("Workflow '%s' cannot stop with status '%s'." % (workflow_id, workflow_info["status"]))
                     return SUCCEED
 
                 workflow_proxy.update_workflow_status(workflow_id, "hold")
@@ -340,8 +347,7 @@ class IfHostInWorkflow(BaseResponse):
         try:
             with WorkflowDao(configuration) as workflow_proxy:
                 workflow_proxy.connect()
-                status_code, result = workflow_proxy.if_host_in_workflow(
-                    params)
+                status_code, result = workflow_proxy.if_host_in_workflow(params)
 
             return self.response(code=status_code, data=result)
 

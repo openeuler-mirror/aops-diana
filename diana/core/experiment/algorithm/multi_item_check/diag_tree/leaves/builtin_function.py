@@ -72,9 +72,7 @@ def builtin_count(target, args_list, data_backpack):
         while index >= 0:
             if data_backpack.get_time_stamp(index, data_name) < shift_time_stamp:
                 break
-            if get_operator_function(judge_op)(
-                    data_backpack.get_data_value(index, data_name),
-                    data_pattern):
+            if get_operator_function(judge_op)(data_backpack.get_data_value(index, data_name), data_pattern):
                 ret += 1
             index -= 1
     except CheckExpressionFunctionError as exp:
@@ -313,9 +311,7 @@ def builtin_diff(target, args_list, data_backpack):
         raise CheckExpressionFunctionError("Invalid index is 0")
     try:
         data_value = data_backpack.get_data_value(data_backpack.target_index, data_name)
-        pre_data_value = data_backpack.get_data_value(
-            data_backpack.target_index - num_shift,
-            data_name)
+        pre_data_value = data_backpack.get_data_value(data_backpack.target_index - num_shift, data_name)
     except CheckExpressionFunctionError as exp:
         raise CheckExpressionFunctionError("calculate failed, %s" % exp) from exp
 
@@ -345,9 +341,7 @@ def builtin_abschange(target, args_list, data_backpack):
         raise CheckExpressionFunctionError("Invalid index is 0")
     try:
         data_value = data_backpack.get_data_value(data_backpack.target_index, data_name)
-        pre_data_value = data_backpack.get_data_value(
-            data_backpack.target_index - num_shift,
-            data_name)
+        pre_data_value = data_backpack.get_data_value(data_backpack.target_index - num_shift, data_name)
     except CheckExpressionFunctionError as exp:
         raise CheckExpressionFunctionError("calculate failed, %s" % exp) from exp
 
@@ -377,9 +371,7 @@ def builtin_change(target, args_list, data_backpack):
         raise CheckExpressionFunctionError("Invalid index is 0")
     try:
         data_value = data_backpack.get_data_value(data_backpack.target_index, data_name)
-        pre_data_value = data_backpack.get_data_value(
-            data_backpack.target_index - num_shift,
-            data_name)
+        pre_data_value = data_backpack.get_data_value(data_backpack.target_index - num_shift, data_name)
     except CheckExpressionFunctionError as exp:
         raise CheckExpressionFunctionError("calculate failed, %s" % exp) from exp
 

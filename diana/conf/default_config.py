@@ -15,17 +15,9 @@ Time:
 Author:
 Description: default config
 """
-diana = {
-    "IP": "127.0.0.1",
-    "PORT": 11112,
-    "MODE": "configurable",
-    "TIMING_CHECK": "on"
-}
+diana = {"IP": "127.0.0.1", "PORT": 11112, "MODE": "configurable", "TIMING_CHECK": "on"}
 
-default_mode = {
-    "PERIOD": 60,
-    "STEP": 60
-}
+default_mode = {"PERIOD": 60, "STEP": 60}
 
 mysql = {
     "IP": "127.0.0.1",
@@ -33,34 +25,18 @@ mysql = {
     "DATABASE_NAME": "aops",
     "ENGINE_FORMAT": "mysql+pymysql://@%s:%s/%s",
     "POOL_SIZE": 100,
-    "POOL_RECYCLE": 7200
+    "POOL_RECYCLE": 7200,
 }
 
-redis = {
-    "IP": "127.0.0.1",
-    "PORT": 6379
-}
+redis = {"IP": "127.0.0.1", "PORT": 6379}
 
-elasticsearch = {
-    "IP": "127.0.0.1",
-    "PORT": 9200,
-    "MAX_ES_QUERY_NUM": 10000000
-}
+elasticsearch = {"IP": "127.0.0.1", "PORT": 9200, "MAX_ES_QUERY_NUM": 10000000}
 
-prometheus = {
-    "IP": "127.0.0.1",
-    "PORT": 9090,
-    "QUERY_RANGE_STEP": "15s"
-}
+prometheus = {"IP": "127.0.0.1", "PORT": 9090, "QUERY_RANGE_STEP": "15s"}
 
-agent = {
-    "DEFAULT_INSTANCE_PORT": 8888
-}
+agent = {"DEFAULT_INSTANCE_PORT": 8888}
 
-zeus = {
-    "IP": "127.0.0.1",
-    "PORT": 11111
-}
+zeus = {"IP": "127.0.0.1", "PORT": 11111}
 
 consumer = {
     "KAFKA_SERVER_LIST": "127.0.0.1:9092",
@@ -70,7 +46,7 @@ consumer = {
     "MAX_RECORDS": 3,
     "TASK_NAME": "CHECK_TASK",
     "TASK_GROUP_ID": "CHECK_TASK_GROUP_ID",
-    "RESULT_NAME": "CHECK_RESULT"
+    "RESULT_NAME": "CHECK_RESULT",
 }
 
 producer = {
@@ -80,5 +56,5 @@ producer = {
     "RETRIES": 3,
     "RETRY_BACKOFF_MS": 100,
     "TASK_NAME": "CHECK_TASK",
-    "TASK_GROUP_ID": "CHECK_TASK_GROUP_ID"
+    "TASK_GROUP_ID": "CHECK_TASK_GROUP_ID",
 }

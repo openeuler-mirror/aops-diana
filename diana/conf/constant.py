@@ -74,7 +74,7 @@ ALGO_LIST = [
                 "create_time": 1660471200,
                 "tag": "",
                 "file_path": "/etc/aops/algorithm/mysql_intelligent.json",
-                "precision": None
+                "precision": None,
             },
             {
                 "username": SYSTEM_USER,
@@ -84,7 +84,7 @@ ALGO_LIST = [
                 "create_time": 1660471200,
                 "tag": "",
                 "file_path": "/etc/aops/algorithm/tpcc_intelligent.json",
-                "precision": None
+                "precision": None,
             },
             {
                 "username": SYSTEM_USER,
@@ -94,9 +94,9 @@ ALGO_LIST = [
                 "create_time": 1660471200,
                 "tag": "",
                 "file_path": "/etc/aops/algorithm/lvs_intelligent.json",
-                "precision": None
-            }
-        ]
+                "precision": None,
+            },
+        ],
     },
     {
         "algo_module": "diana.core.experiment.algorithm.multi_item_check.diagnose_by_tree.Diagnose",
@@ -109,7 +109,7 @@ ALGO_LIST = [
                 "create_time": 1660471500,
                 "tag": "",
                 "file_path": "/etc/aops/algorithm/lvs_network_error_tree.json",
-                "precision": None
+                "precision": None,
             },
             {
                 "username": SYSTEM_USER,
@@ -119,7 +119,7 @@ ALGO_LIST = [
                 "create_time": 1660471500,
                 "tag": "",
                 "file_path": "/etc/aops/algorithm/tpcc_network_error_tree.json",
-                "precision": None
+                "precision": None,
             },
             {
                 "username": SYSTEM_USER,
@@ -129,8 +129,8 @@ ALGO_LIST = [
                 "create_time": 1660471500,
                 "tag": "",
                 "file_path": "/etc/aops/algorithm/mysql_network_error_tree.json",
-                "precision": None
-            }
-        ]
-    }
+                "precision": None,
+            },
+        ],
+    },
 ]

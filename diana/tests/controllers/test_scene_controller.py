@@ -39,13 +39,8 @@ app.register_blueprint(DIANA)
 
 app.testing = True
 client = app.test_client()
-header = {
-    "Content-Type": "application/json; charset=UTF-8"
-}
-header_with_token = {
-    "Content-Type": "application/json; charset=UTF-8",
-    "access_token": "81fe"
-}
+header = {"Content-Type": "application/json; charset=UTF-8"}
+header_with_token = {"Content-Type": "application/json; charset=UTF-8", "access_token": "81fe"}
 
 
 class SceneControllerTestCase(unittest.TestCase):
@@ -56,38 +51,20 @@ class SceneControllerTestCase(unittest.TestCase):
     def test_get_scene_should_return_error_when_request_method_is_wrong(self):
         args = {}
         response = client.get(IDENTIFY_SCENE, json=args).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_get_scene_should_return_param_error_when_input_wrong_param(self):
         args = {
             "applications": ["nginx", ""],
-            "collect_items": {
-                "gala-gopher": [
-                    {
-                        "probe_name": "probe1",
-                        "probe_status": "on",
-                        "support_auto": True
-                    }
-                ]
-            }
+            "collect_items": {"gala-gopher": [{"probe_name": "probe1", "probe_status": "on", "support_auto": True}]},
         }
-        response = client.post(IDENTIFY_SCENE, json=args,
-                               headers=header_with_token).json
+        response = client.post(IDENTIFY_SCENE, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_get_scene_should_return_token_error_when_input_wrong_token(self):
         args = {
             "applications": ["nginx"],
-            "collect_items": {
-                "gala-gopher": [
-                    {
-                        "probe_name": "probe1",
-                        "probe_status": "on",
-                        "support_auto": True
-                    }
-                ]
-            }
+            "collect_items": {"gala-gopher": [{"probe_name": "probe1", "probe_status": "on", "support_auto": True}]},
         }
         response = client.post(IDENTIFY_SCENE, json=args, headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
@@ -96,17 +73,8 @@ class SceneControllerTestCase(unittest.TestCase):
     def test_get_scene_should_return_scene_when_given_correct_params(self, mock_token):
         args = {
             "applications": ["nginx"],
-            "collect_items": {
-                "gala-gopher": [
-                    {
-                        "probe_name": "probe1",
-                        "probe_status": "on",
-                        "support_auto": True
-                    }
-                ]
-            }
+            "collect_items": {"gala-gopher": [{"probe_name": "probe1", "probe_status": "on", "support_auto": True}]},
         }
         mock_token.return_value = SUCCEED
-        response = client.post(IDENTIFY_SCENE, json=args,
-                               headers=header_with_token).json
+        response = client.post(IDENTIFY_SCENE, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)

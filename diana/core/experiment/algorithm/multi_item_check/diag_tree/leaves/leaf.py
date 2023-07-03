@@ -231,7 +231,7 @@ class Leaf:
         merged_data = []
         if not method:
             if len(metric_data.keys()) == 1:
-                merged_data, = metric_data.values()
+                (merged_data,) = metric_data.values()
             return merged_data
 
         if method not in ["avg", "sum"]:
@@ -243,7 +243,7 @@ class Leaf:
                 new_metric_data[timestamp].append(value)
         if method == "avg":
             for timestamp, value in sorted(new_metric_data.items(), key=lambda x: x[0]):
-                merged_data.append([timestamp, round(sum(value)/len(value), 3)])
+                merged_data.append([timestamp, round(sum(value) / len(value), 3)])
         else:
             for timestamp, value in sorted(new_metric_data.items(), key=lambda x: x[0]):
                 merged_data.append([timestamp, sum(value)])

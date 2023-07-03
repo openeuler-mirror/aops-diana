@@ -20,8 +20,7 @@ from marshmallow import Schema, fields, validate
 
 class CreateWorkflowHostInfoSchema(Schema):
     domain = fields.String(required=True, validate=lambda s: len(s) > 0)
-    hosts = fields.List(fields.Integer(validate=lambda s: s > 0), required=True,
-                        validate=lambda s: len(s) > 0)
+    hosts = fields.List(fields.Integer(validate=lambda s: s > 0), required=True, validate=lambda s: len(s) > 0)
 
 
 class CreateWorkflowSchema(Schema):
@@ -43,22 +42,18 @@ class WorkflowListFilterSchema(Schema):
     """
     filter schema of workflow list getting interface
     """
-    domain = fields.List(fields.String, required=False,
-                         validate=lambda s: len(s) > 0)
-    app = fields.List(fields.String, required=False,
-                      validate=lambda s: len(s) > 0)
-    status = fields.List(fields.String(validate=validate.OneOf(["hold", "running", "recommending"])),
-                         required=False)
+
+    domain = fields.List(fields.String, required=False, validate=lambda s: len(s) > 0)
+    app = fields.List(fields.String, required=False, validate=lambda s: len(s) > 0)
+    status = fields.List(fields.String(validate=validate.OneOf(["hold", "running", "recommending"])), required=False)
 
 
 class QueryWorkflowListSchema(Schema):
     filter = fields.Nested(WorkflowListFilterSchema, required=False)
     page = fields.Integer(required=False, validate=lambda s: s > 0)
     per_page = fields.Integer(required=False, validate=lambda s: 0 < s < 50)
-    sort = fields.String(
-        required=False, validate=validate.OneOf(["create_time"]))
-    direction = fields.String(
-        required=False, validate=validate.OneOf(["asc", "desc"]))
+    sort = fields.String(required=False, validate=validate.OneOf(["create_time"]))
+    direction = fields.String(required=False, validate=validate.OneOf(["asc", "desc"]))
 
 
 class ExecuteWorkflowSchema(Schema):
@@ -81,8 +76,7 @@ class WorkflowDetailSchema(Schema):
 
 class UpdateWorkflowSchema(Schema):
     workflow_id = fields.String(required=True, validate=lambda s: len(s) > 0)
-    workflow_name = fields.String(
-        required=False, validate=lambda s: len(s) > 0)
+    workflow_name = fields.String(required=False, validate=lambda s: len(s) > 0)
     description = fields.String(required=False, validate=lambda s: len(s) > 0)
     step = fields.Integer(required=False)
     period = fields.Integer(required=False)
@@ -91,5 +85,4 @@ class UpdateWorkflowSchema(Schema):
 
 
 class IfHostInWorkflowSchema(Schema):
-    host_list = fields.List(
-        fields.Integer(), required=True, validate=lambda s: s > 0)
+    host_list = fields.List(fields.Integer(), required=True, validate=lambda s: s > 0)

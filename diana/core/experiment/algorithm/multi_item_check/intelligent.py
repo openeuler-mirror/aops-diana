@@ -48,7 +48,7 @@ class Intelligent(Algorithm):
             "algo_name": "Intelligent",
             "field": "multicheck",
             "description": "It's an intelligent method.",
-            "path": "diana.core.experiment.algorithm.multi_item_check.intelligent.Intelligent"
+            "path": "diana.core.experiment.algorithm.multi_item_check.intelligent.Intelligent",
         }
         return data
 
@@ -103,13 +103,16 @@ class Intelligent(Algorithm):
         up = mean + n * std + 1e-5
         down = mean - n * std - 1e-5
 
-        result = (((data - up) / (std + 1e-3)).apply(lambda x: max(0, x)) +
-                  ((down - data) / (std + 1e-3)).apply(lambda x: max(0, x))).values.tolist()
+        result = (
+            ((data - up) / (std + 1e-3)).apply(lambda x: max(0, x))
+            + ((down - data) / (std + 1e-3)).apply(lambda x: max(0, x))
+        ).values.tolist()
 
         return result
 
     def _enable_fusion_strategy(
-            self, rule_info: dict, temp_result: Dict[str, pd.Series], time_range: List[int]) -> bool:
+        self, rule_info: dict, temp_result: Dict[str, pd.Series], time_range: List[int]
+    ) -> bool:
         concat_result = pd.concat(temp_result.values(), axis=1)
         fusion_strategy = rule_info['fusion_strategy']
         concat_result['total'] = concat_result[0] & True
@@ -127,8 +130,7 @@ class Intelligent(Algorithm):
 
         return False
 
-    def _check(self, model_info: dict,
-               preprocessed_data: pd.Series) -> List[bool]:
+    def _check(self, model_info: dict, preprocessed_data: pd.Series) -> List[bool]:
         check_model_info = model_info['check_model']
         check_model_name = check_model_info['enabled']
         # adtk
@@ -137,10 +139,8 @@ class Intelligent(Algorithm):
             original_labels = self.run_adtk(preprocessed_data, model_path)
         else:
             param = check_model_info['algorithm_list']['nsigma']['param']
-            original_labels = self.run_nsigma(
-                preprocessed_data, param['n'], param['train_length'])
-            original_labels = list(
-                map(lambda x: True if x > 0 else False, original_labels))
+            original_labels = self.run_nsigma(preprocessed_data, param['n'], param['train_length'])
+            original_labels = list(map(lambda x: True if x > 0 else False, original_labels))
         return original_labels
 
     @staticmethod
@@ -152,8 +152,7 @@ class Intelligent(Algorithm):
         if preprocess_model_name == "adtk":
             strategy_name = preprocess_model_info['algorithm_list'][preprocess_model_name]['algorithm_name']
             param = preprocess_model_info['algorithm_list'][preprocess_model_name]['param']
-            preprocessed_data = adtk_preprocess(
-                agg_data, strategy_name, **param)
+            preprocessed_data = adtk_preprocess(agg_data, strategy_name, **param)
         # normalize and filter
         elif preprocess_model_name == "normal":
             normalized_data = normalize(agg_data)
@@ -163,8 +162,7 @@ class Intelligent(Algorithm):
             preprocessed_data = agg_data
         return preprocessed_data
 
-    def _aggregate(
-            self, data: Dict[str, Dict[str, list]], need_transform: bool = True) -> Dict[str, pd.Series]:
+    def _aggregate(self, data: Dict[str, Dict[str, list]], need_transform: bool = True) -> Dict[str, pd.Series]:
         """
         Args:
             data: original data from prometheus or csv. e.g.
@@ -206,8 +204,7 @@ class Intelligent(Algorithm):
             aggregated_data[metric_name] = agg_data
         return aggregated_data
 
-    def run(
-            self, aggregated_data: Dict[str, pd.Series], time_range: List[int]) -> bool:
+    def run(self, aggregated_data: Dict[str, pd.Series], time_range: List[int]) -> bool:
         """
         Args:
             aggregated_data, e.g.
@@ -233,23 +230,20 @@ class Intelligent(Algorithm):
                 preprocessed_data = self._preprocess(agg_data, model_info)
                 # do check
                 original_labels = self._check(model_info, preprocessed_data)
-                temp_result[metric_name] = pd.Series(
-                    original_labels, index=preprocessed_data.index)
+                temp_result[metric_name] = pd.Series(original_labels, index=preprocessed_data.index)
 
             # no result
             if not temp_result:
                 continue
 
             # enable fusion strategy
-            result = self._enable_fusion_strategy(
-                rule_info, temp_result, time_range)
+            result = self._enable_fusion_strategy(rule_info, temp_result, time_range)
             if result:
                 return True
 
         return False
 
-    def calculate(self, data: Dict[str, Dict[str, list]],
-                  time_range: List[int]) -> bool:
+    def calculate(self, data: Dict[str, Dict[str, list]], time_range: List[int]) -> bool:
         """
         Args:
             data, original data from prometheus. e.g.
@@ -278,8 +272,7 @@ class Intelligent(Algorithm):
         return self.run(aggregated_data, time_range)
 
     @staticmethod
-    def __train_adtk(data: pd.Series, algorithm_name: str,
-                     file_path, **kwargs):
+    def __train_adtk(data: pd.Series, algorithm_name: str, file_path, **kwargs):
         def kwargs_formatting(kwargs):
             for key, value in kwargs.items():
                 if isinstance(value, list):
@@ -303,19 +296,18 @@ class Intelligent(Algorithm):
 
     @staticmethod
     def __attach_label(truth, labels, step, cursor, window):
-        if truth[cursor + window - step:cursor + window].sum() >= 1:
+        if truth[cursor + window - step : cursor + window].sum() >= 1:
             labels.append(1)
         else:
             labels.append(0)
 
-    def __run_algorithm(self, cursor, window,
-                        group_by_metric_name_data, result):
+    def __run_algorithm(self, cursor, window, group_by_metric_name_data, result):
         tmp_data = defaultdict(dict)
         for metric_name, metric_info in self.config['metric_list'].items():
             if group_by_metric_name_data[metric_name] is None:
                 continue
             for label, value in group_by_metric_name_data[metric_name].items():
-                tmp_data[metric_name][label] = value[cursor:cursor + window]
+                tmp_data[metric_name][label] = value[cursor : cursor + window]
 
         agg_data = self._aggregate(tmp_data, False)
         temp = list(agg_data.values())[0]
@@ -359,13 +351,11 @@ class Intelligent(Algorithm):
                     algorithm_name = check_model_info['algorithm_list'][check_model_name]['algorithm_name']
                     param = check_model_info['algorithm_list'][check_model_name]['param']
                     file_path = train_config_dir + '/' + rule_name + '_' + metric_name
-                    self.__train_adtk(
-                        preprocessed_data, algorithm_name, file_path, **param)
+                    self.__train_adtk(preprocessed_data, algorithm_name, file_path, **param)
                     check_model_info['algorithm_list'][check_model_name]['model_path'] = file_path
                 else:
                     param = check_model_info['algorithm_list']['nsigma']['param']
-                    self.run_nsigma(
-                        preprocessed_data, param['n'], param['train_length'])
+                    self.run_nsigma(preprocessed_data, param['n'], param['train_length'])
 
         config_path = os.path.join(train_config_dir, config_name)
         with open(config_path, 'w') as file_io:
@@ -373,7 +363,9 @@ class Intelligent(Algorithm):
 
         print("The global config has been written to", config_path)
 
-    def test(self, data: Dict[str, Dict[str, pd.Series]], truth: pd.Series, window: int = 100, step: int = 40) -> Tuple[List[int], List[int]]:
+    def test(
+        self, data: Dict[str, Dict[str, pd.Series]], truth: pd.Series, window: int = 100, step: int = 40
+    ) -> Tuple[List[int], List[int]]:
         """
         Test the algorithm, split the dataset first
 
@@ -394,8 +386,7 @@ class Intelligent(Algorithm):
 
         # generate dataset every step
         while cursor + window < length:
-            self.__run_algorithm(
-                cursor, window, data, result)
+            self.__run_algorithm(cursor, window, data, result)
             # generate labels
             self.__attach_label(truth, labels, step, cursor, window)
 

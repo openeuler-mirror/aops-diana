@@ -40,13 +40,8 @@ app.register_blueprint(CHECK)
 
 app.testing = True
 client = app.test_client()
-header = {
-    "Content-Type": "application/json; charset=UTF-8"
-}
-header_with_token = {
-    "Content-Type": "application/json; charset=UTF-8",
-    "access_token": "81fe"
-}
+header = {"Content-Type": "application/json; charset=UTF-8"}
+header_with_token = {"Content-Type": "application/json; charset=UTF-8", "access_token": "81fe"}
 
 
 class AppControllerTestCase(unittest.TestCase):
@@ -57,51 +52,25 @@ class AppControllerTestCase(unittest.TestCase):
     def test_create_app_should_return_error_when_request_method_is_wrong(self):
         args = {}
         response = client.get(CREATE_APP, json=args).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_create_app_should_return_param_error_when_input_wrong_param(self):
-        args = {
-            "app_name": "app1",
-            "description": "",
-            "api": {
-                "type": 1,
-                "address1": "sx"
-            }
-        }
-        response = client.post(CREATE_APP, json=args,
-                               headers=header_with_token).json
+        args = {"app_name": "app1", "description": "", "api": {"type": 1, "address1": "sx"}}
+        response = client.post(CREATE_APP, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_create_app_should_return_token_error_when_input_wrong_token(self):
-        args = {
-            "app_name": "app1",
-            "description": "xx",
-            "api": {
-                "type": "api",
-                "address": "execute"
-            },
-            "detail": {}
-        }
+        args = {"app_name": "app1", "description": "xx", "api": {"type": "api", "address": "execute"}, "detail": {}}
         response = client.post(CREATE_APP, json=args, headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_token')
     @mock.patch.object(AppDao, 'connect')
     def test_create_app_should_return_database_error_when_database_is_wrong(self, mock_connect, mock_token):
-        args = {
-            "app_name": "app1",
-            "description": "xx",
-            "api": {
-                "type": "api",
-                "address": "execute"
-            },
-            "detail": {}
-        }
+        args = {"app_name": "app1", "description": "xx", "api": {"type": "api", "address": "execute"}, "detail": {}}
         mock_connect.return_value = False
         mock_token.return_value = SUCCEED
-        response = client.post(CREATE_APP, json=args,
-                               headers=header_with_token).json
+        response = client.post(CREATE_APP, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_args')
@@ -110,57 +79,46 @@ class AppControllerTestCase(unittest.TestCase):
         args = {
             "app_name": "app1",
             "description": "xx",
-            "api": {
-                "type": "api",
-                "address": "execute"
-            },
+            "api": {"type": "api", "address": "execute"},
             "detail": {},
-            "username": "admin"
+            "username": "admin",
         }
         mock_token.return_value = SUCCEED
         mock_args.return_value = SUCCEED
-        response = client.post(CREATE_APP, json=args,
-                               headers=header_with_token).json
+        response = client.post(CREATE_APP, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
         self.assertIn('app_id', response.keys())
 
     def test_query_app_list_should_return_error_when_request_method_is_wrong(self):
         response = client.post(QUERY_APP_LIST).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_query_app_list_should_return_param_error_when_input_wrong_param(self):
-        response = client.get(
-            QUERY_APP_LIST + "?page=1&per_page='1'", headers=header_with_token).json
+        response = client.get(QUERY_APP_LIST + "?page=1&per_page='1'", headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_query_app_list_should_return_token_error_when_input_wrong_token(self):
-        response = client.get(
-            QUERY_APP_LIST + "?page=1&per_page=2", headers=header).json
+        response = client.get(QUERY_APP_LIST + "?page=1&per_page=2", headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
 
     def test_query_app_list_should_return_database_error_when_database_is_wrong(self):
         with mock.patch("vulcanus.restful.response.operate") as mock_operate:
             mock_operate.return_value = DATABASE_CONNECT_ERROR
-            response = client.get(
-                QUERY_APP_LIST + "?page=1&per_page=2", headers=header_with_token).json
+            response = client.get(QUERY_APP_LIST + "?page=1&per_page=2", headers=header_with_token).json
             self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     def test_query_app_list_should_return_succeed_when_correct(self):
         with mock.patch("vulcanus.restful.response.operate") as mock_operate:
             mock_operate.return_value = SUCCEED
-            response = client.get(
-                QUERY_APP_LIST + "?page=1&per_page=2", headers=header_with_token).json
+            response = client.get(QUERY_APP_LIST + "?page=1&per_page=2", headers=header_with_token).json
             self.assertEqual(response['label'], SUCCEED)
 
     def test_query_app_should_return_error_when_request_method_is_wrong(self):
         response = client.post(QUERY_APP).json
-        self.assertEqual(
-            response['message'], 'The method is not allowed for the requested URL.')
+        self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_query_app_should_return_param_error_when_input_wrong_param(self):
-        response = client.get(QUERY_APP + "?app=1",
-                              headers=header_with_token).json
+        response = client.get(QUERY_APP + "?app=1", headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_query_app_should_return_token_error_when_input_wrong_token(self):
@@ -170,8 +128,7 @@ class AppControllerTestCase(unittest.TestCase):
     @mock.patch.object(BaseResponse, 'verify_token')
     def test_query_app_should_return_database_error_when_database_is_wrong(self, mock_token):
         mock_token.return_value = SUCCEED
-        response = client.get(QUERY_APP + "?app_id='2'",
-                              headers=header_with_token).json
+        response = client.get(QUERY_APP + "?app_id='2'", headers=header_with_token).json
         self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_token')
@@ -179,8 +136,7 @@ class AppControllerTestCase(unittest.TestCase):
     def test_query_app_should_return_succeed_when_correct(self, mock_connect, mock_token):
         mock_connect.return_value = True
         mock_token.return_value = SUCCEED
-        response = client.get(QUERY_APP + "?app_id='3'",
-                              headers=header_with_token).json
+        response = client.get(QUERY_APP + "?app_id='3'", headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)
 
 

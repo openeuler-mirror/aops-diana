@@ -21,9 +21,21 @@ description: expression parser
 
 import ply.lex as lex
 import ply.yacc as yacc
-from diana.core.experiment.algorithm.multi_item_check.diag_tree.leaves.element import Conditional, \
-    ArithmeticOperator, ComparisonOperator, LogicalOperation, BitOperation, Unary, \
-    TimeFilter, FunctionCall, Literal, Pair, Dict, Name, MemberOperation
+from diana.core.experiment.algorithm.multi_item_check.diag_tree.leaves.element import (
+    Conditional,
+    ArithmeticOperator,
+    ComparisonOperator,
+    LogicalOperation,
+    BitOperation,
+    Unary,
+    TimeFilter,
+    FunctionCall,
+    Literal,
+    Pair,
+    Dict,
+    Name,
+    MemberOperation,
+)
 from diana.core.experiment.algorithm.multi_item_check.diag_tree.custom_exception import CheckExpressionError
 from vulcanus.log.log import LOGGER
 
@@ -32,20 +44,39 @@ class Lexer:
     """
     Lexer definition
     """
+
     keywords = (
-        'null', 'in', 'notin',
-        'true', 'false', 'True', 'False', 'TRUE', 'FALSE',
+        'null',
+        'in',
+        'notin',
+        'true',
+        'false',
+        'True',
+        'False',
+        'TRUE',
+        'FALSE',
     )
 
     tokens = [
-                 'NAME', 'MARCO',
-                 'NUM', 'MIN', 'SEC', 'HOUR', 'SCI_NUM',
-                 'CHAR_LITERAL',
-                 'STRING_LITERAL',
-                 'OR', 'AND',
-                 'EQ', 'NEQ', 'GTEQ', 'LTEQ',
-                 'LSHIFT', 'RSHIFT', 'RRSHIFT'
-             ] + [k.upper() for k in keywords]
+        'NAME',
+        'MARCO',
+        'NUM',
+        'MIN',
+        'SEC',
+        'HOUR',
+        'SCI_NUM',
+        'CHAR_LITERAL',
+        'STRING_LITERAL',
+        'OR',
+        'AND',
+        'EQ',
+        'NEQ',
+        'GTEQ',
+        'LTEQ',
+        'LSHIFT',
+        'RSHIFT',
+        'RRSHIFT',
+    ] + [k.upper() for k in keywords]
     literals = '()+-*/=?:,.^|&~!=[]{};<>@%'
 
     t_NUM = r'\.?[0-9][0-9eE_lLdDa-fA-F.xXpP]*'
@@ -103,9 +134,9 @@ class Lexer:
         """
         error lex token
         """
-        LOGGER.error("Illegal character '%s' (%s) in line %s", token.value[0],
-                                                              hex(ord(token.value[0])),
-                                                              token.lexer.lineno)
+        LOGGER.error(
+            "Illegal character '%s' (%s) in line %s", token.value[0], hex(ord(token.value[0])), token.lexer.lineno
+        )
         raise CheckExpressionError('error: {}'.format(token))
 
 
@@ -127,7 +158,7 @@ class ExpressionParser:
     @staticmethod
     def p_conditional_expression(production):
         '''conditional_expression : conditional_or_expression
-                                  | conditional_or_expression '?' expression ':' conditional_expression'''
+        | conditional_or_expression '?' expression ':' conditional_expression'''
         if len(production) == 2:
             production[0] = production[1]
         else:
@@ -136,8 +167,8 @@ class ExpressionParser:
     @staticmethod
     def p_conditional_expression_not_name(production):
         '''conditional_expression_not_name : conditional_or_expression_not_name
-                                           | conditional_or_expression_not_name '?' expression ':' conditional_expression
-                                           | name '?' expression ':' conditional_expression'''
+        | conditional_or_expression_not_name '?' expression ':' conditional_expression
+        | name '?' expression ':' conditional_expression'''
         if len(production) == 2:
             production[0] = production[1]
         else:
@@ -155,174 +186,175 @@ class ExpressionParser:
             production[0] = production[1]
         else:
             production[0] = ctor(production[2], production[1], production[3])
+
     @staticmethod
     def p_conditional_or_expression(production):
         '''conditional_or_expression : conditional_and_expression
-                                     | conditional_or_expression OR conditional_and_expression'''
+        | conditional_or_expression OR conditional_and_expression'''
         ExpressionParser.binop(production, LogicalOperation)
 
     @staticmethod
     def p_conditional_or_expression_not_name(production):
         '''conditional_or_expression_not_name : conditional_and_expression_not_name
-                                              | conditional_or_expression_not_name OR conditional_and_expression
-                                              | name OR conditional_and_expression'''
+        | conditional_or_expression_not_name OR conditional_and_expression
+        | name OR conditional_and_expression'''
         ExpressionParser.binop(production, LogicalOperation)
 
     @staticmethod
     def p_conditional_and_expression(production):
         '''conditional_and_expression : inclusive_or_expression
-                                      | conditional_and_expression AND inclusive_or_expression'''
+        | conditional_and_expression AND inclusive_or_expression'''
         ExpressionParser.binop(production, LogicalOperation)
 
     @staticmethod
     def p_conditional_and_expression_not_name(production):
         '''conditional_and_expression_not_name : inclusive_or_expression_not_name
-                                               | conditional_and_expression_not_name AND inclusive_or_expression
-                                               | name AND inclusive_or_expression'''
+        | conditional_and_expression_not_name AND inclusive_or_expression
+        | name AND inclusive_or_expression'''
         ExpressionParser.binop(production, LogicalOperation)
 
     @staticmethod
     def p_inclusive_or_expression(production):
         '''inclusive_or_expression : exclusive_or_expression
-                                   | inclusive_or_expression '|' exclusive_or_expression'''
+        | inclusive_or_expression '|' exclusive_or_expression'''
         ExpressionParser.binop(production, BitOperation)
 
     @staticmethod
     def p_inclusive_or_expression_not_name(production):
         '''inclusive_or_expression_not_name : exclusive_or_expression_not_name
-                                            | inclusive_or_expression_not_name '|' exclusive_or_expression
-                                            | name '|' exclusive_or_expression'''
+        | inclusive_or_expression_not_name '|' exclusive_or_expression
+        | name '|' exclusive_or_expression'''
         ExpressionParser.binop(production, BitOperation)
 
     @staticmethod
     def p_exclusive_or_expression(production):
         '''exclusive_or_expression : and_expression
-                                   | exclusive_or_expression '^' and_expression'''
+        | exclusive_or_expression '^' and_expression'''
         ExpressionParser.binop(production, BitOperation)
 
     @staticmethod
     def p_exclusive_or_expression_not_name(production):
         '''exclusive_or_expression_not_name : and_expression_not_name
-                                            | exclusive_or_expression_not_name '^' and_expression
-                                            | name '^' and_expression'''
+        | exclusive_or_expression_not_name '^' and_expression
+        | name '^' and_expression'''
         ExpressionParser.binop(production, BitOperation)
 
     @staticmethod
     def p_and_expression(production):
         '''and_expression : equality_expression
-                          | and_expression '&' equality_expression'''
+        | and_expression '&' equality_expression'''
         ExpressionParser.binop(production, BitOperation)
 
     @staticmethod
     def p_and_expression_not_name(production):
         '''and_expression_not_name : equality_expression_not_name
-                                   | and_expression_not_name '&' equality_expression
-                                   | name '&' equality_expression'''
+        | and_expression_not_name '&' equality_expression
+        | name '&' equality_expression'''
         ExpressionParser.binop(production, BitOperation)
 
     @staticmethod
     def p_equality_expression(production):
         '''equality_expression : relational_expression
-                               | equality_expression EQ relational_expression
-                               | equality_expression NEQ relational_expression '''
+        | equality_expression EQ relational_expression
+        | equality_expression NEQ relational_expression'''
         ExpressionParser.binop(production, ComparisonOperator)
 
     @staticmethod
     def p_equality_expression_not_name(production):
         '''equality_expression_not_name : relational_expression_not_name
-                                        | equality_expression_not_name EQ relational_expression
-                                        | name EQ relational_expression
-                                        | equality_expression_not_name NEQ relational_expression
-                                        | name NEQ relational_expression '''
+        | equality_expression_not_name EQ relational_expression
+        | name EQ relational_expression
+        | equality_expression_not_name NEQ relational_expression
+        | name NEQ relational_expression'''
         ExpressionParser.binop(production, ComparisonOperator)
 
     @staticmethod
     def p_membership_expression(production):
         '''equality_expression : dict IN dict
-                               | dict NOTIN dict '''
+        | dict NOTIN dict'''
         ExpressionParser.binop(production, MemberOperation)
 
     @staticmethod
     def p_relational_expression(production):
         '''relational_expression : shift_expression
-                                 | relational_expression '>' shift_expression
-                                 | relational_expression '<' shift_expression
-                                 | relational_expression GTEQ shift_expression
-                                 | relational_expression LTEQ shift_expression '''
+        | relational_expression '>' shift_expression
+        | relational_expression '<' shift_expression
+        | relational_expression GTEQ shift_expression
+        | relational_expression LTEQ shift_expression'''
         ExpressionParser.binop(production, ComparisonOperator)
 
     @staticmethod
     def p_relational_expression_not_name(production):
         '''relational_expression_not_name : shift_expression_not_name
-                                          | shift_expression_not_name '<' shift_expression
-                                          | name '<' shift_expression
-                                          | shift_expression_not_name '>' shift_expression
-                                          | name '>' shift_expression
-                                          | shift_expression_not_name GTEQ shift_expression
-                                          | name GTEQ shift_expression
-                                          | shift_expression_not_name LTEQ shift_expression
-                                          | name LTEQ shift_expression'''
+        | shift_expression_not_name '<' shift_expression
+        | name '<' shift_expression
+        | shift_expression_not_name '>' shift_expression
+        | name '>' shift_expression
+        | shift_expression_not_name GTEQ shift_expression
+        | name GTEQ shift_expression
+        | shift_expression_not_name LTEQ shift_expression
+        | name LTEQ shift_expression'''
         ExpressionParser.binop(production, ComparisonOperator)
 
     @staticmethod
     def p_shift_expression(production):
         '''shift_expression : additive_expression
-                            | shift_expression LSHIFT additive_expression
-                            | shift_expression RSHIFT additive_expression
-                            | shift_expression RRSHIFT additive_expression'''
+        | shift_expression LSHIFT additive_expression
+        | shift_expression RSHIFT additive_expression
+        | shift_expression RRSHIFT additive_expression'''
         ExpressionParser.binop(production, BitOperation)
 
     @staticmethod
     def p_shift_expression_not_name(production):
         '''shift_expression_not_name : additive_expression_not_name
-                                     | shift_expression_not_name LSHIFT additive_expression
-                                     | name LSHIFT additive_expression
-                                     | shift_expression_not_name RSHIFT additive_expression
-                                     | name RSHIFT additive_expression
-                                     | shift_expression_not_name RRSHIFT additive_expression
-                                     | name RRSHIFT additive_expression'''
+        | shift_expression_not_name LSHIFT additive_expression
+        | name LSHIFT additive_expression
+        | shift_expression_not_name RSHIFT additive_expression
+        | name RSHIFT additive_expression
+        | shift_expression_not_name RRSHIFT additive_expression
+        | name RRSHIFT additive_expression'''
         ExpressionParser.binop(production, BitOperation)
 
     @staticmethod
     def p_additive_expression(production):
         '''additive_expression : multiplicative_expression
-                               | additive_expression '+' multiplicative_expression
-                               | additive_expression '-' multiplicative_expression'''
+        | additive_expression '+' multiplicative_expression
+        | additive_expression '-' multiplicative_expression'''
         ExpressionParser.binop(production, ArithmeticOperator)
 
     @staticmethod
     def p_additive_expression_not_name(production):
         '''additive_expression_not_name : multiplicative_expression_not_name
-                                        | additive_expression_not_name '+' multiplicative_expression
-                                        | name '+' multiplicative_expression
-                                        | additive_expression_not_name '-' multiplicative_expression
-                                        | name '-' multiplicative_expression'''
+        | additive_expression_not_name '+' multiplicative_expression
+        | name '+' multiplicative_expression
+        | additive_expression_not_name '-' multiplicative_expression
+        | name '-' multiplicative_expression'''
         ExpressionParser.binop(production, ArithmeticOperator)
 
     @staticmethod
     def p_multiplicative_expression(production):
         '''multiplicative_expression : unary_expression
-                                     | multiplicative_expression '*' unary_expression
-                                     | multiplicative_expression '/' unary_expression
-                                     | multiplicative_expression '%' unary_expression'''
+        | multiplicative_expression '*' unary_expression
+        | multiplicative_expression '/' unary_expression
+        | multiplicative_expression '%' unary_expression'''
         ExpressionParser.binop(production, ArithmeticOperator)
 
     @staticmethod
     def p_multiplicative_expression_not_name(production):
         '''multiplicative_expression_not_name : unary_expression_not_name
-                                              | multiplicative_expression_not_name '*' unary_expression
-                                              | name '*' unary_expression
-                                              | multiplicative_expression_not_name '/' unary_expression
-                                              | name '/' unary_expression
-                                              | multiplicative_expression_not_name '%' unary_expression
-                                              | name '%' unary_expression'''
+        | multiplicative_expression_not_name '*' unary_expression
+        | name '*' unary_expression
+        | multiplicative_expression_not_name '/' unary_expression
+        | name '/' unary_expression
+        | multiplicative_expression_not_name '%' unary_expression
+        | name '%' unary_expression'''
         ExpressionParser.binop(production, ArithmeticOperator)
 
     @staticmethod
     def p_unary_expression(production):
         '''unary_expression : '+' unary_expression
-                            | '-' unary_expression
-                            | unary_expression_not_plus_minus'''
+        | '-' unary_expression
+        | unary_expression_not_plus_minus'''
         if len(production) == 2:
             production[0] = production[1]
         else:
@@ -331,8 +363,8 @@ class ExpressionParser:
     @staticmethod
     def p_unary_expression_not_name(production):
         '''unary_expression_not_name : '+' unary_expression
-                                     | '-' unary_expression
-                                     | unary_expression_not_plus_minus_not_name'''
+        | '-' unary_expression
+        | unary_expression_not_plus_minus_not_name'''
         if len(production) == 2:
             production[0] = production[1]
         else:
@@ -341,8 +373,8 @@ class ExpressionParser:
     @staticmethod
     def p_unary_expression_not_plus_minus(production):
         '''unary_expression_not_plus_minus : postfix_expression
-                                           | '~' unary_expression
-                                           | '!' unary_expression'''
+        | '~' unary_expression
+        | '!' unary_expression'''
         if len(production) == 2:
             production[0] = production[1]
         else:
@@ -351,8 +383,8 @@ class ExpressionParser:
     @staticmethod
     def p_unary_expression_not_plus_minus_not_name(production):
         '''unary_expression_not_plus_minus_not_name : postfix_expression_not_name
-                                                    | '~' unary_expression
-                                                    | '!' unary_expression'''
+        | '~' unary_expression
+        | '!' unary_expression'''
         if len(production) == 2:
             production[0] = production[1]
         else:
@@ -361,12 +393,12 @@ class ExpressionParser:
     @staticmethod
     def p_postfix_expression(production):
         '''postfix_expression : primary
-                              | name '''
+        | name'''
         production[0] = production[1]
 
     @staticmethod
     def p_postfix_expression_not_name(production):
-        '''postfix_expression_not_name : primary '''
+        '''postfix_expression_not_name : primary'''
         production[0] = production[1]
 
     @staticmethod
@@ -377,13 +409,13 @@ class ExpressionParser:
     @staticmethod
     def p_primary_no_new_array(production):
         '''primary_no_new_array : literal
-                                | function_call'''
+        | function_call'''
         production[0] = production[1]
 
     @staticmethod
     def p_primary_no_new_array2(production):
         '''primary_no_new_array : '(' name ')'
-                                | '(' expression_not_name ')' '''
+        | '(' expression_not_name ')' '''
         production[0] = production[2]
 
 
@@ -415,7 +447,7 @@ class FunctionParser:
     @staticmethod
     def p_argument_list(production):
         '''argument_list : expression
-                         | argument_list ',' expression'''
+        | argument_list ',' expression'''
         if len(production) == 2:
             production[0] = [production[1]]
         else:
@@ -424,7 +456,7 @@ class FunctionParser:
     @staticmethod
     def p_argument_list_time_filter(production):
         '''argument_list : time_filter
-                         | time_filter ',' argument_list '''
+        | time_filter ',' argument_list'''
         if len(production) == 2:
             production[0] = [production[1]]
         else:
@@ -432,9 +464,9 @@ class FunctionParser:
 
     @staticmethod
     def p_time_filter(production):
-        ''' time_filter : NUM MIN
-                        | NUM SEC
-                        | NUM HOUR '''
+        '''time_filter : NUM MIN
+        | NUM SEC
+        | NUM HOUR'''
         production[0] = TimeFilter(production[1], production[2])
 
 
@@ -451,24 +483,24 @@ class TypeParser:
     @staticmethod
     def p_simple_name(production):
         '''simple_name : NAME
-                       | MARCO '''
+        | MARCO'''
         production[0] = Name(production[1])
 
     @staticmethod
     def p_literal(production):
         '''literal : NUM
-                   | SCI_NUM
-                   | CHAR_LITERAL
-                   | STRING_LITERAL
-                   | TRUE
-                   | FALSE
-                   | NULL'''
+        | SCI_NUM
+        | CHAR_LITERAL
+        | STRING_LITERAL
+        | TRUE
+        | FALSE
+        | NULL'''
         production[0] = Literal(production)
 
     @staticmethod
     def p_pair_list(production):
         '''pair_list : pair
-                     | pair_list ',' pair '''
+        | pair_list ',' pair'''
         if len(production) == 2:
             production[0] = [production[1]]
         else:
@@ -478,15 +510,15 @@ class TypeParser:
     @staticmethod
     def p_pair(production):
         '''pair : name ':' name
-                | literal ':' literal
-                | name ':' literal
-                | literal ':' name '''
+        | literal ':' literal
+        | name ':' literal
+        | literal ':' name'''
         production[0] = Pair(production[1], production[3])
 
     @staticmethod
     def p_dict(production):
         '''dict : '{' '}'
-                | '{' pair_list '}' '''
+        | '{' pair_list '}' '''
         if len(production) == 2:
             production[0] = {}
         else:
@@ -497,6 +529,7 @@ class YaccParser(ExpressionParser, TypeParser, FunctionParser):
     """
     Yacc Parser
     """
+
     tokens = Lexer.tokens
 
     @staticmethod

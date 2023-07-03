@@ -18,7 +18,7 @@ from diana.utils.schema.result import (
     QueryCheckResultHostSchema,
     QueryCheckResultListSchema,
     CheckResultConfirmSchema,
-    QueryResultDomainCountSchema
+    QueryResultDomainCountSchema,
 )
 from vulcanus.restful.response import BaseResponse
 from diana.conf import configuration
@@ -26,8 +26,8 @@ from diana.conf import configuration
 
 class QueryCheckResultHost(BaseResponse):
     """
-        Interface for get check result.
-        Restful API: GET
+    Interface for get check result.
+    Restful API: GET
     """
 
     @BaseResponse.handle(schema=QueryCheckResultHostSchema, proxy=ResultDao, config=configuration)
@@ -58,14 +58,14 @@ class QueryCheckResultHost(BaseResponse):
 
 class QueryCheckResultList(BaseResponse):
     """
-        Interface for get check result list.
-        Restful API: GET
+    Interface for get check result list.
+    Restful API: GET
     """
 
     @BaseResponse.handle(schema=QueryCheckResultListSchema, proxy=ResultDao, config=configuration)
     def get(self, callback: ResultDao, **params):
         """
-            get check result list from database
+        get check result list from database
         """
         status_code, result = callback.query_result_list(params)
         return self.response(code=status_code, data=result)
@@ -73,14 +73,14 @@ class QueryCheckResultList(BaseResponse):
 
 class QueryResultTotalCount(BaseResponse):
     """
-        Interface for get number of alerts
-        Restful API: GET
+    Interface for get number of alerts
+    Restful API: GET
     """
 
     @BaseResponse.handle(proxy=ResultDao, config=configuration)
     def get(self, callback: ResultDao, **params):
         """
-            get number of alerts from database
+        get number of alerts from database
         """
         status_code, result = callback.query_result_total_count(params)
         return self.response(code=status_code, data=result)
@@ -88,22 +88,22 @@ class QueryResultTotalCount(BaseResponse):
 
 class ConfirmCheckResult(BaseResponse):
     """
-        Interface for confirm check result
-        Restful API: POST
+    Interface for confirm check result
+    Restful API: POST
     """
 
     @BaseResponse.handle(schema=CheckResultConfirmSchema, proxy=ResultDao, config=configuration)
     def post(self, callback: ResultDao, **params):
         """
-            confirm check result, modify confirmed value to True
+        confirm check result, modify confirmed value to True
         """
         return self.response(code=callback.confirm_check_result(params))
 
 
 class QueryDomainResultCount(BaseResponse):
     """
-        Interface for get number of domain check result
-        Restful API: GET
+    Interface for get number of domain check result
+    Restful API: GET
     """
 
     @BaseResponse.handle(schema=QueryResultDomainCountSchema, proxy=ResultDao, config=configuration)
@@ -159,12 +159,15 @@ class DownloadAlertReport(BaseResponse):
             """
             check_result = ""
             for host_check in host.get("host_check_result", list()):
-                check_result += f"""
+                check_result += (
+                    f"""
                 Label: {host_check['metric_label']}
                 Metric Name: {host_check['metric_name']}
                 Time: {host_check['time']}
 
-                """ + os.linesep
+                """
+                    + os.linesep
+                )
             stream_content += _host + check_result
         return stream_content
 
@@ -176,6 +179,5 @@ class DownloadAlertReport(BaseResponse):
 
         _, hosts = callback.query_result_host(params)
         _, domain_info = callback.query_result_list(params)
-        stream_content = self._beautify_stream_content(
-            hosts=hosts, domain=domain_info.get("result"))
+        stream_content = self._beautify_stream_content(hosts=hosts, domain=domain_info.get("result"))
         return self._file_stream(content=stream_content, alert_id=request.args.get("alert_id", ""))

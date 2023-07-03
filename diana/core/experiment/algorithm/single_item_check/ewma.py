@@ -18,7 +18,6 @@ from diana.core.experiment.algorithm.base_algo import BaseSingleItemAlgorithm
 
 
 class EWMA(BaseSingleItemAlgorithm):
-
     def __init__(self, var_times: int = 10, alpha: float = 0.9, adjust: bool = True) -> None:
         self._var_times = var_times
         self._alpha = alpha
@@ -30,7 +29,7 @@ class EWMA(BaseSingleItemAlgorithm):
             "algo_name": "ewma",
             "field": "singlecheck",
             "description": "It's a single item check method using ewma algorithm.",
-            "path": "diana.core.experiment.algorithm.single_item_check.ewma.EWMA"
+            "path": "diana.core.experiment.algorithm.single_item_check.ewma.EWMA",
         }
         return data
 
@@ -78,5 +77,5 @@ class EWMA(BaseSingleItemAlgorithm):
                 count += 1
                 continue
             variance += (data[index] - moving_average[index]) ** 2
-        variance /= (len(data) - count + 1)
+        variance /= len(data) - count + 1
         return variance

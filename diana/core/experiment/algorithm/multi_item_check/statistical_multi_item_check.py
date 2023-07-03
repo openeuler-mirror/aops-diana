@@ -21,13 +21,12 @@ METRIC_WEIGHT_MAP = {
         "scrape_duration_seconds": 0.5,
         "scrape_samples_post_metric_relabeling": 0.1,
         "scrape_samples_scraped": 0.1,
-        "scrape_series_added": 0.1
-    }
+        "scrape_series_added": 0.1,
+    },
 }
 
 
 class StatisticalCheck(BaseMultiItemAlgorithmTwo):
-
     def __init__(self, threshold: float = 1.0, metric_weight_map: dict = None):
         """
 
@@ -67,7 +66,6 @@ class StatisticalCheck(BaseMultiItemAlgorithmTwo):
             "algo_name": "statistical_multi_item_check",
             "field": "multicheck",
             "description": "It's a statistical multiple item check method.",
-            "path": "diana.core.experiment.algorithm.multi_item_check."
-                    "statistical_multi_item_check.StatisticalCheck"
+            "path": "diana.core.experiment.algorithm.multi_item_check." "statistical_multi_item_check.StatisticalCheck",
         }
         return data

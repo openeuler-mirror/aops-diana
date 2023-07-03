@@ -68,7 +68,7 @@ class Config:
                     if value.isdigit():
                         value = int(value)
                     elif value.lower() in ('true', 'false'):
-                        value = (True if value.lower() == 'true' else False)
+                        value = True if value.lower() == 'true' else False
                     temp_config[key.upper()] = value
             if temp_config:
                 # let default configuration be merged with configuration from config file

@@ -56,9 +56,7 @@ class CheckTaskKeeper:
             LOGGER.error("Failed to get time range of %s ", workflow_id)
             return False
 
-        check_msg = {"workflow_id": workflow_id,
-                     "username": username,
-                     "time_range": time_range}
+        check_msg = {"workflow_id": workflow_id, "username": username, "time_range": time_range}
         return CheckTaskKeeper.publish_check_task(check_msg)
 
     @staticmethod
@@ -91,12 +89,14 @@ class CheckTaskKeeper:
 
         """
         # Creating a Forward Scheduled Task
-        job_def = {'id': self._workflow_id,
-                   'func': CheckTaskKeeper.create_task,
-                   'trigger': 'interval',
-                   'seconds': self._step,
-                   'args': [self._workflow_id, self._username],
-                   'max_instances': 10}
+        job_def = {
+            'id': self._workflow_id,
+            'func': CheckTaskKeeper.create_task,
+            'trigger': 'interval',
+            'seconds': self._step,
+            'args': [self._workflow_id, self._username],
+            'max_instances': 10,
+        }
         # If an app is specified, use this app.
         # Otherwise, use current_app
         if app:

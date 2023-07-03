@@ -65,36 +65,32 @@ class Util:
                 data = json.load(f)
 
         except FileNotFoundError:
-            LOGGER.error('Cannot find file /etc/aops/diana_hosts.json when start aops-diana '
-                         'by default mode')
-            raise FileNotFoundError("Cannot find file /etc/aops/diana_hosts.json,"
-                                    "please check it and try again")
+            LOGGER.error('Cannot find file /etc/aops/diana_hosts.json when start aops-diana ' 'by default mode')
+            raise FileNotFoundError("Cannot find file /etc/aops/diana_hosts.json," "please check it and try again")
 
         except json.decoder.JSONDecodeError:
-            LOGGER.error(
-                'diana_default json file content structure is not what we expect')
-            raise ValueError("diana_default file content structure is not what we expect "
-                             "please check it and try again")
+            LOGGER.error('diana_default json file content structure is not what we expect')
+            raise ValueError(
+                "diana_default file content structure is not what we expect " "please check it and try again"
+            )
 
         if BaseResponse.verify_args(data, HostAddressSchema) != SUCCEED:
             LOGGER.error('The json data is not what we expect')
-            raise ValueError("The data entered does not meet the requirements,please check the "
-                             "data structure")
+            raise ValueError("The data entered does not meet the requirements,please check the " "data structure")
 
         return data['ip_list']
 
     @staticmethod
     def get_period_and_step():
         """
-            get period and step from config file
+        get period and step from config file
         """
         period = configuration.default_mode.get('PERIOD')
         step = configuration.default_mode.get('STEP')
 
         if not period or not step:
             LOGGER.error("period or step may not be empty")
-            raise ValueError(
-                "period or step may not be empty, please check it and try again!")
+            raise ValueError("period or step may not be empty, please check it and try again!")
 
         if isinstance(period, int) and isinstance(step, int):
             return period, step
@@ -123,8 +119,9 @@ class Util:
 
 class Config:
     """
-        Scheduled task configuration
+    Scheduled task configuration
     """
+
     JOBS = []
 
     def __init__(self):
@@ -132,8 +129,10 @@ class Config:
             {
                 "id": "job_default",
                 "func": "diana.mode.default_scheduler:Util.check_default_mode",
-                "args": (Util.get_dict_from_file(HOST_IP_INFO_LIST),
-                         [int(time.time()) - Util.get_period_and_step()[1], int(time.time())]),
+                "args": (
+                    Util.get_dict_from_file(HOST_IP_INFO_LIST),
+                    [int(time.time()) - Util.get_period_and_step()[1], int(time.time())],
+                ),
                 "trigger": "interval",
                 "seconds": Util.get_period_and_step()[0],
             }

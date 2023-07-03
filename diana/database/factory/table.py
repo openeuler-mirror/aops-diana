@@ -26,19 +26,20 @@ class WorkflowHostAssociation(Base, MyBase):
     """
     workflow and host tables' association table, record host and workflow's association
     """
+
     __tablename__ = "workflow_host"
 
     host_id = Column(Integer(), primary_key=True, nullable=False)
     host_name = Column(String(20), nullable=False)
     host_ip = Column(String(16), nullable=False)
-    workflow_id = Column(String(32), ForeignKey('workflow.workflow_id', ondelete="CASCADE"),
-                         primary_key=True)
+    workflow_id = Column(String(32), ForeignKey('workflow.workflow_id', ondelete="CASCADE"), primary_key=True)
 
 
 class Workflow(Base, MyBase):
     """
     workflow info Table
     """
+
     __tablename__ = "workflow"
 
     workflow_id = Column(String(32), primary_key=True, nullable=False)
@@ -59,6 +60,7 @@ class Algorithm(Base, MyBase):
     """
     algorithm info
     """
+
     __tablename__ = "algorithm"
 
     algo_id = Column(String(32), primary_key=True, nullable=False)
@@ -74,13 +76,13 @@ class Model(Base, MyBase):
     """
     Model info
     """
+
     __tablename__ = "model"
 
     model_id = Column(String(32), primary_key=True, nullable=False)
     model_name = Column(String(50), nullable=False)
     tag = Column(String(255), nullable=True)
-    algo_id = Column(String(32), ForeignKey(
-        'algorithm.algo_id'), nullable=False)
+    algo_id = Column(String(32), ForeignKey('algorithm.algo_id'), nullable=False)
     create_time = Column(Integer, nullable=False)
     file_path = Column(String(64), nullable=True)
     precision = Column(Float, nullable=True)
@@ -92,6 +94,7 @@ class DomainCheckResult(Base, MyBase):
     """
     domain check result
     """
+
     __tablename__ = "domain_check_result"
 
     alert_id = Column(String(32), primary_key=True, nullable=False)
@@ -109,11 +112,11 @@ class AlertHost(Base, MyBase):
     """
     Alert host relationship
     """
+
     __tablename__ = "alert_host"
 
     host_id = Column(Integer(), primary_key=True)
-    alert_id = Column(String(32), ForeignKey('domain_check_result.alert_id', ondelete="CASCADE"),
-                      primary_key=True)
+    alert_id = Column(String(32), ForeignKey('domain_check_result.alert_id', ondelete="CASCADE"), primary_key=True)
     host_ip = Column(String(32), nullable=False)
     host_name = Column(String(50), nullable=False)
 
@@ -122,11 +125,11 @@ class HostCheckResult(Base, MyBase):
     """
     Host check result
     """
+
     __tablename__ = "host_check_result"
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    host_id = Column(Integer(), ForeignKey(
-        'alert_host.host_id', ondelete="CASCADE"))
+    host_id = Column(Integer(), ForeignKey('alert_host.host_id', ondelete="CASCADE"))
     alert_id = Column(String(32), ForeignKey('domain_check_result.alert_id', ondelete="CASCADE"))
     time = Column(Integer, nullable=False)
     is_root = Column(Boolean, default=False)
@@ -144,8 +147,6 @@ def create_check_tables(engine=ENGINE):
 
     """
     # pay attention, the sequence of list is important. Base table need to be listed first.
-    tables = [Workflow, WorkflowHostAssociation, Algorithm,
-              Model, DomainCheckResult, HostCheckResult, AlertHost]
-    tables_objects = [Base.metadata.tables[table.__tablename__]
-                      for table in tables]
+    tables = [Workflow, WorkflowHostAssociation, Algorithm, Model, DomainCheckResult, HostCheckResult, AlertHost]
+    tables_objects = [Base.metadata.tables[table.__tablename__] for table in tables]
     create_tables(Base, engine, tables=tables_objects)

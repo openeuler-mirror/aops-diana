@@ -22,8 +22,14 @@ import sqlalchemy
 
 from vulcanus.kafka.kafka_exception import ProducerInitError
 from vulcanus.kafka.producer import BaseProducer
-from vulcanus.restful.resp.state import SUCCEED, PARTIAL_SUCCEED, DATABASE_INSERT_ERROR, \
-    TASK_EXECUTION_FAIL, DATABASE_QUERY_ERROR, DATABASE_CONNECT_ERROR
+from vulcanus.restful.resp.state import (
+    SUCCEED,
+    PARTIAL_SUCCEED,
+    DATABASE_INSERT_ERROR,
+    TASK_EXECUTION_FAIL,
+    DATABASE_QUERY_ERROR,
+    DATABASE_CONNECT_ERROR,
+)
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.response import BaseResponse
 from vulcanus.conf.constant import URL_FORMAT, QUERY_HOST_DETAIL
@@ -59,13 +65,19 @@ class Workflow:
         return self.__detail
 
     def _insert_domain(self, result_dao, alert_id, domain, insert_time, network_monitor_data, workflow_name):
-        insert_status = result_dao.insert_domain(data=dict(alert_id=alert_id, domain=domain,
-                                                           alert_name=network_monitor_data["alert_name"],
-                                                           time=insert_time, workflow_name=workflow_name,
-                                                           workflow_id=self.__workflow_id,
-                                                           username=self.__username,
-                                                           level=None, confirmed=False
-                                                           ))
+        insert_status = result_dao.insert_domain(
+            data=dict(
+                alert_id=alert_id,
+                domain=domain,
+                alert_name=network_monitor_data["alert_name"],
+                time=insert_time,
+                workflow_name=workflow_name,
+                workflow_id=self.__workflow_id,
+                username=self.__username,
+                level=None,
+                confirmed=False,
+            )
+        )
         if insert_status != SUCCEED:
             LOGGER.debug("Failed to insert domain workflow data.")
             raise WorkflowExecuteError
@@ -74,11 +86,14 @@ class Workflow:
     def _insert_alert_host(result_dao, workflow, alert_host_ids, alert_id):
         for host_id in alert_host_ids:
             host = workflow["input"]["hosts"].get(host_id)
-            if result_dao.insert_alert_host(data=dict(host_id=host_id,
-                                                      alert_id=alert_id,
-                                                      host_ip=host.get(
-                                                          "host_ip"),
-                                                      host_name=host.get("host_name"))) != SUCCEED:
+            if (
+                result_dao.insert_alert_host(
+                    data=dict(
+                        host_id=host_id, alert_id=alert_id, host_ip=host.get("host_ip"), host_name=host.get("host_name")
+                    )
+                )
+                != SUCCEED
+            ):
                 LOGGER.debug("Failed to insert alert host workflow data.")
                 raise WorkflowExecuteError
 
@@ -88,15 +103,19 @@ class Workflow:
             if not isinstance(metrics, list):
                 continue
             for metric_item in metrics:
-                if result_dao.insert_host_check(data=dict(host_id=host_id,
-                                                          time=insert_time,
-                                                          alert_id=alert_id,
-                                                          is_root=metric_item.get(
-                                                              "is_root", False),
-                                                          metric_name=metric_item.get(
-                                                              "metric_name"),
-                                                          metric_label=metric_item.get(
-                                                              "metric_label"))) != SUCCEED:
+                if (
+                    result_dao.insert_host_check(
+                        data=dict(
+                            host_id=host_id,
+                            time=insert_time,
+                            alert_id=alert_id,
+                            is_root=metric_item.get("is_root", False),
+                            metric_name=metric_item.get("metric_name"),
+                            metric_label=metric_item.get("metric_label"),
+                        )
+                    )
+                    != SUCCEED
+                ):
                     LOGGER.debug("Failed to insert host check workflow data.")
                     raise WorkflowExecuteError
 
@@ -105,23 +124,22 @@ class Workflow:
             alert_id = alert_time + "-" + domain
             with ResultDao(configuration) as resultdao_proxy:
                 try:
-                    self._insert_domain(resultdao_proxy, alert_id, domain,
-                                        alert_time, network_monitor_data, workflow["workflow_name"])
-                    alert_host_ids = [host_id for host_id in network_monitor_data.get(
-                        "host_result", dict()).keys()]
-                    self._insert_alert_host(
-                        resultdao_proxy, workflow, alert_host_ids, alert_id)
+                    self._insert_domain(
+                        resultdao_proxy, alert_id, domain, alert_time, network_monitor_data, workflow["workflow_name"]
+                    )
+                    alert_host_ids = [host_id for host_id in network_monitor_data.get("host_result", dict()).keys()]
+                    self._insert_alert_host(resultdao_proxy, workflow, alert_host_ids, alert_id)
 
-                    self._insert_host_check(
-                        resultdao_proxy, network_monitor_data, alert_time, alert_id)
+                    self._insert_host_check(resultdao_proxy, network_monitor_data, alert_time, alert_id)
 
-                    LOGGER.debug("Insert the success, workflow name: %s workflow id: %s" % (
-                        workflow["workflow_name"], self.__workflow_id))
+                    LOGGER.debug(
+                        "Insert the success, workflow name: %s workflow id: %s"
+                        % (workflow["workflow_name"], self.__workflow_id)
+                    )
                     return SUCCEED
                 except WorkflowExecuteError:
                     if resultdao_proxy.delete_alert(alert_id=alert_id) != SUCCEED:
-                        LOGGER.error(
-                            "Failed to delete the domain info, alert_id: %s." % alert_id)
+                        LOGGER.error("Failed to delete the domain info, alert_id: %s." % alert_id)
                     return DATABASE_INSERT_ERROR
         except sqlalchemy.exc.SQLAlchemyError:
             LOGGER.error("Connect mysql fail when insert built-in algorithm.")
@@ -132,8 +150,7 @@ class Workflow:
         hosts = workflow["input"]["hosts"]
         alert_hosts = dict()
         for host_id, host in hosts.items():
-            alert_hosts[host_id] = dict(host_ip=host.get("host_ip"),
-                                        host_name=host.get("host_name"))
+            alert_hosts[host_id] = dict(host_ip=host.get("host_ip"), host_name=host.get("host_name"))
         return alert_hosts
 
     @staticmethod
@@ -143,12 +160,11 @@ class Workflow:
             if not isinstance(metrics, list):
                 continue
             for metric_item in metrics:
-                host_check[host_id] = dict(is_root=metric_item.get(
-                    "is_root", False),
-                    metric_name=metric_item.get(
-                    "metric_name"),
-                    metric_label=metric_item.get(
-                    "metric_label"))
+                host_check[host_id] = dict(
+                    is_root=metric_item.get("is_root", False),
+                    metric_name=metric_item.get("metric_name"),
+                    metric_label=metric_item.get("metric_label"),
+                )
         return host_check
 
     def _send_kafka(self, network_monitor_data, workflow, domain):
@@ -162,13 +178,12 @@ class Workflow:
             "level": None,
             "confirmed": False,
             "alert_host": self._kafka_alert_host_msg(workflow),
-            "host_check": self._kafka_host_check_msg(network_monitor_data)
+            "host_check": self._kafka_host_check_msg(network_monitor_data),
         }
         try:
             producer = BaseProducer(configuration)
             LOGGER.debug("Send workflow msg %s" % workflow_msg)
-            producer.send_msg(configuration.consumer.get(
-                'RESULT_NAME'), workflow_msg)
+            producer.send_msg(configuration.consumer.get('RESULT_NAME'), workflow_msg)
             return SUCCEED
         except ProducerInitError as error:
             LOGGER.error("Produce workflow msg failed. %s" % error)
@@ -179,7 +194,8 @@ class Workflow:
             with WorkflowDao(configuration) as workflow_proxy:
                 workflow_proxy.connect()
                 status_code, workflow = workflow_proxy.get_workflow(
-                    data=dict(username=self.__username, workflow_id=self.__workflow_id))
+                    data=dict(username=self.__username, workflow_id=self.__workflow_id)
+                )
         except sqlalchemy.exc.SQLAlchemyError:
             LOGGER.error("Connect mysql fail when insert built-in algorithm.")
             return DATABASE_CONNECT_ERROR
@@ -193,8 +209,7 @@ class Workflow:
         try:
             domain = workflow["input"]["domain"]
             for host_id, host in workflow["input"]["hosts"].items():
-                hosts.append(
-                    dict(host_id=host_id, host_ip=host.get('host_ip')))
+                hosts.append(dict(host_id=host_id, host_ip=host.get('host_ip')))
         except KeyError:
             LOGGER.error("No valid 'hosts' are queried in workflow")
             return DATABASE_QUERY_ERROR
@@ -207,24 +222,25 @@ class Workflow:
             return DATABASE_CONNECT_ERROR
 
         # data time range should based on the algorithm in the future
-        data_time_range = [time_range[1]-1500, time_range[1]]
-        data_status, monitor_data = data_dao.query_data(
-            time_range=data_time_range, host_list=hosts)
+        data_time_range = [time_range[1] - 1500, time_range[1]]
+        data_status, monitor_data = data_dao.query_data(time_range=data_time_range, host_list=hosts)
 
         if data_status not in [SUCCEED, PARTIAL_SUCCEED]:
             LOGGER.error("Data query error")
             return DATABASE_QUERY_ERROR
 
         processed_data = reformat_queried_data(monitor_data)
-        LOGGER.debug("Finish querying workflow '%s' data and original data, start executing app."
-                     % self.__workflow_id)
+        LOGGER.debug("Finish querying workflow '%s' data and original data, start executing app." % self.__workflow_id)
 
         app = MysqlNetworkDiagnoseApp()
-        network_monitor_data = app.execute(model_info=workflow.get(
-            "model_info"), detail=workflow.get("detail"), data=processed_data, time_range=time_range)
+        network_monitor_data = app.execute(
+            model_info=workflow.get("model_info"),
+            detail=workflow.get("detail"),
+            data=processed_data,
+            time_range=time_range,
+        )
         if not network_monitor_data:
-            LOGGER.debug("No error message,workflow id: %s." %
-                         self.__workflow_id)
+            LOGGER.debug("No error message,workflow id: %s." % self.__workflow_id)
             return SUCCEED
 
         return network_monitor_data
@@ -243,8 +259,7 @@ class Workflow:
         if isinstance(workflow, int):
             return workflow
 
-        network_monitor_data = self._get_app_execute_result(
-            time_range, workflow["hosts"], workflow["workflow"])
+        network_monitor_data = self._get_app_execute_result(time_range, workflow["hosts"], workflow["workflow"])
         LOGGER.debug(network_monitor_data)
         if isinstance(network_monitor_data, int):
             return network_monitor_data
@@ -253,22 +268,27 @@ class Workflow:
         if storage:
             try:
                 storage_status = self.add_workflow_alert(
-                    network_monitor_data, workflow["workflow"], workflow["domain"], str(time_range[-1]))
-                LOGGER.debug("Insert workflow '%s' execute result into database successful."
-                             % self.__workflow_id)
+                    network_monitor_data, workflow["workflow"], workflow["domain"], str(time_range[-1])
+                )
+                LOGGER.debug("Insert workflow '%s' execute result into database successful." % self.__workflow_id)
             except sqlalchemy.exc.SQLAlchemyError:
                 storage_status = DATABASE_CONNECT_ERROR
         if kafka:
-            kafka_status = self._send_kafka(
-                network_monitor_data, workflow["workflow"], workflow["domain"])
-            LOGGER.debug(
-                "Insert workflow '%s' execute result into kafka successful." % self.__workflow_id)
+            kafka_status = self._send_kafka(network_monitor_data, workflow["workflow"], workflow["domain"])
+            LOGGER.debug("Insert workflow '%s' execute result into kafka successful." % self.__workflow_id)
 
         return storage_status == SUCCEED or kafka_status == SUCCEED
 
     @staticmethod
-    def assign_model(username: str, token: str, app_id: str, host_list: list,
-                     assign_logic: str, steps: list = None, workflow_id: str = "") -> Tuple[dict, dict]:
+    def assign_model(
+        username: str,
+        token: str,
+        app_id: str,
+        host_list: list,
+        assign_logic: str,
+        steps: list = None,
+        workflow_id: str = "",
+    ) -> Tuple[dict, dict]:
         """
         assign model to workflow, for configurable mode
         Args:
@@ -301,19 +321,18 @@ class Workflow:
         """
         support_assign_logic = ["app", "recommend"]
         if assign_logic not in support_assign_logic:
-            raise WorkflowModelAssignError("Assign logic '%s' is not supported, "
-                                           "should be inside %s" %
-                                           (assign_logic, support_assign_logic), workflow_id)
+            raise WorkflowModelAssignError(
+                "Assign logic '%s' is not supported, " "should be inside %s" % (assign_logic, support_assign_logic),
+                workflow_id,
+            )
 
         hosts_info = Workflow.__get_host_info(token, host_list, workflow_id)
         app_detail = Workflow.__get_app_detail(username, app_id, workflow_id)
 
         if assign_logic == "app":
-            workflow_detail = Workflow.__assign_by_app_logic(
-                workflow_id, hosts_info, app_detail)
+            workflow_detail = Workflow.__assign_by_app_logic(workflow_id, hosts_info, app_detail)
         else:
-            workflow_detail = Workflow.__assign_by_builtin_logic(workflow_id, hosts_info,
-                                                                 app_detail, steps)
+            workflow_detail = Workflow.__assign_by_builtin_logic(workflow_id, hosts_info, app_detail, steps)
         return hosts_info, workflow_detail
 
     @staticmethod
@@ -324,24 +343,21 @@ class Workflow:
         support_steps = {"singlecheck", "multicheck", "diag"}
         app_proxy = AppDao(configuration)
         if not app_proxy.connect():
-            raise WorkflowModelAssignError(
-                "Connect to elasticsearch failed.", workflow_id)
+            raise WorkflowModelAssignError("Connect to elasticsearch failed.", workflow_id)
 
-        status_code, app_info = app_proxy.query_app(
-            {"username": username, "app_id": app_id})
+        status_code, app_info = app_proxy.query_app({"username": username, "app_id": app_id})
         if status_code != SUCCEED:
-            raise WorkflowModelAssignError(
-                "Query info of app '%s' failed." % app_id, workflow_id)
+            raise WorkflowModelAssignError("Query info of app '%s' failed." % app_id, workflow_id)
 
         try:
             steps = app_info["result"]["detail"].keys()
         except KeyError as error:
-            raise WorkflowModelAssignError("Parse app info to get steps failed: %s"
-                                           % error, workflow_id)
+            raise WorkflowModelAssignError("Parse app info to get steps failed: %s" % error, workflow_id)
 
         if steps and steps - support_steps:
-            raise WorkflowModelAssignError("The step %s is not supported to assign model."
-                                           % list(steps - support_steps), workflow_id)
+            raise WorkflowModelAssignError(
+                "The step %s is not supported to assign model." % list(steps - support_steps), workflow_id
+            )
         return app_info["result"]["detail"]
 
     @staticmethod
@@ -357,25 +373,21 @@ class Workflow:
         """
         manager_ip = configuration.zeus.get("IP")  # pylint: disable=E1101
         manager_port = configuration.zeus.get("PORT")  # pylint: disable=E1101
-        manager_url = URL_FORMAT % (
-            manager_ip, manager_port, QUERY_HOST_DETAIL)
-        header = {
-            "access_token": token,
-            "Content-Type": "application/json; charset=UTF-8"
-        }
+        manager_url = URL_FORMAT % (manager_ip, manager_port, QUERY_HOST_DETAIL)
+        header = {"access_token": token, "Content-Type": "application/json; charset=UTF-8"}
         pyload = {"host_list": host_list, "basic": True}
 
-        response = BaseResponse.get_response(
-            'POST', manager_url, pyload, header)
+        response = BaseResponse.get_response('POST', manager_url, pyload, header)
         if response.get('label') != SUCCEED or not response.get("data", dict()).get("host_infos"):
-            raise WorkflowModelAssignError(
-                "Query host info of '%s' failed." % host_list, workflow_id)
+            raise WorkflowModelAssignError("Query host info of '%s' failed." % host_list, workflow_id)
 
         result = {}
         for host_info in response["data"]["host_infos"]:
-            result[host_info["host_id"]] = {"host_ip": host_info["host_ip"],
-                                            "scene": host_info["scene"],
-                                            "host_name": host_info["host_name"]}
+            result[host_info["host_id"]] = {
+                "host_ip": host_info["host_ip"],
+                "scene": host_info["scene"],
+                "host_name": host_info["host_name"],
+            }
         return result
 
     @staticmethod
@@ -383,25 +395,23 @@ class Workflow:
         """
         assign model by app logic
         """
-        workflow_detail = Workflow.__assign_model(
-            workflow_id, hosts_info, app_detail)
+        workflow_detail = Workflow.__assign_model(workflow_id, hosts_info, app_detail)
         return workflow_detail
 
     @staticmethod
-    def __assign_by_builtin_logic(workflow_id: str, hosts_info: dict, app_detail: dict,
-                                  steps: list) -> dict:
+    def __assign_by_builtin_logic(workflow_id: str, hosts_info: dict, app_detail: dict, steps: list) -> dict:
         """
         assign model by built-in recommend logic
         """
         if steps and set(steps) - set(app_detail.keys()):
-            raise WorkflowModelAssignError("Step '%s' is not in app." %
-                                           list(set(steps) - set(app_detail.keys())), workflow_id)
+            raise WorkflowModelAssignError(
+                "Step '%s' is not in app." % list(set(steps) - set(app_detail.keys())), workflow_id
+            )
 
         if not steps:
             steps = app_detail.keys()
         new_app_detail = {step: None for step in steps}
-        result = Workflow.__assign_model(
-            workflow_id, hosts_info, new_app_detail)
+        result = Workflow.__assign_model(workflow_id, hosts_info, new_app_detail)
         return result
 
     @staticmethod
@@ -422,11 +432,9 @@ class Workflow:
         result = {}
         try:
             if "singlecheck" in step_detail:
-                result["singlecheck"] = Workflow.__assign_single_item_model(
-                    hosts_info, step_detail["singlecheck"])
+                result["singlecheck"] = Workflow.__assign_single_item_model(hosts_info, step_detail["singlecheck"])
             if "multicheck" in step_detail:
-                result["multicheck"] = Workflow.__assign_multi_item_model(
-                    hosts_info, step_detail["multicheck"])
+                result["multicheck"] = Workflow.__assign_multi_item_model(hosts_info, step_detail["multicheck"])
             if "diag" in step_detail:
                 result["diag"] = Workflow.__assign_cluster_diag_model()
         except ValueError as error:
@@ -468,8 +476,7 @@ class Workflow:
         """
         host_algo = {}
         for host_id, value in hosts_info.items():
-            host_algo[host_id] = ModelAssign.assign_multi_kpi_model(
-                value["scene"], config)
+            host_algo[host_id] = ModelAssign.assign_multi_kpi_model(value["scene"], config)
         return host_algo
 
     @staticmethod

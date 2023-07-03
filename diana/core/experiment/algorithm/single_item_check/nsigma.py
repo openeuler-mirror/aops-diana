@@ -18,7 +18,6 @@ from diana.core.experiment.algorithm.base_algo import BaseSingleItemAlgorithm
 
 
 class NSigma(BaseSingleItemAlgorithm):
-
     def __init__(self, n: int = 3):
         self._n = n
 
@@ -28,7 +27,7 @@ class NSigma(BaseSingleItemAlgorithm):
             "algo_name": "ngisgma",
             "field": "singlecheck",
             "description": "It's a single item check method using nsigma algorithm.",
-            "path": "diana.core.experiment.algorithm.single_item_check.nsigma.NSigma"
+            "path": "diana.core.experiment.algorithm.single_item_check.nsigma.NSigma",
         }
         return data
 

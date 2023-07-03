@@ -35,69 +35,37 @@ class MultiModel2:
 
 class NetworkDiagnoseTestCase(unittest.TestCase):
     def test_do_single_check_should_return_correct_value_when_input_is_normal(self):
-        detail = {
-            1: {
-                "metric1": "model1",
-                "metric2": "model2"
-            }
-        }
-        data = {
-            1: {
-                "metric1{l1=1}": [[1, 1], [2, 3]],
-                "metric2{l2=2}": [[1, 1]]
-            }
-        }
+        detail = {1: {"metric1": "model1", "metric2": "model2"}}
+        data = {1: {"metric1{l1=1}": [[1, 1], [2, 3]], "metric2{l2=2}": [[1, 1]]}}
         app = NetworkDiagnoseApp()
         app.model = {'model1': SingleModel1, 'model2': SingleModel2}
-        self.assertEqual(app.do_single_check(detail, data),
-                         {'host1': [{"metric_name": "metric1", "metric_label": "{l1=1}"}]})
+        self.assertEqual(
+            app.do_single_check(detail, data), {'host1': [{"metric_name": "metric1", "metric_label": "{l1=1}"}]}
+        )
 
     def test_do_single_check_should_return_empty_when_metrics_is_none(self):
-        detail = {
-            1: {
-                "metric1": "model1",
-                "metric2": "model2"
-            }
-        }
-        data = {
-            1: {
-                "metric1{l1=1}": None,
-                "metric2{l2=1}": []
-            },
-            2: None
-        }
+        detail = {1: {"metric1": "model1", "metric2": "model2"}}
+        data = {1: {"metric1{l1=1}": None, "metric2{l2=1}": []}, 2: None}
         app = NetworkDiagnoseApp()
         app.model = {'model1': SingleModel1, 'model2': SingleModel2}
         self.assertEqual(app.do_single_check(detail, data), {})
 
     def test_do_multi_check_should_return_correct_value_when_input_is_normal(self):
-        detail = {
-            1: "model1",
-            2: "model2"
-        }
-        data = {
-            1: [{"metric_name": "metric1"}],
-            2: [{"metric_name": "metric2"}, {"metric_name": "metric3"}]
-        }
+        detail = {1: "model1", 2: "model2"}
+        data = {1: [{"metric_name": "metric1"}], 2: [{"metric_name": "metric2"}, {"metric_name": "metric3"}]}
         app = NetworkDiagnoseApp()
         app.model = {"model1": MultiModel1, "model2": MultiModel2}
         self.assertEqual(app.do_multi_check(detail, data), {"host1": [{"metric_name": "metric1"}]})
 
     def test_do_multi_check_should_return_all_when_detail_is_not_matched(self):
-        detail = {
-            1: "model3",
-            3: "model2"
-        }
-        data = {
-            1: [{"metric_name": "metric1"}],
-            2: [{"metric_name": "metric2"}, {"metric_name": "metric3"}]
-        }
+        detail = {1: "model3", 3: "model2"}
+        data = {1: [{"metric_name": "metric1"}], 2: [{"metric_name": "metric2"}, {"metric_name": "metric3"}]}
         app = NetworkDiagnoseApp()
         app.model = {"model1": MultiModel1, "model2": MultiModel2}
-        self.assertEqual(app.do_multi_check(detail, data), {
-            1: [{"metric_name": "metric1"}],
-            2: [{"metric_name": "metric2"}, {"metric_name": "metric3"}]
-        })
+        self.assertEqual(
+            app.do_multi_check(detail, data),
+            {1: [{"metric_name": "metric1"}], 2: [{"metric_name": "metric2"}, {"metric_name": "metric3"}]},
+        )
 
     def test_do_diag_should_return_empty_when_model_is_none(self):
         detail = "11"
@@ -106,17 +74,24 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
 
     def test_format_result_should_return_correct_value_when_is_normal(self):
         multi_check_result = {
-            1: [{"metric_name": "m1", "metric_label": "l1"}, {"metric_name": "m2", "metric_label": "l2"},
-                      {"metric_name": "m3", "metric_label": "l3"}],
-            2: [{"metric_name": "m1", "metric_label": "l1"}, {"metric_name": "m2", "metric_label": "l2"}]
+            1: [
+                {"metric_name": "m1", "metric_label": "l1"},
+                {"metric_name": "m2", "metric_label": "l2"},
+                {"metric_name": "m3", "metric_label": "l3"},
+            ],
+            2: [{"metric_name": "m1", "metric_label": "l1"}, {"metric_name": "m2", "metric_label": "l2"}],
         }
         diag_result = "host1", "m2", "l2"
         expect_result = {
-            1: [{"metric_name": "m1", "metric_label": "l1", "is_root": False},
-                      {"metric_name": "m2", "metric_label": "l2", "is_root": True},
-                      {"metric_name": "m3", "metric_label": "l3", "is_root": False}],
-            2: [{"metric_name": "m1", "metric_label": "l1", "is_root": False},
-                      {"metric_name": "m2", "metric_label": "l2", "is_root": False}]
+            1: [
+                {"metric_name": "m1", "metric_label": "l1", "is_root": False},
+                {"metric_name": "m2", "metric_label": "l2", "is_root": True},
+                {"metric_name": "m3", "metric_label": "l3", "is_root": False},
+            ],
+            2: [
+                {"metric_name": "m1", "metric_label": "l1", "is_root": False},
+                {"metric_name": "m2", "metric_label": "l2", "is_root": False},
+            ],
         }
         app = NetworkDiagnoseApp()
         self.assertEqual(app.format_result(multi_check_result, diag_result), expect_result)
@@ -134,13 +109,12 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
 
     @mock.patch.object(NetworkDiagnoseApp, 'do_single_check')
     @mock.patch.object(NetworkDiagnoseApp, 'load_models')
-    def test_execute_should_return_empty_when_return_no_single_check_result(self, mock_load_models,
-                                                                            mock_do_single_check):
+    def test_execute_should_return_empty_when_return_no_single_check_result(
+        self, mock_load_models, mock_do_single_check
+    ):
         app = NetworkDiagnoseApp()
         fake_model_info = Mock()
-        fake_detail = {
-            "singlecheck": Mock()
-        }
+        fake_detail = {"singlecheck": Mock()}
         fake_data = Mock()
         fake_load_models = True
         mock_load_models.return_value = fake_load_models
@@ -151,15 +125,12 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
     @mock.patch.object(NetworkDiagnoseApp, 'do_multi_check')
     @mock.patch.object(NetworkDiagnoseApp, 'do_single_check')
     @mock.patch.object(NetworkDiagnoseApp, 'load_models')
-    def test_execute_should_return_empty_when_return_no_multi_check_result(self, mock_load_models,
-                                                                           mock_do_single_check,
-                                                                           mock_do_multi_check):
+    def test_execute_should_return_empty_when_return_no_multi_check_result(
+        self, mock_load_models, mock_do_single_check, mock_do_multi_check
+    ):
         app = NetworkDiagnoseApp()
         fake_model_info = Mock()
-        fake_detail = {
-            "singlecheck": Mock(),
-            "multicheck": Mock()
-        }
+        fake_detail = {"singlecheck": Mock(), "multicheck": Mock()}
         fake_data = Mock()
         fake_load_models = True
         fake_single_check_result = Mock()
@@ -174,18 +145,12 @@ class NetworkDiagnoseTestCase(unittest.TestCase):
     @mock.patch.object(NetworkDiagnoseApp, 'do_multi_check')
     @mock.patch.object(NetworkDiagnoseApp, 'do_single_check')
     @mock.patch.object(NetworkDiagnoseApp, 'load_models')
-    def test_execute_should_have_correct_steps(self, mock_load_models,
-                                               mock_do_single_check,
-                                               mock_do_multi_check,
-                                               mock_do_diag,
-                                               mock_format_result):
+    def test_execute_should_have_correct_steps(
+        self, mock_load_models, mock_do_single_check, mock_do_multi_check, mock_do_diag, mock_format_result
+    ):
         app = NetworkDiagnoseApp()
         fake_model_info = Mock()
-        fake_detail = {
-            "singlecheck": Mock(),
-            "multicheck": Mock(),
-            "diag": Mock()
-        }
+        fake_detail = {"singlecheck": Mock(), "multicheck": Mock(), "diag": Mock()}
         fake_data = Mock()
         fake_load_models = True
         fake_single_check_result = Mock()

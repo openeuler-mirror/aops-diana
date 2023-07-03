@@ -38,9 +38,9 @@ class Executor(Mode):
     @staticmethod
     def run() -> NoReturn:
         consumer_list = [
-            WorkflowConsumer(configuration.consumer.get('TASK_NAME'),
-                             configuration.consumer.get('TASK_GROUP_ID'),
-                             configuration)
+            WorkflowConsumer(
+                configuration.consumer.get('TASK_NAME'), configuration.consumer.get('TASK_GROUP_ID'), configuration
+            )
         ]
         manager = ConsumerManager(consumer_list)
         manager.run()

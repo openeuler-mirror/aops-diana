@@ -16,7 +16,6 @@ from diana.conf import configuration
 
 
 engine_url = make_mysql_engine_url(configuration)
-ENGINE = create_database_engine(engine_url,
-                                configuration.mysql.get(
-                                    "POOL_SIZE"),  # pylint: disable=E1101
-                                configuration.mysql.get("POOL_RECYCLE"))  # pylint: disable=E1101
+ENGINE = create_database_engine(
+    engine_url, configuration.mysql.get("POOL_SIZE"), configuration.mysql.get("POOL_RECYCLE")  # pylint: disable=E1101
+)  # pylint: disable=E1101

@@ -22,28 +22,14 @@ class TestAssignSingleKpiModelByName(unittest.TestCase):
     def test_assign_should_return_normal_when_given_map_with_default_model(self):
         model_assign = ModelAssign()
 
-        user_defined_map = {
-            "default_model": "NSigma-1",
-            "model_info": {
-                "cpu_load15": "NSigma-1",
-                "rx_error": ""
-            }
-        }
-        assigned_model = model_assign.assign_kpi_model_by_name(
-            user_defined_map)
-        self.assertDictEqual(
-            assigned_model, {"cpu_load15": "NSigma-1", "rx_error": "NSigma-1"})
+        user_defined_map = {"default_model": "NSigma-1", "model_info": {"cpu_load15": "NSigma-1", "rx_error": ""}}
+        assigned_model = model_assign.assign_kpi_model_by_name(user_defined_map)
+        self.assertDictEqual(assigned_model, {"cpu_load15": "NSigma-1", "rx_error": "NSigma-1"})
 
     def test_assign_should_raise_value_error_when_default_model_not_given(self):
         model_assign = ModelAssign()
-        user_defined_map = {
-            "model_info": {
-                "cpu_load15": "Mae-1",
-                "rx_error": "NSigma-1"
-            }
-        }
-        self.assertRaises(
-            ValueError, model_assign.assign_kpi_model_by_name, user_defined_map)
+        user_defined_map = {"model_info": {"cpu_load15": "Mae-1", "rx_error": "NSigma-1"}}
+        self.assertRaises(ValueError, model_assign.assign_kpi_model_by_name, user_defined_map)
 
 
 class TestAssignMultiKpiModelByName(unittest.TestCase):
@@ -66,10 +52,9 @@ class TestAssignMultiKpiModelByName(unittest.TestCase):
                 "web": "StatisticalCheck-1",
                 "edge": "StatisticalCheck-1",
                 "cloud": "StatisticalCheck-1",
-            }
+            },
         }
-        assigned_model = model_assign.assign_multi_kpi_model(
-            "big_data", user_defined_map)
+        assigned_model = model_assign.assign_multi_kpi_model("big_data", user_defined_map)
         self.assertEqual(assigned_model, "new_model")
 
     def test_assign_should_raise_value_error_when_given_map_without_default_model(self):
@@ -82,5 +67,4 @@ class TestAssignMultiKpiModelByName(unittest.TestCase):
                 "cloud": "StatisticalCheck-1",
             }
         }
-        self.assertRaises(
-            ValueError, model_assign.assign_multi_kpi_model, "big_data", user_defined_map)
+        self.assertRaises(ValueError, model_assign.assign_multi_kpi_model, "big_data", user_defined_map)

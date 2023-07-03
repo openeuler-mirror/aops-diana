@@ -20,10 +20,7 @@ from typing import Dict
 
 METRIC_MODEL_MAP = {
     "default_model": "NSigma-1",  # NSigma model
-    "model_info": {
-        "cpu_load15": "NSigma-1",  # NSigma model
-        "rx_error": "NSigma-1"  # NSigma model
-    }
+    "model_info": {"cpu_load15": "NSigma-1", "rx_error": "NSigma-1"},  # NSigma model  # NSigma model
 }
 
 SCENE_MODEL_MAP = {
@@ -33,7 +30,7 @@ SCENE_MODEL_MAP = {
         "web": "intelligent-for-mysql",  # intelligent model for mysql
         "edge": "intelligent-for-mysql",  # intelligent model for mysql
         "cloud": "intelligent-for-mysql",  # intelligent model for mysql
-    }
+    },
 }
 
 

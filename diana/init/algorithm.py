@@ -53,8 +53,7 @@ def init_algo_and_model():
 
         status_code = algo_proxy.insert_algo(algo_info)
         if status_code == DATABASE_INSERT_ERROR:
-            LOGGER.error(
-                "Insert built-in algorithm '%s' into mysql failed." % algo_info["algo_name"])
+            LOGGER.error("Insert built-in algorithm '%s' into mysql failed." % algo_info["algo_name"])
             raise sqlalchemy.exc.SQLAlchemyError("Insert mysql failed.")
 
         model_list = algo["models"]
@@ -62,8 +61,7 @@ def init_algo_and_model():
             model_info["algo_id"] = algo_id
             status_code = model_proxy.insert_model(model_info)
             if status_code == DATABASE_INSERT_ERROR:
-                LOGGER.error(
-                    "Insert built-in model '%s' into mysql failed." % model_info["model_name"])
+                LOGGER.error("Insert built-in model '%s' into mysql failed." % model_info["model_name"])
                 raise sqlalchemy.exc.SQLAlchemyError("Insert mysql failed.")
 
         LOGGER.info("Init built-in algorithm and model succeed.")

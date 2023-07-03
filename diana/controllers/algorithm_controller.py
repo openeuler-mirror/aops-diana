@@ -18,9 +18,10 @@ from diana.conf import configuration
 
 class QueryAlgorithmList(BaseResponse):
     """
-        Interface for get algorithm list.
-        Restful API: GET
+    Interface for get algorithm list.
+    Restful API: GET
     """
+
     @BaseResponse.handle(schema=QueryAlgorithmListSchema, proxy=AlgorithmDao, config=configuration)
     def get(self, callback: AlgorithmDao, **params):
         """
@@ -49,8 +50,8 @@ class QueryAlgorithmList(BaseResponse):
 
 class QueryAlgorithm(BaseResponse):
     """
-        Interface for get algorithm list.
-        Restful API: GET
+    Interface for get algorithm list.
+    Restful API: GET
     """
 
     @BaseResponse.handle(schema=QueryAlgorithmSchema, proxy=AlgorithmDao, config=configuration)

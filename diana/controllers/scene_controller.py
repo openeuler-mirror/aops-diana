@@ -23,7 +23,6 @@ from diana.utils.schema.scene import IdentifySceneSchema
 
 
 class RecognizeScene(BaseResponse):
-
     @BaseResponse.handle(schema=IdentifySceneSchema)
     def post(self, **params):
         """
