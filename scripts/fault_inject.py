@@ -1,8 +1,8 @@
-#coding:utf-8
+# coding:utf-8
 import requests, json
 import sys
-import time,datetime
-import schedule 
+import time, datetime
+import schedule
 import random
 from functools import partial
 import paramiko
@@ -11,98 +11,94 @@ import logging
 import re
 
 CONFIG = {
-        'tpcc': {
-            'ip': '172.168.193.208',
-            'interface': 'enp1s0',
-            'chaosblade_port': 7070,
-            'benchmarksql': {
-                'run_filedir': '/home/wgg/software/benchmarksql5.0-for-mysql/run/',
-                'run_cmd': '/home/wgg/software/benchmarksql5.0-for-mysql/run/runBenchmark.sh props.conf > /home/wgg/software/benchmarksql5.0-for-mysql/run/run.log',
-                'log_file': '/home/wgg/software/benchmarksql5.0-for-mysql/run/run.log'
-                }
-            },
-        'mysqlA': {
-            'ip': '172.168.108.236',
-            'interface': 'enp1s0',
-            'chaosblade_port': 7070
-            },
-        'mysqlB': {
-            'ip': '172.168.108.112',
-            'interface': 'enp1s0',
-            'chaosblade_port': 7070
-            },
-        'VIP': '172.168.108.134',
-        'lvs': {
-            'ip': '172.168.108.111',
-            'interface': 'enp1s0',
-            'chaosblade_port': 7070
-            },
-        'aops': {
-            'ip': '172.168.201.40',
-            'interface': 'enp1s0',
-            'chaosblade_port': 7070
-            },
-        'fault_inject_file': './test_fault_inject_recording.txt',
-        'fault_inject_log': './test_fault_inject_recording.log'
-        }
+    'tpcc': {
+        'ip': '172.168.193.208',
+        'interface': 'enp1s0',
+        'chaosblade_port': 7070,
+        'benchmarksql': {
+            'run_filedir': '/home/wgg/software/benchmarksql5.0-for-mysql/run/',
+            'run_cmd': '/home/wgg/software/benchmarksql5.0-for-mysql/run/runBenchmark.sh props.conf > /home/wgg/software/benchmarksql5.0-for-mysql/run/run.log',
+            'log_file': '/home/wgg/software/benchmarksql5.0-for-mysql/run/run.log',
+        },
+    },
+    'mysqlA': {'ip': '172.168.108.236', 'interface': 'enp1s0', 'chaosblade_port': 7070},
+    'mysqlB': {'ip': '172.168.108.112', 'interface': 'enp1s0', 'chaosblade_port': 7070},
+    'VIP': '172.168.108.134',
+    'lvs': {'ip': '172.168.108.111', 'interface': 'enp1s0', 'chaosblade_port': 7070},
+    'aops': {'ip': '172.168.201.40', 'interface': 'enp1s0', 'chaosblade_port': 7070},
+    'fault_inject_file': './test_fault_inject_recording.txt',
+    'fault_inject_log': './test_fault_inject_recording.log',
+}
 
 
 def get_node_name(fault_node):
-    node_name = {
-            '1': 'tpcc',
-            '2': 'mysqlA',
-            '3': 'mysqlB',
-            '4': 'lvs',
-            '5': 'aops'
-            }
-    
+    node_name = {'1': 'tpcc', '2': 'mysqlA', '3': 'mysqlB', '4': 'lvs', '5': 'aops'}
+
     return node_name[fault_node]
 
 
 def get_fault_type_name(fault_type):
-    fault_type_name = {
-            '1': 'interrupt',
-            '2': 'delay',
-            '3': 'reorder',
-            '4': 'detached'
-            }
-    
+    fault_type_name = {'1': 'interrupt', '2': 'delay', '3': 'reorder', '4': 'detached'}
+
     return fault_type_name[fault_type]
 
 
 def chaos_inject_network(host, port, params, time_out, fault_node, fault_type):
-    
-    url = 'http://' + host +':' + str(port) + '/chaosblade'
+    url = 'http://' + host + ':' + str(port) + '/chaosblade'
     response = requests.get(url, params=params)
     inject_time = datetime.datetime.now()
     inject_timestamp = int(inject_time.timestamp())
     inject_time_format = datetime.datetime.strftime(inject_time, "%Y-%m-%d %H:%M:%S")
     success = json.loads(response.text).get('success')
-    
+
     if not success:
         logging.error("inject_time_format + ' inject unsuccessfully...")
         print(inject_time_format + ' inject unsuccessfully...')
         sys.exit(0)
-    
-    inject_end_time = inject_time + datetime.timedelta(seconds = time_out)
+
+    inject_end_time = inject_time + datetime.timedelta(seconds=time_out)
     inject_end_timestamp = int(inject_end_time.timestamp())
-    
+
     file_name = CONFIG['fault_inject_file']
 
     try:
         file_handle = open(file_name, mode='a+')
         file_handle.write(
-            '' + str(inject_timestamp) + ' ' + str(inject_end_timestamp) + ' ' + 'node' + ' ' + get_node_name(
-                str(fault_node)) + ' ' + get_fault_type_name(str(fault_type)) + '\n')
+            ''
+            + str(inject_timestamp)
+            + ' '
+            + str(inject_end_timestamp)
+            + ' '
+            + 'node'
+            + ' '
+            + get_node_name(str(fault_node))
+            + ' '
+            + get_fault_type_name(str(fault_type))
+            + '\n'
+        )
         file_handle.close()
     except PermissionError:
         pass
 
     result = json.loads(response.text).get('result')
-    print(inject_time_format + ' inject network fault ' + get_fault_type_name(str(fault_type)) + ' in ' + get_node_name(str(fault_node)) + ' successfully...')
+    print(
+        inject_time_format
+        + ' inject network fault '
+        + get_fault_type_name(str(fault_type))
+        + ' in '
+        + get_node_name(str(fault_node))
+        + ' successfully...'
+    )
     print(params)
     print(result)
-    logging.info(inject_time_format + ' inject network fault ' + get_fault_type_name(str(fault_type)) + ' in ' + get_node_name(str(fault_node)) + ' successfully...')
+    logging.info(
+        inject_time_format
+        + ' inject network fault '
+        + get_fault_type_name(str(fault_type))
+        + ' in '
+        + get_node_name(str(fault_node))
+        + ' successfully...'
+    )
     logging.info(params)
     logging.info(result)
 
@@ -131,19 +127,19 @@ def ssh_cmd(target_host, cmd):
 def check_mysql_running(mysql_ip):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    
+
     # check if mysql is running by 'ipvsadm -ln' on lvs
     lvs_ip = CONFIG['lvs']['ip']
     client.connect(hostname=lvs_ip, username='USERNAME', password='PASSWORD')
     mysql_status_check_cmd = 'ipvsadm -ln'
     stdin, stdout, stderr = client.exec_command(mysql_status_check_cmd)
-    
+
     mysql_status_info = stdout.read().decode('utf-8')
     print(mysql_status_info)
     info_list = str(mysql_status_info).split('->')
     current_active_conn = 0
     for info in info_list:
-        if info.find(mysql_ip)!=-1:
+        if info.find(mysql_ip) != -1:
             nums = [int(s) for s in re.findall(r'\b\d+\b', info)]
             current_active_conn = nums[6]
             continue
@@ -176,16 +172,16 @@ def check_tpcc_status(tpcc_ip):
         second_content = stdout.read().decode('utf-8')
         print(second_content)
         logging.info(second_content)
-        
+
         # if the content is inconsistent, there is no need to restart tpcc
-        if first_content!=second_content:
+        if first_content != second_content:
             print('60 seconds ago and current is not the same')
             logging.info('60 seconds ago and current is not the same')
             # tpcc not restarted
             return False
         else:
             print('60 seconds ago and current is the same')
-            logging.info('60 seconds ago and current is the same')          
+            logging.info('60 seconds ago and current is the same')
 
         # kill tpcc related progress
         print('the tpcc service has stuck and is restarting...')
@@ -195,7 +191,9 @@ def check_tpcc_status(tpcc_ip):
         print(stdout.read().decode('utf-8'))
         logging.info(stdout.read().decode('utf-8'))
 
-        kill_all_proc_cmd2 = "ps -ef | grep mysql | grep -v grep | grep -v run_mysql.sh | awk '{print $2}' | xargs kill -9"
+        kill_all_proc_cmd2 = (
+            "ps -ef | grep mysql | grep -v grep | grep -v run_mysql.sh | awk '{print $2}' | xargs kill -9"
+        )
         stdin, stdout, stderr = client.exec_command(kill_all_proc_cmd2)
         print(stdout.read().decode('utf-8'))
         print("wait 30 seconds...")
@@ -203,7 +201,13 @@ def check_tpcc_status(tpcc_ip):
         logging.info("wait 30 seconds...")
         time.sleep(30)
 
-        again_run_cmd = 'cd '+ CONFIG['tpcc']['benchmarksql']['run_filedir'] + ' && ls && nohup bash '+ CONFIG['tpcc']['benchmarksql']['run_cmd'] + ' & \n'
+        again_run_cmd = (
+            'cd '
+            + CONFIG['tpcc']['benchmarksql']['run_filedir']
+            + ' && ls && nohup bash '
+            + CONFIG['tpcc']['benchmarksql']['run_cmd']
+            + ' & \n'
+        )
         invoke = client.invoke_shell()
         invoke.send(again_run_cmd)
         time.sleep(2)
@@ -225,31 +229,55 @@ def check_tpcc_status(tpcc_ip):
 
 def iptables_fault(target_host, cmd, fault_node, fault_type, time_out, check_tpcc=False):
     ssh_cmd(target_host, cmd)
-     
+
     file_name = CONFIG['fault_inject_file']
     inject_time = datetime.datetime.now()
     inject_timestamp = int(inject_time.timestamp())
     inject_time_format = datetime.datetime.strftime(inject_time, "%Y-%m-%d %H:%M:%S")
-    inject_end_time = inject_time + datetime.timedelta(seconds = time_out)
+    inject_end_time = inject_time + datetime.timedelta(seconds=time_out)
     inject_end_timestamp = int(inject_end_time.timestamp())
     try:
         file_handle = open(file_name, mode='a+')
         file_handle.write(
-            '' + str(inject_timestamp) + ' ' + str(inject_end_timestamp) + ' ' + 'node' + ' ' + get_node_name(
-                str(fault_node)) + ' ' + get_fault_type_name(str(fault_type)) + '\n')
+            ''
+            + str(inject_timestamp)
+            + ' '
+            + str(inject_end_timestamp)
+            + ' '
+            + 'node'
+            + ' '
+            + get_node_name(str(fault_node))
+            + ' '
+            + get_fault_type_name(str(fault_type))
+            + '\n'
+        )
         file_handle.close()
     except PermissionError:
         pass
 
-    print(inject_time_format + ' iptables inject network fault ' + get_fault_type_name(str(fault_type)) + ' in ' + get_node_name(str(fault_node)) + ' successfully...')
-    logging.info(inject_time_format + ' iptables inject network fault ' + get_fault_type_name(str(fault_type)) + ' in ' + get_node_name(str(fault_node)) + ' successfully...')
+    print(
+        inject_time_format
+        + ' iptables inject network fault '
+        + get_fault_type_name(str(fault_type))
+        + ' in '
+        + get_node_name(str(fault_node))
+        + ' successfully...'
+    )
+    logging.info(
+        inject_time_format
+        + ' iptables inject network fault '
+        + get_fault_type_name(str(fault_type))
+        + ' in '
+        + get_node_name(str(fault_node))
+        + ' successfully...'
+    )
     params = {'cmd': ' '.join(cmd) + ' --time-out ' + str(time_out)}
     print(params)
     logging.info(params)
     time.sleep(time_out)
 
     ssh_cmd(target_host, ['iptables -F'])
-    
+
 
 def inject_iptables_and_check_tpcc(target_host, fault_cmd, fault_node, fault_type, time_out, tpcc_ip):
     tpcc_ip = CONFIG['tpcc']['ip']
@@ -264,30 +292,35 @@ def inject_iptables_and_check_tpcc(target_host, fault_cmd, fault_node, fault_typ
 
 
 def random_network_fault_params_for_tpcc(target_host, blade_port, fault_type=None):
-    
     interface = CONFIG['tpcc']['interface']
     exclude_ip = CONFIG['aops']['ip']
 
-    time_local = random.uniform(150,200)
-    time_out = random.randrange(120,180)
+    time_local = random.uniform(150, 200)
+    time_out = random.randrange(120, 180)
     percent = random.randrange(15, 20)
-    offset = random.uniform(0,100)
+    offset = random.uniform(0, 100)
     correlation = random.randint(0, 100)
     gap = random.randint(1, 5)
 
-    interrupt_params = {'cmd':'create network loss --percent 100 --interface %s  --timeout %s  --exclude-ip %s' % \
-        (interface, time_out, exclude_ip) }
-    delay_params = {'cmd':'create network delay --time %s --offset %s --interface %s   --timeout %s --exclude-ip %s' % \
-         (time_local, offset, interface, time_out, exclude_ip) }
-    reorder_params = {'cmd':'create network reorder --correlation %s --percent %s --gap %s  --interface %s  --timeout %s --exclude-ip %s' % \
-         (correlation, percent, gap, interface, time_out, exclude_ip) }
+    interrupt_params = {
+        'cmd': 'create network loss --percent 100 --interface %s  --timeout %s  --exclude-ip %s'
+        % (interface, time_out, exclude_ip)
+    }
+    delay_params = {
+        'cmd': 'create network delay --time %s --offset %s --interface %s   --timeout %s --exclude-ip %s'
+        % (time_local, offset, interface, time_out, exclude_ip)
+    }
+    reorder_params = {
+        'cmd': 'create network reorder --correlation %s --percent %s --gap %s  --interface %s  --timeout %s --exclude-ip %s'
+        % (correlation, percent, gap, interface, time_out, exclude_ip)
+    }
 
     params = [interrupt_params, delay_params, reorder_params]
     if fault_type is None:
         fault_type = random.choice([1, 2, 3])
     fault_node = 1
-    
-    choosed_params = params[fault_type-1]
+
+    choosed_params = params[fault_type - 1]
     chaos_inject_network(target_host, blade_port, choosed_params, time_out, fault_node, fault_type)
 
 
@@ -298,30 +331,36 @@ def random_network_fault_params_for_mysqlA(target_host, blade_port, fault_type=N
         print('the active connection on the current mysql host is 0, please inject fault to another mysql host...')
         logging.info('the active connection is 0, please inject fault to another mysql host...')
         return
-    
+
     interface = CONFIG['mysqlA']['interface']
     exclude_ip = CONFIG['aops']['ip']
 
-    time_local = random.uniform(150,200)
-    time_out = random.randrange(180,240)
+    time_local = random.uniform(150, 200)
+    time_out = random.randrange(180, 240)
     percent = random.randrange(15, 20)
-    offset = random.uniform(0,100)
+    offset = random.uniform(0, 100)
     correlation = random.randint(0, 100)
     gap = random.randint(1, 5)
 
-    interrupt_params = {'cmd':'create network loss --percent 100 --interface %s  --timeout %s --exclude-ip %s' % \
-         (interface, time_out, exclude_ip) }
-    delay_params = {'cmd':'create network delay --time %s --offset %s --interface %s   --timeout %s --exclude-ip %s' % \
-        (time_local, offset, interface, time_out, exclude_ip) }
-    reorder_params = {'cmd':'create network reorder --correlation %s --percent %s --gap %s --interface %s --timeout %s --exclude-ip %s' % \
-        (correlation, percent, gap, interface, time_out, exclude_ip) }
+    interrupt_params = {
+        'cmd': 'create network loss --percent 100 --interface %s  --timeout %s --exclude-ip %s'
+        % (interface, time_out, exclude_ip)
+    }
+    delay_params = {
+        'cmd': 'create network delay --time %s --offset %s --interface %s   --timeout %s --exclude-ip %s'
+        % (time_local, offset, interface, time_out, exclude_ip)
+    }
+    reorder_params = {
+        'cmd': 'create network reorder --correlation %s --percent %s --gap %s --interface %s --timeout %s --exclude-ip %s'
+        % (correlation, percent, gap, interface, time_out, exclude_ip)
+    }
 
     params = [interrupt_params, delay_params, reorder_params]
     if fault_type is None:
         fault_type = random.choice([1, 2, 3])
-    
+
     fault_node = 2
-    choosed_params = params[fault_type-1]
+    choosed_params = params[fault_type - 1]
     if fault_type in [2, 3]:
         chaos_inject_network(target_host, blade_port, choosed_params, time_out, fault_node, fault_type)
     else:
@@ -330,17 +369,17 @@ def random_network_fault_params_for_mysqlA(target_host, blade_port, fault_type=N
         fault_cmd = [fault_cmd]
         tpcc_ip = CONFIG['tpcc']['ip']
         inject_iptables_and_check_tpcc(target_host, fault_cmd, fault_node, fault_type, time_out, tpcc_ip)
-        
+
         # after eliminating the fault, if tpcc is in the normal access state, it is normal
         print("check tpcc...")
         logging.info("check tpcc...")
         result = check_tpcc_status(tpcc_ip)
-        
+
         # the log content is inconsistent, indicating that tpcc is already in a normal access state
         if result == False:
             print("tpcc is normal")
             logging.info("tpcc is normal")
-        else :
+        else:
             print("tpcc does not return to the normal state, has restarted...")
             logging.info("tpcc does not return to the normal state, has restarted...")
 
@@ -352,29 +391,35 @@ def random_network_fault_params_for_mysqlB(target_host, blade_port, fault_type=N
         print('the active connection on the current mysql host is 0, please inject fault to another mysql host...')
         logging.info('the active connection is 0, please inject fault to another mysql host...')
         return
-    
+
     interface = CONFIG['mysqlB']['interface']
     exclude_ip = CONFIG['aops']['ip']
 
-    time_local = random.uniform(150,200)
-    time_out = random.randrange(180,240)
+    time_local = random.uniform(150, 200)
+    time_out = random.randrange(180, 240)
     percent = random.randrange(15, 20)
-    offset = random.uniform(0,100)
+    offset = random.uniform(0, 100)
     correlation = random.randint(0, 100)
     gap = random.randint(1, 5)
-    
-    interrupt_params = {'cmd':'create network loss --percent 100 --interface %s  --timeout %s --exclude-ip %s' % \
-         (interface, time_out, exclude_ip) }
-    delay_params = {'cmd':'create network delay --time %s --offset %s --interface %s   --timeout %s --exclude-ip %s' % \
-         (time_local, offset, interface, time_out, exclude_ip) }
-    reorder_params = {'cmd':'create network reorder --correlation %s --percent %s --gap %s --interface %s --timeout %s --exclude-ip %s' % \
-         (correlation, percent, gap, interface, time_out, exclude_ip) }
-    
+
+    interrupt_params = {
+        'cmd': 'create network loss --percent 100 --interface %s  --timeout %s --exclude-ip %s'
+        % (interface, time_out, exclude_ip)
+    }
+    delay_params = {
+        'cmd': 'create network delay --time %s --offset %s --interface %s   --timeout %s --exclude-ip %s'
+        % (time_local, offset, interface, time_out, exclude_ip)
+    }
+    reorder_params = {
+        'cmd': 'create network reorder --correlation %s --percent %s --gap %s --interface %s --timeout %s --exclude-ip %s'
+        % (correlation, percent, gap, interface, time_out, exclude_ip)
+    }
+
     params = [interrupt_params, delay_params, reorder_params]
     if fault_type is None:
         fault_type = random.choice([1, 2, 3])
- 
-    choosed_params = params[fault_type-1]
+
+    choosed_params = params[fault_type - 1]
     fault_node = 3
     if fault_type in [2, 3]:
         chaos_inject_network(target_host, blade_port, choosed_params, time_out, fault_node, fault_type)
@@ -384,7 +429,7 @@ def random_network_fault_params_for_mysqlB(target_host, blade_port, fault_type=N
         fault_cmd = [fault_cmd]
         tpcc_ip = CONFIG['tpcc']['ip']
         inject_iptables_and_check_tpcc(target_host, fault_cmd, fault_node, fault_type, time_out, tpcc_ip)
-        
+
         # after eliminating the fault, if tpcc is in the normal access state, it is normal
         print("check tpcc...")
         logging.info("check tpcc...")
@@ -393,36 +438,41 @@ def random_network_fault_params_for_mysqlB(target_host, blade_port, fault_type=N
         if result == False:
             print("tpcc is normal")
             logging.info("tpcc is normal")
-        else :
+        else:
             print("tpcc does not return to the normal state, has restarted...")
             logging.info("tpcc does not return to the normal state, has restarted...")
 
 
 def random_network_fault_params_for_lvs(target_host, blade_port, fault_type=None):
-    
     interface = CONFIG['lvs']['interface']
     exclude_ip = CONFIG['aops']['ip']
 
     local_port = 3306
-    time_local = random.uniform(150,200)
-    time_out = random.randrange(180,240)
+    time_local = random.uniform(150, 200)
+    time_out = random.randrange(180, 240)
     percent = random.randrange(15, 20)
-    offset = random.uniform(0,100)
+    offset = random.uniform(0, 100)
     correlation = random.randint(0, 100)
     gap = random.randint(1, 5)
-    
-    interrupt_params = {'cmd':'create network loss --percent 100 --interface %s  --local-port %s --timeout %s' % \
-         (interface, local_port, time_out) }
-    delay_params = {'cmd':'create network delay --time %s --offset %s --interface %s   --timeout %s --exclude-ip %s' % \
-         (time_local, offset, interface, time_out, exclude_ip) }
-    reorder_params = {'cmd':'create network reorder --correlation %s --percent %s --gap %s --interface %s --timeout %s --exclude-ip %s' % \
-         (correlation, percent, gap, interface, time_out, exclude_ip) }
-    
+
+    interrupt_params = {
+        'cmd': 'create network loss --percent 100 --interface %s  --local-port %s --timeout %s'
+        % (interface, local_port, time_out)
+    }
+    delay_params = {
+        'cmd': 'create network delay --time %s --offset %s --interface %s   --timeout %s --exclude-ip %s'
+        % (time_local, offset, interface, time_out, exclude_ip)
+    }
+    reorder_params = {
+        'cmd': 'create network reorder --correlation %s --percent %s --gap %s --interface %s --timeout %s --exclude-ip %s'
+        % (correlation, percent, gap, interface, time_out, exclude_ip)
+    }
+
     params = [interrupt_params, delay_params, reorder_params]
     if fault_type is None:
         fault_type = random.choice([1, 2, 3])
-   
-    choosed_params = params[fault_type-1]
+
+    choosed_params = params[fault_type - 1]
     fault_node = 4
     if fault_type in [2, 3]:
         chaos_inject_network(target_host, blade_port, choosed_params, time_out, fault_node, fault_type)
@@ -431,23 +481,22 @@ def random_network_fault_params_for_lvs(target_host, blade_port, fault_type=None
         mysqlB_ip = CONFIG['mysqlB']['ip']
         tpcc_ip = CONFIG['tpcc']['ip']
         fault_cmd = [
-                'iptables -I INPUT -s ' + mysqlA_ip + ' -j DROP',
-                'iptables -I INPUT -s ' + mysqlB_ip + ' -j DROP',
-                'iptables -I INPUT -s ' + tpcc_ip + ' -j DROP'
-                ]
+            'iptables -I INPUT -s ' + mysqlA_ip + ' -j DROP',
+            'iptables -I INPUT -s ' + mysqlB_ip + ' -j DROP',
+            'iptables -I INPUT -s ' + tpcc_ip + ' -j DROP',
+        ]
         iptables_fault(target_host, fault_cmd, fault_node, fault_type, time_out)
 
 
 def random_network_fault_params_for_aops(target_host, blade_port):
-    
-    time_out = random.randrange(180,240)
+    time_out = random.randrange(180, 240)
 
     # monitor host
     tpcc_ip = CONFIG['tpcc']['ip']
     mysqlA_ip = CONFIG['mysqlA']['ip']
     mysqlB_ip = CONFIG['mysqlB']['ip']
     lvs_ip = CONFIG['lvs']['ip']
-    
+
     tpcc_fault_cmd = 'iptables -I INPUT -s ' + tpcc_ip + ' -j DROP'
     tpcc_fault_cmd = [tpcc_fault_cmd]
     mysqlA_fault_cmd = 'iptables -I INPUT -s ' + mysqlA_ip + ' -j DROP'
@@ -456,15 +505,16 @@ def random_network_fault_params_for_aops(target_host, blade_port):
     mysqlB_fault_cmd = [mysqlB_fault_cmd]
     lvs_fault_cmd = 'iptables -I INPUT -s ' + lvs_ip + ' -j DROP'
     lvs_fault_cmd = [lvs_fault_cmd]
-    
+
     fault_type = 4
-    
-    fault_node = random.choice([1,2,3,4])
-    
+
+    fault_node = random.choice([1, 2, 3, 4])
+
     cmds = [tpcc_fault_cmd, mysqlA_fault_cmd, mysqlB_fault_cmd, lvs_fault_cmd]
-    fault_cmd = cmds[fault_node-1]
+    fault_cmd = cmds[fault_node - 1]
 
     iptables_fault(target_host, fault_cmd, fault_node, fault_type, time_out)
+
 
 def random_fault():
     tpcc_host = CONFIG['tpcc']['ip']
@@ -477,14 +527,14 @@ def random_fault():
     lvs_chaosblade_port = CONFIG['lvs']['chaosblade_port']
     aops_host = CONFIG['aops']['ip']
     aops_chaosblade_port = CONFIG['aops']['chaosblade_port']
-    
+
     fun = [
-            partial(random_network_fault_params_for_tpcc, tpcc_host, tpcc_chaosblade_port),
-            partial(random_network_fault_params_for_mysqlA, mysqlA_host, mysqlA_chaosblade_port),
-            partial(random_network_fault_params_for_mysqlB, mysqlB_host, mysqlB_chaosblade_port),
-            partial(random_network_fault_params_for_lvs, lvs_host, lvs_chaosblade_port),
-            partial(random_network_fault_params_for_aops, aops_host, aops_chaosblade_port)
-            ]
+        partial(random_network_fault_params_for_tpcc, tpcc_host, tpcc_chaosblade_port),
+        partial(random_network_fault_params_for_mysqlA, mysqlA_host, mysqlA_chaosblade_port),
+        partial(random_network_fault_params_for_mysqlB, mysqlB_host, mysqlB_chaosblade_port),
+        partial(random_network_fault_params_for_lvs, lvs_host, lvs_chaosblade_port),
+        partial(random_network_fault_params_for_aops, aops_host, aops_chaosblade_port),
+    ]
     random.choice(fun)()
 
 
@@ -527,10 +577,7 @@ def main():
     python3 fault_inject.py all all cycle
     """
     log_filename = CONFIG['fault_inject_log']
-    logging.basicConfig(
-            filename=log_filename,
-            filemode='a',
-            level=logging.INFO)
+    logging.basicConfig(filename=log_filename, filemode='a', level=logging.INFO)
     if len(sys.argv) != 4:
         print('input error!')
         logging.error('input error!')
@@ -554,6 +601,7 @@ def main():
     else:
         print('mode error')
         logging.error('mode error')
+
 
 if __name__ == "__main__":
     main()

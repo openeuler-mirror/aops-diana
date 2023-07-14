@@ -24,6 +24,7 @@ class ModelListFilterSchema(Schema):
     """
     filter schema of model list getting interface
     """
+
     tag = fields.String(required=False, validate=lambda s: len(s) != 0)
     field = fields.String(required=False, validate=validate.OneOf(["singlecheck", "multicheck", "diag"]))
     model_name = fields.String(required=False, validate=lambda s: len(s) != 0)
@@ -34,8 +35,9 @@ class QueryModelListSchema(Schema):
     """
     schema of query model list interface
     """
+
     sort = fields.String(required=False, validate=validate.OneOf(["precision"]))
     direction = fields.String(required=False, validate=validate.OneOf(["asc", "desc"]))
-    page = fields.Integer(required=False, validate= lambda s: s > 0)
+    page = fields.Integer(required=False, validate=lambda s: s > 0)
     per_page = fields.Integer(required=False, validate=lambda s: 0 < s < 50)
     filter = fields.Nested(ModelListFilterSchema, required=False)

@@ -22,8 +22,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from vulcanus.database.helper import judge_return_code, sort_and_page
 from vulcanus.database.proxy import MysqlProxy
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.resp.state import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, \
-    DATABASE_INSERT_ERROR, DATA_EXIST
+from vulcanus.restful.resp.state import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, DATABASE_INSERT_ERROR, DATA_EXIST
 
 from diana.conf.constant import SYSTEM_USER
 from diana.database.factory.table import Model, Algorithm
@@ -80,9 +79,11 @@ class ModelDao(MysqlProxy):
         Returns:
             bool
         """
-        name_count = self.session.query(func.count(Model.model_name)) \
-            .filter(Model.model_name == model_name, Model.username.in_([username, SYSTEM_USER])) \
+        name_count = (
+            self.session.query(func.count(Model.model_name))
+            .filter(Model.model_name == model_name, Model.username.in_([username, SYSTEM_USER]))
             .scalar()
+        )
         if name_count:
             return True
         return False
@@ -135,28 +136,21 @@ class ModelDao(MysqlProxy):
         """
         get model list from mysql
         """
-        result = {
-            "total_count": 0,
-            "total_page": 0,
-            "result": []
-        }
+        result = {"total_count": 0, "total_page": 0, "result": []}
 
-        filters = self._get_model_list_filters(
-            data["username"], data.get("filter"))
+        filters = self._get_model_list_filters(data["username"], data.get("filter"))
         model_query = self._query_model_list(filters)
 
         total_count = len(model_query.all())
         if not total_count:
             return result
 
-        direction, page, per_page = data.get(
-            'direction'), data.get('page'), data.get('per_page')
+        direction, page, per_page = data.get('direction'), data.get('page'), data.get('per_page')
         if data.get("sort"):
             sort_column = getattr(Model, data["sort"])
         else:
             sort_column = None
-        processed_query, total_page = sort_and_page(model_query, sort_column,
-                                                    direction, per_page, page)
+        processed_query, total_page = sort_and_page(model_query, sort_column, direction, per_page, page)
 
         result['result'] = self._model_list_row2dict(processed_query)
         result['total_page'] = total_page
@@ -173,10 +167,13 @@ class ModelDao(MysqlProxy):
         Returns:
             sqlalchemy.orm.query.Query
         """
-        model_query = self.session.query(Model.model_name, Algorithm.algo_name, Model.create_time,
-                                         Model.precision, Model.tag, Model.model_id) \
-            .join(Algorithm, Model.algo_id == Algorithm.algo_id) \
+        model_query = (
+            self.session.query(
+                Model.model_name, Algorithm.algo_name, Model.create_time, Model.precision, Model.tag, Model.model_id
+            )
+            .join(Algorithm, Model.algo_id == Algorithm.algo_id)
             .filter(*filters)
+        )
 
         return model_query
 
@@ -203,8 +200,7 @@ class ModelDao(MysqlProxy):
             return filters
 
         if filter_dict.get("model_name"):
-            filters.add(Model.model_name.like(
-                "%" + filter_dict["model_name"] + "%"))
+            filters.add(Model.model_name.like("%" + filter_dict["model_name"] + "%"))
         if filter_dict.get("algo_name"):
             filters.add(Algorithm.algo_name.in_(filter_dict["algo_name"]))
         if filter_dict.get("tag"):
@@ -227,7 +223,7 @@ class ModelDao(MysqlProxy):
                 "create_time": row.create_time,
                 "precision": row.precision,
                 "tag": row.tag,
-                "model_id": row.model_id
+                "model_id": row.model_id,
             }
             result.append(model_info)
         return result
@@ -248,30 +244,28 @@ class ModelDao(MysqlProxy):
             return status_code, result
         except (SQLAlchemyError, KeyError) as error:
             LOGGER.error(error)
-            LOGGER.error(
-                "Get model's algorithm info failed due to internal error.")
+            LOGGER.error("Get model's algorithm info failed due to internal error.")
             return DATABASE_QUERY_ERROR, result
 
     def _get_model_algo_info(self, model_list: list) -> Tuple[int, dict]:
         """
         get model's name and its algorithm info from mysql
         """
-        model_query = self.session.query(Model.model_id, Model.model_name,
-                                         Algorithm.algo_id, Algorithm.algo_name) \
-            .join(Algorithm, Model.algo_id == Algorithm.algo_id) \
+        model_query = (
+            self.session.query(Model.model_id, Model.model_name, Algorithm.algo_id, Algorithm.algo_name)
+            .join(Algorithm, Model.algo_id == Algorithm.algo_id)
             .filter(Model.model_id.in_(model_list))
+        )
 
         result = {}
         for row in model_query:
-            result[row.model_id] = {"model_name": row.model_name, "algo_id": row.algo_id,
-                                    "algo_name": row.algo_name}
+            result[row.model_id] = {"model_name": row.model_name, "algo_id": row.algo_id, "algo_name": row.algo_name}
 
         succeed_list = list(result.keys())
         fail_list = list(set(model_list) - set(succeed_list))
         if fail_list:
             fail_str = ",".join(fail_list)
-            LOGGER.debug(
-                "No data found when getting the info of model: %s." % fail_str)
+            LOGGER.debug("No data found when getting the info of model: %s." % fail_str)
 
         status_dict = {"succeed_list": succeed_list, "fail_list": fail_list}
         status_code = judge_return_code(status_dict, NO_DATA)
@@ -293,20 +287,20 @@ class ModelDao(MysqlProxy):
             return DATABASE_QUERY_ERROR, result
 
     def _get_model_info(self, model_list: List[str]) -> Tuple[int, Dict[str, dict]]:
-        model_query = self.session.query(Model.model_id, Model.model_name, Model.file_path, Algorithm.path) \
-            .join(Algorithm, Model.algo_id == Algorithm.algo_id) \
+        model_query = (
+            self.session.query(Model.model_id, Model.model_name, Model.file_path, Algorithm.path)
+            .join(Algorithm, Model.algo_id == Algorithm.algo_id)
             .filter(Model.model_id.in_(model_list))
+        )
 
         result = {}
         for row in model_query:
-            result[row.model_id] = {
-                "model_path": row.file_path, "algo_path": row.path}
+            result[row.model_id] = {"model_path": row.file_path, "algo_path": row.path}
 
         succeed_list = list(result.keys())
         fail_list = list(set(model_list) - set(succeed_list))
         if fail_list:
-            LOGGER.error(
-                "No data found when getting the info of model: %s" % fail_list)
+            LOGGER.error("No data found when getting the info of model: %s" % fail_list)
 
         status_dict = {"succeed_list": succeed_list, "fail_list": fail_list}
         status_code = judge_return_code(status_dict, NO_DATA)

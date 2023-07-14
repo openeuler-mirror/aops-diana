@@ -33,7 +33,8 @@ from vulcanus.restful.resp.state import (
     NO_DATA,
     DATABASE_UPDATE_ERROR,
     DATABASE_DELETE_ERROR,
-    DATA_EXIST)
+    DATA_EXIST,
+)
 
 from diana.database.factory.table import WorkflowHostAssociation, Workflow
 from diana.conf.constant import WORKFLOW_INDEX
@@ -132,8 +133,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         username = data["username"]
 
         if self._if_workflow_name_exists(workflow_name, username):
-            LOGGER.debug(
-                "Insert workflow failed due to workflow name already exists.")
+            LOGGER.debug("Insert workflow failed due to workflow name already exists.")
             return DATA_EXIST
 
         data.pop("alert")
@@ -153,16 +153,13 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         workflow_id = data["workflow_id"]
         try:
             self._insert_workflow_host_table(workflow_id, hosts_info)
-            status_code = self._insert_workflow_into_es(
-                username, workflow_id, detail, model_info)
+            status_code = self._insert_workflow_into_es(username, workflow_id, detail, model_info)
             if status_code != SUCCEED:
-                raise ElasticsearchException("Insert workflow '%s' in to elasticsearch failed."
-                                             % workflow_id)
+                raise ElasticsearchException("Insert workflow '%s' in to elasticsearch failed." % workflow_id)
 
         except (SQLAlchemyError, ElasticsearchException):
             self.session.rollback()
-            self.session.query(Workflow).filter(Workflow.workflow_id == workflow_id) \
-                .delete()
+            self.session.query(Workflow).filter(Workflow.workflow_id == workflow_id).delete()
             self.session.commit()
             raise
         return SUCCEED
@@ -177,8 +174,12 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         """
         rows = []
         for host_id, host_info in hosts_info.items():
-            row = {"workflow_id": workflow_id, "host_id": host_id, "host_ip": host_info["host_ip"],
-                   "host_name": host_info["host_name"]}
+            row = {
+                "workflow_id": workflow_id,
+                "host_id": host_id,
+                "host_ip": host_info["host_ip"],
+                "host_name": host_info["host_name"],
+            }
             rows.append(row)
 
         self.session.bulk_insert_mappings(WorkflowHostAssociation, rows)
@@ -193,8 +194,11 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         Returns:
             bool
         """
-        workflow_count = self.session.query(func.count(Workflow.workflow_name)) \
-            .filter(Workflow.workflow_name == workflow_name, Workflow.username == username).scalar()
+        workflow_count = (
+            self.session.query(func.count(Workflow.workflow_name))
+            .filter(Workflow.workflow_name == workflow_name, Workflow.username == username)
+            .scalar()
+        )
         if workflow_count:
             return True
         return False
@@ -209,26 +213,22 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         Returns:
             bool
         """
-        workflow = self.session.query(Workflow) \
-            .filter(Workflow.workflow_id == workflow_id, Workflow.username == username)
+        workflow = self.session.query(Workflow).filter(
+            Workflow.workflow_id == workflow_id, Workflow.username == username
+        )
         if len(workflow.all()):
             return True
         return False
 
-    def _insert_workflow_into_es(self, username: str, workflow_id: str, detail: dict,
-                                 model_info: dict, index: Optional[str] = WORKFLOW_INDEX) -> int:
+    def _insert_workflow_into_es(
+        self, username: str, workflow_id: str, detail: dict, model_info: dict, index: Optional[str] = WORKFLOW_INDEX
+    ) -> int:
         """
         insert workflow's detail info and model info into elasticsearch
         """
-        data = {
-            "workflow_id": workflow_id,
-            "username": username,
-            "detail": detail,
-            "model_info": model_info
-        }
+        data = {"workflow_id": workflow_id, "username": username, "detail": detail, "model_info": model_info}
 
-        res = ElasticsearchProxy.insert(
-            self, index, data, document_id=workflow_id)
+        res = ElasticsearchProxy.insert(self, index, data, document_id=workflow_id)
         if res:
             LOGGER.info("Add workflow '%s' info into es succeed.", workflow_id)
             return SUCCEED
@@ -295,31 +295,23 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         Returns:
             dict: query result
         """
-        result = {
-            "total_count": 0,
-            "total_page": 1,
-            "result": []
-        }
+        result = {"total_count": 0, "total_page": 1, "result": []}
 
-        workflow_query = self._query_workflow_list(
-            data["username"], data.get("filter"))
+        workflow_query = self._query_workflow_list(data["username"], data.get("filter"))
         total_count = len(workflow_query.all())
         if not total_count:
             return result
 
-        direction, page, per_page = data.get(
-            'direction'), data.get('page'), data.get('per_page')
+        direction, page, per_page = data.get('direction'), data.get('page'), data.get('per_page')
         if data.get("sort"):
             sort_column = getattr(Workflow, data["sort"])
         else:
             sort_column = None
-        processed_query, total_page = sort_and_page(workflow_query, sort_column, direction,
-                                                    per_page, page)
+        processed_query, total_page = sort_and_page(workflow_query, sort_column, direction, per_page, page)
 
         workflow_id_list = [row.workflow_id for row in processed_query]
         workflow_host = self._get_workflow_hosts(workflow_id_list)
-        result['result'] = self.__process_workflow_list_info(
-            processed_query, workflow_host)
+        result['result'] = self.__process_workflow_list_info(processed_query, workflow_host)
         result['total_page'] = total_page
         result['total_count'] = total_count
         return result
@@ -349,10 +341,16 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             if filter_dict.get("app"):
                 filters.add(Workflow.app_name.in_(filter_dict["app"]))
 
-        workflow_query = self.session.query(Workflow.workflow_name, Workflow.workflow_id,
-                                            Workflow.description, Workflow.create_time, Workflow.status,
-                                            Workflow.app_name, Workflow.app_id, Workflow.domain) \
-            .filter(*filters)
+        workflow_query = self.session.query(
+            Workflow.workflow_name,
+            Workflow.workflow_id,
+            Workflow.description,
+            Workflow.create_time,
+            Workflow.status,
+            Workflow.app_name,
+            Workflow.app_id,
+            Workflow.domain,
+        ).filter(*filters)
         return workflow_query
 
     def _get_workflow_hosts(self, workflow_id_list: list) -> Dict:
@@ -372,22 +370,21 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
                     }
                 }
         """
-        hosts_query = self.session.query(WorkflowHostAssociation.workflow_id,
-                                         WorkflowHostAssociation.host_id,
-                                         WorkflowHostAssociation.host_ip,
-                                         WorkflowHostAssociation.host_name) \
-            .filter(WorkflowHostAssociation.workflow_id.in_(workflow_id_list))
+        hosts_query = self.session.query(
+            WorkflowHostAssociation.workflow_id,
+            WorkflowHostAssociation.host_id,
+            WorkflowHostAssociation.host_ip,
+            WorkflowHostAssociation.host_name,
+        ).filter(WorkflowHostAssociation.workflow_id.in_(workflow_id_list))
 
         workflow_host = defaultdict(dict)
         for row in hosts_query:
-            workflow_host[row.workflow_id][row.host_id] = {
-                "host_ip": row.host_ip, "host_name": row.host_name}
+            workflow_host[row.workflow_id][row.host_id] = {"host_ip": row.host_ip, "host_name": row.host_name}
 
         return dict(workflow_host)
 
     @staticmethod
-    def __process_workflow_list_info(workflow_info: sqlalchemy.orm.query.Query,
-                                     workflow_host: dict) -> list:
+    def __process_workflow_list_info(workflow_info: sqlalchemy.orm.query.Query, workflow_host: dict) -> list:
         """
         combine workflow info and workflow's host together.
         In some abnormal circumstance, workflow may has no hosts, here we give empty host
@@ -402,11 +399,8 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
                 "status": row.status,
                 "app_name": row.app_name,
                 "app_id": row.app_id,
-                "input": {
-                    "domain": row.domain,
-                    "hosts": workflow_host.get(row.workflow_id, {})
-                },
-                "workflow_id": row.workflow_id
+                "input": {"domain": row.domain, "hosts": workflow_host.get(row.workflow_id, {})},
+                "workflow_id": row.workflow_id,
             }
             result.append(workflow_info)
         return result
@@ -434,8 +428,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             return status_code, result
         except SQLAlchemyError as error:
             LOGGER.error(error)
-            LOGGER.error(
-                "Get all users' workflow list failed due to internal error.")
+            LOGGER.error("Get all users' workflow list failed due to internal error.")
             return DATABASE_QUERY_ERROR, result
 
     def _get_all_workflow_list(self, status: str) -> Tuple[int, dict]:
@@ -443,20 +436,16 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         get all users' workflow from mysql
         """
         result = {}
-        workflow_query = self.session.query(Workflow.username, Workflow.workflow_id,
-                                            Workflow.workflow_name, Workflow.step) \
-            .filter(Workflow.status == status)
+        workflow_query = self.session.query(
+            Workflow.username, Workflow.workflow_id, Workflow.workflow_name, Workflow.step
+        ).filter(Workflow.status == status)
 
         if not workflow_query.count():
             return NO_DATA, result
 
         result = {}
         for row in workflow_query:
-            result[row.workflow_id] = {
-                "workflow_name": row.workflow_name,
-                "username": row.username,
-                "step": row.step
-            }
+            result[row.workflow_id] = {"workflow_name": row.workflow_name, "username": row.username, "step": row.step}
         return SUCCEED, result
 
     def get_workflow(self, data) -> Tuple[int, dict]:
@@ -531,8 +520,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         Returns:
             int, dict
         """
-        basic_info = self._get_workflow_basic_info(
-            data["username"], data["workflow_id"])
+        basic_info = self._get_workflow_basic_info(data["username"], data["workflow_id"])
         status_code, detail_info = self._get_workflow_detail_info(data)
         if status_code != SUCCEED:
             return status_code, {}
@@ -553,11 +541,22 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         filters.add(Workflow.username == username)
         filters.add(Workflow.workflow_id == workflow_id)
 
-        workflow_query = self.session.query(Workflow.workflow_name, Workflow.workflow_id,
-                                            Workflow.description, Workflow.create_time, Workflow.status,
-                                            Workflow.app_name, Workflow.app_id, Workflow.domain,
-                                            Workflow.step, Workflow.period) \
-            .filter(*filters).one()
+        workflow_query = (
+            self.session.query(
+                Workflow.workflow_name,
+                Workflow.workflow_id,
+                Workflow.description,
+                Workflow.create_time,
+                Workflow.status,
+                Workflow.app_name,
+                Workflow.app_id,
+                Workflow.domain,
+                Workflow.step,
+                Workflow.period,
+            )
+            .filter(*filters)
+            .one()
+        )
 
         workflow_host = self._get_workflow_hosts([workflow_id])
 
@@ -568,13 +567,10 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             "status": workflow_query.status,
             "app_name": workflow_query.app_name,
             "app_id": workflow_query.app_id,
-            "input": {
-                "domain": workflow_query.domain,
-                "hosts": workflow_host.get(workflow_query.workflow_id, {})
-            },
+            "input": {"domain": workflow_query.domain, "hosts": workflow_host.get(workflow_query.workflow_id, {})},
             "step": workflow_query.step,
             "period": workflow_query.period,
-            "workflow_id": workflow_query.workflow_id
+            "workflow_id": workflow_query.workflow_id,
         }
         return workflow_info
 
@@ -588,9 +584,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         """
         result = {}
         query_body = self._general_body(data)
-        query_body["query"]["bool"]["must"].append(
-            {"term": {"workflow_id": data["workflow_id"]}}
-        )
+        query_body["query"]["bool"]["must"].append({"term": {"workflow_id": data["workflow_id"]}})
         status, res = self.query(index, query_body)
         if status:
             if len(res['hits']['hits']) == 0:
@@ -641,16 +635,14 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         except (SQLAlchemyError, ElasticsearchException) as error:
             self.session.rollback()
             LOGGER.error(error)
-            LOGGER.error(
-                "Updating workflow info failed due to internal error.")
+            LOGGER.error("Updating workflow info failed due to internal error.")
             return DATABASE_UPDATE_ERROR
 
     def _update_workflow(self, data):
         """
         update workflow basic info into mysql, detail info into elasticsearch
         """
-        workflow_exist = self._if_workflow_id_exists(
-            data["workflow_id"], data["username"])
+        workflow_exist = self._if_workflow_id_exists(data["workflow_id"], data["username"])
         if not workflow_exist:
             return NO_DATA
 
@@ -675,19 +667,16 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
 
         if not basic_info_row:
             return
-        self.session.query(Workflow).filter(Workflow.username == data["username"],
-                                            Workflow.workflow_id == data["workflow_id"]) \
-            .update(basic_info_row)
+        self.session.query(Workflow).filter(
+            Workflow.username == data["username"], Workflow.workflow_id == data["workflow_id"]
+        ).update(basic_info_row)
 
     def _update_workflow_detail_info(self, data: dict, index: str = WORKFLOW_INDEX) -> int:
         """
         update workflow's detail info in es
         """
         workflow_id = data["workflow_id"]
-        action = [{
-            "_id": workflow_id,
-            "_source": data,
-            "_index": index}]
+        action = [{"_id": workflow_id, "_source": data, "_index": index}]
         update_res = self._bulk(action)
 
         if not update_res:
@@ -724,21 +713,20 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
 
         username = data["username"]
         workflow_id = data["workflow_id"]
-        filters = {Workflow.workflow_id ==
-                   workflow_id, Workflow.username == username}
+        filters = {Workflow.workflow_id == workflow_id, Workflow.username == username}
         self.session.query(Workflow).filter(*filters).delete()
 
         query_body = self._general_body()
         query_body["query"]["bool"]["must"].extend(
-            [{"term": {"username": data["username"]}}, {"term": {"workflow_id": workflow_id}}])
+            [{"term": {"username": data["username"]}}, {"term": {"workflow_id": workflow_id}}]
+        )
 
         res = ElasticsearchProxy.delete(self, index, query_body)
         if res:
             LOGGER.debug("Delete workflow from elasticsearch succeed.")
             return SUCCEED
 
-        LOGGER.error(
-            "Delete workflow from elasticsearch failed due to internal error.")
+        LOGGER.error("Delete workflow from elasticsearch failed due to internal error.")
         return DATABASE_DELETE_ERROR
 
     def _if_workflow_running(self, data) -> int:
@@ -748,14 +736,11 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         username = data["username"]
         workflow_id = data["workflow_id"]
 
-        filters = {Workflow.username == username,
-                   Workflow.workflow_id == workflow_id}
-        workflow_query = self.session.query(
-            Workflow.status).filter(*filters).one()
+        filters = {Workflow.username == username, Workflow.workflow_id == workflow_id}
+        workflow_query = self.session.query(Workflow.status).filter(*filters).one()
 
         if workflow_query.status in ("running", "recommending"):
-            LOGGER.info("Delete workflow '%s' failed because it's still %s" % (
-                workflow_id, workflow_query.status))
+            LOGGER.info("Delete workflow '%s' failed because it's still %s" % (workflow_id, workflow_query.status))
             return True
         return False
 
@@ -763,8 +748,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         """
         update workflow status
         """
-        self.session.query(Workflow).filter(Workflow.workflow_id == workflow_id) \
-            .update({"status": status})
+        self.session.query(Workflow).filter(Workflow.workflow_id == workflow_id).update({"status": status})
         self.session.commit()
 
     def if_host_in_workflow(self, data: dict) -> Tuple[int, dict]:
@@ -788,17 +772,18 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             return SUCCEED, {"result": result}
         except SQLAlchemyError as error:
             LOGGER.error(error)
-            LOGGER.error(
-                "Query if a host exists in a workflow failed due to internal error.")
+            LOGGER.error("Query if a host exists in a workflow failed due to internal error.")
             return DATABASE_QUERY_ERROR, result
 
     def _query_host_in_workflow(self, data):
-        host_query = self.session.query(WorkflowHostAssociation.host_id,
-                                        func.count(WorkflowHostAssociation.workflow_id).label("workflow_num")) \
-            .join(Workflow, Workflow.workflow_id == WorkflowHostAssociation.workflow_id) \
-            .filter(WorkflowHostAssociation.host_id.in_(data["host_list"]),
-                    Workflow.username == data["username"])\
+        host_query = (
+            self.session.query(
+                WorkflowHostAssociation.host_id, func.count(WorkflowHostAssociation.workflow_id).label("workflow_num")
+            )
+            .join(Workflow, Workflow.workflow_id == WorkflowHostAssociation.workflow_id)
+            .filter(WorkflowHostAssociation.host_id.in_(data["host_list"]), Workflow.username == data["username"])
             .group_by(WorkflowHostAssociation.host_id)
+        )
 
         result = {host_id: False for host_id in data["host_list"]}
         for row in host_query.all():

@@ -22,6 +22,7 @@ class StartupError(Exception):
     """
     It's an error that check server may raise when it's starting up.
     """
+
     __slots__ = ["__check_mode", "__support_mode"]
 
     def __init__(self, check_mode: str, support_mode: List[str]):

@@ -16,6 +16,9 @@ from marshmallow import fields
 
 class HostAddressSchema(Schema):
     ip_list = fields.List(
-        fields.Dict(ip=fields.String(validate=lambda s: len(s) != 0, required=True),
-                    port=fields.String(validate=lambda s: len(s) != 0, required=True)),
-        required=True)
+        fields.Dict(
+            ip=fields.String(validate=lambda s: len(s) != 0, required=True),
+            port=fields.String(validate=lambda s: len(s) != 0, required=True),
+        ),
+        required=True,
+    )

@@ -48,7 +48,7 @@ from diana.controllers import (
     model_controller,
     algorithm_controller,
     result_controller,
-    metric_controller
+    metric_controller,
 )
 
 URLS = []
@@ -57,11 +57,9 @@ SPECIFIC_URLS = {
     'APP_URLS': [
         (app_controller.CreateApp, CREATE_APP),
         (app_controller.QueryApp, QUERY_APP),
-        (app_controller.QueryAppList, QUERY_APP_LIST)
+        (app_controller.QueryAppList, QUERY_APP_LIST),
     ],
-    'SCENE_URLS': [
-        (scene_controller.RecognizeScene, IDENTIFY_SCENE)
-    ],
+    'SCENE_URLS': [(scene_controller.RecognizeScene, IDENTIFY_SCENE)],
     'WORKFLOW_URLS': [
         (workflow_controller.CreateWorkflow, CREATE_WORKFLOW),
         (workflow_controller.DeleteWorkflow, DELETE_WORKFLOW),
@@ -70,14 +68,12 @@ SPECIFIC_URLS = {
         (workflow_controller.UpdateWorkflow, UPDATE_WORKFLOW),
         (workflow_controller.IfHostInWorkflow, IF_HOST_IN_WORKFLOW),
         (workflow_controller.ExecuteWorkflow, EXECUTE_WORKFLOW),
-        (workflow_controller.StopWorkflow, STOP_WORKFLOW)
+        (workflow_controller.StopWorkflow, STOP_WORKFLOW),
     ],
-    'MODEL_URLS': [
-        (model_controller.QueryModelList, QUERY_MODEL_LIST)
-    ],
+    'MODEL_URLS': [(model_controller.QueryModelList, QUERY_MODEL_LIST)],
     'ALGORITHM': [
         (algorithm_controller.QueryAlgorithmList, QUERY_ALGO_LIST),
-        (algorithm_controller.QueryAlgorithm, QUERY_ALGO)
+        (algorithm_controller.QueryAlgorithm, QUERY_ALGO),
     ],
     'RESULT': [
         (result_controller.QueryCheckResultHost, QUERY_HOST_CHECK_RESULT),

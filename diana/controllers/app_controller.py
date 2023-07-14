@@ -22,11 +22,7 @@ from vulcanus.restful.resp.state import SUCCEED
 
 from diana.conf import configuration
 from diana.database.dao.app_dao import AppDao
-from diana.utils.schema.app import (
-    CreateAppSchema,
-    QueryAppListSchema,
-    QueryAppSchema
-)
+from diana.utils.schema.app import CreateAppSchema, QueryAppListSchema, QueryAppSchema
 
 
 class CreateApp(BaseResponse):

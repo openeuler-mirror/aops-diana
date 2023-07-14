@@ -20,12 +20,8 @@ from adtk.data import validate_series
 from adtk.transformer import DoubleRollingAggregate
 
 
-def filtering(series: pd.Series, moving_window: int = 30,
-              min_periods: int = 1) -> pd.Series:
-    series.values[:] = abs(
-        series - series.rolling(
-            window=moving_window,
-            min_periods=min_periods).median())
+def filtering(series: pd.Series, moving_window: int = 30, min_periods: int = 1) -> pd.Series:
+    series.values[:] = abs(series - series.rolling(window=moving_window, min_periods=min_periods).median())
 
     return series
 

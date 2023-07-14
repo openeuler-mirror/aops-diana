@@ -37,8 +37,7 @@ class CheckScheduler:
     def __init__(self):
         self._workflow_task_manager = {}
         self._work_flow_list_lock = Lock()
-        self.timing_check = True if configuration.diana.get(
-            "TIMING_CHECK") == "on" else False
+        self.timing_check = True if configuration.diana.get("TIMING_CHECK") == "on" else False
 
     @staticmethod
     def _query_running_workflow() -> tuple:
@@ -52,8 +51,7 @@ class CheckScheduler:
         try:
             with WorkflowDao(configuration) as workflow_proxy:
                 workflow_proxy.connect()
-                status, result = workflow_proxy.get_all_workflow_list(
-                    "running")
+                status, result = workflow_proxy.get_all_workflow_list("running")
         except sqlalchemy.exc.SQLAlchemyError:
             LOGGER.error("Connect to workflow_proxy failed.")
             return DATABASE_CONNECT_ERROR, {}
@@ -94,8 +92,7 @@ class CheckScheduler:
 
         return status
 
-    def _add_workflow(self, workflow_id: str, username: str,
-                      step: int, app: Optional[Flask] = None) -> None:
+    def _add_workflow(self, workflow_id: str, username: str, step: int, app: Optional[Flask] = None) -> None:
         """
         Add workflow task keeper and timed task
         Args:
@@ -159,8 +156,7 @@ class CheckScheduler:
         # stop timed task and delete task keeper
         with self._work_flow_list_lock:
             if workflow_id not in self._workflow_task_manager:
-                LOGGER.warning(
-                    "workflow_id %s not existed when stop.", workflow_id)
+                LOGGER.warning("workflow_id %s not existed when stop.", workflow_id)
             else:
                 check_task_keeper = self._workflow_task_manager[workflow_id]
                 check_task_keeper.delete_timed_task()

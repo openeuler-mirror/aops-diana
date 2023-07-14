@@ -19,13 +19,7 @@ from typing import Dict, Optional, Tuple
 
 from vulcanus.database.proxy import ElasticsearchProxy
 from vulcanus.log.log import LOGGER
-from vulcanus.restful.resp.state import (
-    SUCCEED,
-    DATABASE_INSERT_ERROR,
-    DATABASE_QUERY_ERROR,
-    NO_DATA,
-    DATA_EXIST
-)
+from vulcanus.restful.resp.state import SUCCEED, DATABASE_INSERT_ERROR, DATABASE_QUERY_ERROR, NO_DATA, DATA_EXIST
 
 from diana.conf.constant import APP_INDEX
 
@@ -40,9 +34,7 @@ class AppDao(ElasticsearchProxy):
         Judge whether app has existed, the judge rule is that app's name of the user is same.
         """
         query_body = self._general_body()
-        query_body["query"]["bool"]["must"].extend([
-            {"term": {"username": username}},
-            {'term': {'app_name': app_name}}])
+        query_body["query"]["bool"]["must"].extend([{"term": {"username": username}}, {'term': {'app_name': app_name}}])
         status, res = self.query(index, query_body, ['app_id'])
         if status and len(res['hits']['hits']) > 0:
             return True
@@ -91,11 +83,7 @@ class AppDao(ElasticsearchProxy):
                 }
             index: app index in elasticsearch
         """
-        result = {
-            "total_count": 0,
-            "total_page": 0,
-            "app_list": []
-        }
+        result = {"total_count": 0, "total_page": 0, "app_list": []}
         query_body = self._general_body(data)
         # return (succeed or fail: bool, count: int)
         count_res = self.count(index, query_body)
@@ -109,8 +97,7 @@ class AppDao(ElasticsearchProxy):
 
         total_count = count_res[1]
         total_page = self._make_es_paginate_body(data, total_count, query_body)
-        res = self.query(index, query_body, [
-            "app_id", "version", "app_name", "description"])
+        res = self.query(index, query_body, ["app_id", "version", "app_name", "description"])
         if res[0]:
             LOGGER.debug("query app list succeed")
             result["total_page"] = total_page
@@ -136,9 +123,7 @@ class AppDao(ElasticsearchProxy):
         """
         result = {}
         query_body = self._general_body(data)
-        query_body["query"]["bool"]["must"].append(
-            {"term": {"app_id": data["app_id"]}}
-        )
+        query_body["query"]["bool"]["must"].append({"term": {"app_id": data["app_id"]}})
         status, res = self.query(index, query_body)
         if status:
             if len(res['hits']['hits']) == 0:

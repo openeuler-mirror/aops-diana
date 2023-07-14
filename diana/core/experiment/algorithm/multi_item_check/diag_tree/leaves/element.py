@@ -36,22 +36,21 @@ class SourceElement:
 
     def __init__(self):
         """
-            Constructor
+        Constructor
         """
         self._fields = []
 
     def __repr__(self):
         """
-            repr
+        repr
         """
-        equals = ("{0}={1!r}".format(k, getattr(self, k))
-                  for k in self._fields)
+        equals = ("{0}={1!r}".format(k, getattr(self, k)) for k in self._fields)
         args = ", ".join(equals)
         return "{0}({1})".format(self.__class__.__name__, args)
 
     def __eq__(self, other):
         """
-            equal
+        equal
         """
         try:
             return self.__dict__ == other.__dict__
@@ -60,7 +59,7 @@ class SourceElement:
 
     def __ne__(self, other):
         """
-            not equal
+        not equal
         """
         return not self.__dict__ == other.__dict__
 

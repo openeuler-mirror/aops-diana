@@ -75,8 +75,7 @@ class TimeKeeperManager:
         """
         with self._time_keeper_lock:
             if workflow_id in self._cache:
-                LOGGER.warning("The time keeper of workflow %s is "
-                               "existed. Update a new one.", workflow_id)
+                LOGGER.warning("The time keeper of workflow %s is " "existed. Update a new one.", workflow_id)
                 self._cache.pop(workflow_id)
             self._cache[workflow_id] = CheckTimeKeeper(step)
 
@@ -91,8 +90,7 @@ class TimeKeeperManager:
         """
         with self._time_keeper_lock:
             if workflow_id not in self._cache:
-                LOGGER.warning("The time keeper of workflow %s is "
-                               "not existed. Delete nothing.", workflow_id)
+                LOGGER.warning("The time keeper of workflow %s is " "not existed. Delete nothing.", workflow_id)
                 return
             self._cache.pop(workflow_id)
 
@@ -108,8 +106,7 @@ class TimeKeeperManager:
         with self._time_keeper_lock:
             if workflow_id in self._cache:
                 return self._cache[workflow_id].get_time_range()
-            LOGGER.warning("Cannot find the  time keeper of workflow %s "
-                           "when get time range.", workflow_id)
+            LOGGER.warning("Cannot find the  time keeper of workflow %s " "when get time range.", workflow_id)
             return []
 
 

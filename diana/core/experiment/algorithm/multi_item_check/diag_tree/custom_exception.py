@@ -19,6 +19,7 @@ class BaseError(Exception):
     """
     Self-defined Exception class
     """
+
     def __init__(self, error_info=''):
         super().__init__(self)
         self.message = error_info

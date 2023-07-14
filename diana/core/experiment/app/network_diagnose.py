@@ -30,10 +30,7 @@ class NetworkDiagnoseApp(App):
             "version": "1.0",
             "description": "",
             "username": "admin",
-            "api": {
-                "type": "api",
-                "address": "execute"
-            },
+            "api": {"type": "api", "address": "execute"},
             "detail": {
                 "singlecheck": {
                     "default_model": "NSigma-1",
@@ -91,16 +88,12 @@ class NetworkDiagnoseApp(App):
                         "gala_gopher_system_infos_tcp_in_errs": "",
                         "gala_gopher_system_infos_udp_indata_grams": "",
                         "gala_gopher_system_infos_udp_outdata_grams": "",
-                        "up": ""
-                    }
+                        "up": "",
+                    },
                 },
-                "multicheck": {
-                    "default_model": "StatisticalCheck-1"
-                },
-                "diag": {
-                    "default_model": "StatisticDiag-1"
-                }
-            }
+                "multicheck": {"default_model": "StatisticalCheck-1"},
+                "diag": {"default_model": "StatisticDiag-1"},
+            },
         }
         return info
 
@@ -139,14 +132,16 @@ class NetworkDiagnoseApp(App):
                 index = metric.find('{')
                 metric_name = metric[:index]
                 metric_label = metric[index:]
-                if value is None or len(value) == 0 or \
-                        detail.get(host_id) is None or detail[host_id].get(metric_name) is None:
+                if (
+                    value is None
+                    or len(value) == 0
+                    or detail.get(host_id) is None
+                    or detail[host_id].get(metric_name) is None
+                ):
                     continue
-                model: BaseSingleItemAlgorithm = self.model.get(
-                    detail[host_id][metric_name])
+                model: BaseSingleItemAlgorithm = self.model.get(detail[host_id][metric_name])
                 if len(model.calculate(value)) > 0:
-                    temp_result.append(
-                        {'metric_name': metric_name, 'metric_label': metric_label})
+                    temp_result.append({'metric_name': metric_name, 'metric_label': metric_label})
             if temp_result:
                 result[host_id] = temp_result
 
@@ -199,8 +194,9 @@ class NetworkDiagnoseApp(App):
         return model.calculate(data)
 
     @staticmethod
-    def format_result(multi_check_result: Dict[int, List[Dict[str, str]]], diag_result: Tuple[str, str, str]) -> Dict[
-            int, List[Dict[str, str]]]:
+    def format_result(
+        multi_check_result: Dict[int, List[Dict[str, str]]], diag_result: Tuple[str, str, str]
+    ) -> Dict[int, List[Dict[str, str]]]:
         """
         Args:
             multi_check_result
@@ -217,18 +213,23 @@ class NetworkDiagnoseApp(App):
         """
         result = {}
         for host_id, metrics in multi_check_result.items():
-            is_root = (host_id == diag_result[0])
+            is_root = host_id == diag_result[0]
             result[host_id] = []
             for metric in metrics:
-                result[host_id].append({
-                    "metric_name": metric['metric_name'],
-                    "metric_label": metric['metric_label'],
-                    "is_root": is_root and (metric['metric_name'] == diag_result[1]) and (
-                        metric['metric_label'] == diag_result[2])
-                })
+                result[host_id].append(
+                    {
+                        "metric_name": metric['metric_name'],
+                        "metric_label": metric['metric_label'],
+                        "is_root": is_root
+                        and (metric['metric_name'] == diag_result[1])
+                        and (metric['metric_label'] == diag_result[2]),
+                    }
+                )
         return result
 
-    def execute(self, model_info: Dict[str, Dict[str, str]], detail: dict, data: dict, default_mode: bool = False) -> dict:
+    def execute(
+        self, model_info: Dict[str, Dict[str, str]], detail: dict, data: dict, default_mode: bool = False
+    ) -> dict:
         """
         Args:
             model_info: it's information about model and algorithm. e.g.
@@ -285,8 +286,7 @@ class NetworkDiagnoseApp(App):
         if not signle_check_result:
             return {}
 
-        multi_check_result = self.do_multi_check(
-            detail['multicheck'], signle_check_result)
+        multi_check_result = self.do_multi_check(detail['multicheck'], signle_check_result)
         if not multi_check_result:
             return {}
 
@@ -294,8 +294,5 @@ class NetworkDiagnoseApp(App):
 
         format_result = self.format_result(multi_check_result, diag_result)
 
-        result = {
-            "host_result": format_result,
-            "alert_name": "network abnormal"
-        }
+        result = {"host_result": format_result, "alert_name": "network abnormal"}
         return result

@@ -25,6 +25,7 @@ class Mode(Register):
     """
     It's a base mode class which realizes register function for check mode.
     """
+
     def __init__(self):
         super().__init__()
 

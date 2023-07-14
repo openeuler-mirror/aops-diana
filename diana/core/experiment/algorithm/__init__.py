@@ -15,6 +15,8 @@ Time:
 Author:
 Description:
 """
+
+
 class Algorithm:
     def train(self):
         ...

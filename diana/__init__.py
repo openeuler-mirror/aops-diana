@@ -25,8 +25,6 @@ API = Api()
 for view, url in URLS:
     API.add_resource(view, url)
 
-BLUE_POINT = [
-    (CHECK, API)
-]
+BLUE_POINT = [(CHECK, API)]
 
 __all__ = ['BLUE_POINT']

@@ -28,6 +28,7 @@ class TreeNode(abc.ABC):
     """
     Base class of Diagnose tree's node
     """
+
     def __init__(self, data):
         """
         Init node of the diagnose tree, cannot be instantiated.
@@ -58,6 +59,7 @@ class BranchNode(TreeNode):
     """
     class of branch node in diagnose tree
     """
+
     def __init__(self, data):
         """
         Init a middle node
@@ -115,6 +117,7 @@ class LeafNode(TreeNode):
     """
     class of leaf node of diagnose tree
     """
+
     def __init__(self, data):
         """
         Init leaf node
@@ -146,6 +149,7 @@ class DiagTree:
     """
     Diag tree sheet
     """
+
     def __init__(self, tree_dict):
         """
         Init DiagTree object
@@ -164,6 +168,7 @@ class DiagTree:
             parent_node (BranchNode): parent node of the new node
 
         """
+
         def is_leaf(data_dict):
             if "check item" in data_dict:
                 return True
@@ -184,7 +189,6 @@ class DiagTree:
         """
 
         def dfs_create(children_list, parent):
-
             for child_dict in children_list:
                 new_node = self.create_node(child_dict, parent)
                 # if the node is a branch node, continue create
@@ -254,8 +258,9 @@ class DiagTree:
             try:
                 value = calculate(expression, leaves_dict)
             except DiagExpressionError as error:
-                raise DiagExpressionError("Expression '%s' of node '%s' has error."
-                                      % (expression, parent.name)) from error
+                raise DiagExpressionError(
+                    "Expression '%s' of node '%s' has error." % (expression, parent.name)
+                ) from error
             parent.value = value
 
             return value

@@ -62,8 +62,7 @@ class LeavesManager:
         """
         for leaf_info in leaves:
             leaf_name = leaf_info["check_item"]
-            leaf = Leaf(leaf_name, leaf_info["data_list"], leaf_info["condition"],
-                        leaf_info["description"])
+            leaf = Leaf(leaf_name, leaf_info["data_list"], leaf_info["condition"], leaf_info["description"])
             self.leaves_cache[leaf_name] = leaf
 
             for metric_info in leaf.data_list:

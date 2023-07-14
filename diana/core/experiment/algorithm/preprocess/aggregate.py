@@ -52,10 +52,11 @@ def transfer_str_2_series(data: Dict[str, List]) -> Dict[str, pd.Series]:
 
 
 def data_aggregation(
-        data: Dict[str, pd.Series],
-        filter_rule: Dict = None,
-        fill_method: Literal["backfill", "bfill", "ffill", "pad"] = 'pad',
-        fill_value: int = None) -> pd.Series:
+    data: Dict[str, pd.Series],
+    filter_rule: Dict = None,
+    fill_method: Literal["backfill", "bfill", "ffill", "pad"] = 'pad',
+    fill_value: int = None,
+) -> pd.Series:
     """
     Args:
         data: Dict of pd.Series, e.g.
@@ -104,12 +105,12 @@ def data_aggregation(
 
 def parse_label_info(label_info: str) -> Dict[str, str]:
     index = label_info.find('{')
-    labels = label_info[index + 1:-1].split(',')
+    labels = label_info[index + 1 : -1].split(',')
     mapping = {}
     for label in labels:
         equal_index = label.find('=')
         label_name = label[:equal_index]
-        label_value = label[equal_index + 2:-1]
+        label_value = label[equal_index + 2 : -1]
         mapping[label_name] = label_value
 
     return mapping
@@ -117,9 +118,13 @@ def parse_label_info(label_info: str) -> Dict[str, str]:
 
 if __name__ == "__main__":
     data = {
-        '''{instance="172.168.128.164:9100",label1="value2"}''': [['1669278600', '2'], ['1669278615', '3'], ['1669278630', '4']],
+        '''{instance="172.168.128.164:9100",label1="value2"}''': [
+            ['1669278600', '2'],
+            ['1669278615', '3'],
+            ['1669278630', '4'],
+        ],
         "l2": [['1669278600', '3'], ['1669278615', '4'], ['1669278630', '5'], ['1669278645', '6']],
-        "l3": []
+        "l3": [],
     }
     series = transfer_str_2_series(data)
     filter_rule = {"label1": "value2"}

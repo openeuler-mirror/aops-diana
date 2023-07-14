@@ -14,51 +14,33 @@ test_cases = [
         'app_id': "id1",
         "app_name": "name1",
         "description": "we",
-        "api": {
-            "type": "api",
-            "address": "run"
-        },
-        "detail": {
-            "single": {},
-            "diag": {}
-        }
+        "api": {"type": "api", "address": "run"},
+        "detail": {"single": {}, "diag": {}},
     },
     {
         "username": "test",
         'app_id': "id2",
         "app_name": "name2",
         "description": "laolu",
-        "api": {
-            "type": "server",
-            "address": "http://127.0.0.1:1122/test"
-        },
-        "detail": {
-        }
+        "api": {"type": "server", "address": "http://127.0.0.1:1122/test"},
+        "detail": {},
     },
     {
         "username": "test",
         'app_id': "id3",
         "app_name": "name3",
         "description": "other",
-        "api": {
-            "type": "server",
-            "address": "http://127.0.0.1:1122/test"
-        },
-        "detail": {
-        }
+        "api": {"type": "server", "address": "http://127.0.0.1:1122/test"},
+        "detail": {},
     },
     {
         "username": "test",
         'app_id': "id4",
         "app_name": "name1",
         "description": "laolu",
-        "api": {
-            "type": "server",
-            "address": "http://127.0.0.1:1122/test"
-        },
-        "detail": {
-        }
-    }
+        "api": {"type": "server", "address": "http://127.0.0.1:1122/test"},
+        "detail": {},
+    },
 ]
 
 
@@ -102,11 +84,7 @@ class AppDaoTestcase(unittest.TestCase):
 
     def test_query_app_list_should_return_one_result_when_page_and_per_page_are_defined(self):
         self.help()
-        data = {
-            "username": "test",
-            "page": 2,
-            "per_page": 2
-        }
+        data = {"username": "test", "page": 2, "per_page": 2}
         status, res = self.dao.query_app_list(data, self.index)
         self.assertEqual(SUCCEED, status)
         self.assertEqual(3, res['total_count'])
@@ -123,20 +101,14 @@ class AppDaoTestcase(unittest.TestCase):
 
     def test_query_app_should_return_correct_result_when_input_id_is_correct(self):
         self.help()
-        data = {
-            'username': "test",
-            "app_id": "id3"
-        }
+        data = {'username': "test", "app_id": "id3"}
         status, res = self.dao.query_app(data, self.index)
         self.assertEqual(SUCCEED, status)
         self.assertEqual(test_cases[2], res['result'])
 
     def test_query_app_should_return_no_data_when_input_query_app_is_not_existed(self):
         self.help()
-        data = {
-            'username': "test",
-            "app_id": "id5"
-        }
+        data = {'username': "test", "app_id": "id5"}
         status, res = self.dao.query_app(data, self.index)
         self.assertEqual(NO_DATA, status)
 

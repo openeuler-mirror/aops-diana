@@ -24,14 +24,18 @@ from diana.database.dao.data_dao import DataDao
 from diana.errors.workflow_error import WorkflowModelAssignError
 from diana.conf import configuration
 from diana.conf.constant import ALGO_LIST
-from vulcanus.restful.resp.state import SUCCEED, DATABASE_CONNECT_ERROR, DATABASE_QUERY_ERROR,\
-    TASK_EXECUTION_FAIL, PARTIAL_SUCCEED
+from vulcanus.restful.resp.state import (
+    SUCCEED,
+    DATABASE_CONNECT_ERROR,
+    DATABASE_QUERY_ERROR,
+    TASK_EXECUTION_FAIL,
+    PARTIAL_SUCCEED,
+)
 from diana.core.experiment.app import App
 from vulcanus.log.log import LOGGER
 
 
 class DefaultWorkflow:
-
     def __init__(self, hosts: list, app=MysqlNetworkDiagnoseApp):
         if not issubclass(app, App):
             raise TypeError()
@@ -46,11 +50,11 @@ class DefaultWorkflow:
         step_detail = self.__app.info["detail"]
         try:
             if "singlecheck" in step_detail:
-                workflow_detail["singlecheck"] = DefaultWorkflow.__assign_single_item_model(hosts,
-                                                                                            step_detail["singlecheck"])
+                workflow_detail["singlecheck"] = DefaultWorkflow.__assign_single_item_model(
+                    hosts, step_detail["singlecheck"]
+                )
             if "multicheck" in step_detail:
-                workflow_detail["multicheck"] = DefaultWorkflow.__assign_multi_item_model(
-                    hosts)
+                workflow_detail["multicheck"] = DefaultWorkflow.__assign_multi_item_model(hosts)
             if "diag" in step_detail:
                 workflow_detail["diag"] = ModelAssign.assign_cluster_diag_model()
 
@@ -86,16 +90,18 @@ class DefaultWorkflow:
             for model_detail in algo["models"]:
                 if model_detail['model_id'] not in model_list:
                     continue
-                model_info[model_detail['model_id']] = {"model_name": model_detail['model_name'], "algo_id": algo_id,
-                                                        "algo_name": algo_class().info.get('algo_name')}
+                model_info[model_detail['model_id']] = {
+                    "model_name": model_detail['model_name'],
+                    "algo_id": algo_id,
+                    "algo_name": algo_class().info.get('algo_name'),
+                }
         return model_info
 
     @staticmethod
     def _generate_hosts(hosts):
         host_list = list()
         for host_ip in hosts:
-            host_list.append(
-                {"host_id": host_ip["ip"], "host_ip": host_ip["ip"], "instance_port": host_ip["port"]})
+            host_list.append({"host_id": host_ip["ip"], "host_ip": host_ip["ip"], "instance_port": host_ip["port"]})
         return host_list
 
     def _get_app_execute_result(self, time_range):
@@ -104,8 +110,7 @@ class DefaultWorkflow:
             LOGGER.error("Promethus connection failed.")
             return DATABASE_CONNECT_ERROR, None
 
-        data_status, monitor_data = data_dao.query_data(
-            time_range=time_range, host_list=self.__hosts)
+        data_status, monitor_data = data_dao.query_data(time_range=time_range, host_list=self.__hosts)
 
         if data_status != SUCCEED and data_status != PARTIAL_SUCCEED:
             LOGGER.error("Promethus data query error.")
@@ -113,7 +118,8 @@ class DefaultWorkflow:
 
         processed_data = reformat_queried_data(monitor_data)
         network_monitor_data = self.__app.execute(
-            model_info=self.__model_info, detail=self.__detail_info, data=processed_data, default_mode=True)
+            model_info=self.__model_info, detail=self.__detail_info, data=processed_data, default_mode=True
+        )
         if not network_monitor_data:
             LOGGER.debug("No error message.")
 
@@ -126,22 +132,22 @@ class DefaultWorkflow:
             if not isinstance(metrics, list):
                 continue
             for metric_item in metrics:
-                host_check[host_ip] = dict(is_root=metric_item.get("is_root", False),
-                                           metric_name=metric_item.get(
-                                               "metric_name"),
-                                           metric_label=metric_item.get("metric_label"))
+                host_check[host_ip] = dict(
+                    is_root=metric_item.get("is_root", False),
+                    metric_name=metric_item.get("metric_name"),
+                    metric_label=metric_item.get("metric_label"),
+                )
         return host_check
 
     def _send_kafka(self, network_monitor_data):
         workflow_msg = {
             "alert_name": network_monitor_data["alert_name"],
-            "host_check": self._kafka_host_check_msg(network_monitor_data)
+            "host_check": self._kafka_host_check_msg(network_monitor_data),
         }
         try:
             producer = BaseProducer(configuration)
             LOGGER.debug("Send workflow msg %s" % workflow_msg)
-            producer.send_msg(configuration.consumer.get(
-                'RESULT_NAME'), workflow_msg)
+            producer.send_msg(configuration.consumer.get('RESULT_NAME'), workflow_msg)
             return SUCCEED
         except ProducerInitError as error:
             LOGGER.error("Produce workflow msg failed. %s" % error)
@@ -155,8 +161,7 @@ class DefaultWorkflow:
         Returns:
             int
         """
-        app_execute_status, network_monitor_data = self._get_app_execute_result(
-            time_range)
+        app_execute_status, network_monitor_data = self._get_app_execute_result(time_range)
         if app_execute_status != SUCCEED or not network_monitor_data:
             return app_execute_status
 
@@ -164,8 +169,7 @@ class DefaultWorkflow:
         if send_result != SUCCEED:
             LOGGER.error("Description failed to send a kafka message.")
         else:
-            LOGGER.debug(
-                "Insert workflow execute result into kafka successful.")
+            LOGGER.debug("Insert workflow execute result into kafka successful.")
         return send_result
 
     @staticmethod
