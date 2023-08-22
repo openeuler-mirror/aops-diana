@@ -13,7 +13,6 @@
 from vulcanus.restful.response import BaseResponse
 from diana.database.dao.algo_dao import AlgorithmDao
 from diana.utils.schema.algorithm import QueryAlgorithmListSchema, QueryAlgorithmSchema
-from diana.conf import configuration
 
 
 class QueryAlgorithmList(BaseResponse):
@@ -22,7 +21,7 @@ class QueryAlgorithmList(BaseResponse):
     Restful API: GET
     """
 
-    @BaseResponse.handle(schema=QueryAlgorithmListSchema, proxy=AlgorithmDao, config=configuration)
+    @BaseResponse.handle(schema=QueryAlgorithmListSchema, proxy=AlgorithmDao)
     def get(self, callback: AlgorithmDao, **params):
         """
             Get algorithm info list
@@ -54,7 +53,7 @@ class QueryAlgorithm(BaseResponse):
     Restful API: GET
     """
 
-    @BaseResponse.handle(schema=QueryAlgorithmSchema, proxy=AlgorithmDao, config=configuration)
+    @BaseResponse.handle(schema=QueryAlgorithmSchema, proxy=AlgorithmDao)
     def get(self, callback: AlgorithmDao, **params):
         """
             Get algorithm info

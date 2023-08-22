@@ -17,11 +17,13 @@ Description:
 """
 import time
 from typing import Dict, Tuple
-
 import sqlalchemy
 
+from vulcanus.database.proxy import connect_database
+from vulcanus.conf.constant import URL_FORMAT
 from vulcanus.kafka.kafka_exception import ProducerInitError
 from vulcanus.kafka.producer import BaseProducer
+from vulcanus.log.log import LOGGER
 from vulcanus.restful.resp.state import (
     SUCCEED,
     PARTIAL_SUCCEED,
@@ -30,20 +32,19 @@ from vulcanus.restful.resp.state import (
     DATABASE_QUERY_ERROR,
     DATABASE_CONNECT_ERROR,
 )
-from vulcanus.log.log import LOGGER
 from vulcanus.restful.response import BaseResponse
-from vulcanus.conf.constant import URL_FORMAT, QUERY_HOST_DETAIL
-
+from vulcanus.exceptions import DatabaseConnectionFailed
+from diana.conf.constant import QUERY_HOST_DETAIL
 from diana.conf import configuration
-from diana.errors.workflow_error import WorkflowExecuteError, WorkflowModelAssignError
-from diana.database.dao.data_dao import DataDao
-from diana.database.dao.app_dao import AppDao
-from diana.database.dao.model_dao import ModelDao
-from diana.core.rule.model_assign import ModelAssign
-from diana.database.dao.workflow_dao import WorkflowDao
-from diana.database.dao.result_dao import ResultDao
 from diana.core.experiment.app.mysql_network_diagnose import MysqlNetworkDiagnoseApp
 from diana.core.rule.functions import reformat_queried_data
+from diana.core.rule.model_assign import ModelAssign
+from diana.database.dao.app_dao import AppDao
+from diana.database.dao.data_dao import DataDao
+from diana.database.dao.model_dao import ModelDao
+from diana.database.dao.result_dao import ResultDao
+from diana.database.dao.workflow_dao import WorkflowDao
+from diana.errors.workflow_error import WorkflowExecuteError, WorkflowModelAssignError
 
 
 class Workflow:
@@ -119,10 +120,10 @@ class Workflow:
                     LOGGER.debug("Failed to insert host check workflow data.")
                     raise WorkflowExecuteError
 
-    def add_workflow_alert(self, network_monitor_data: dict, workflow: dict, domain: str, alert_time: str) -> int:
+    def add_workflow_alert(self, network_monitor_data: dict, workflow: dict, domain: str, alert_time: str) -> str:
         try:
             alert_id = alert_time + "-" + domain
-            with ResultDao(configuration) as resultdao_proxy:
+            with ResultDao() as resultdao_proxy:
                 try:
                     self._insert_domain(
                         resultdao_proxy, alert_id, domain, alert_time, network_monitor_data, workflow["workflow_name"]
@@ -141,7 +142,7 @@ class Workflow:
                     if resultdao_proxy.delete_alert(alert_id=alert_id) != SUCCEED:
                         LOGGER.error("Failed to delete the domain info, alert_id: %s." % alert_id)
                     return DATABASE_INSERT_ERROR
-        except sqlalchemy.exc.SQLAlchemyError:
+        except DatabaseConnectionFailed:
             LOGGER.error("Connect mysql fail when insert built-in algorithm.")
             raise sqlalchemy.exc.SQLAlchemyError("Connect mysql failed.")
 
@@ -189,16 +190,12 @@ class Workflow:
             LOGGER.error("Produce workflow msg failed. %s" % error)
             return TASK_EXECUTION_FAIL
 
+    @connect_database
     def _get_workflow(self):
-        try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
-                status_code, workflow = workflow_proxy.get_workflow(
-                    data=dict(username=self.__username, workflow_id=self.__workflow_id)
-                )
-        except sqlalchemy.exc.SQLAlchemyError:
-            LOGGER.error("Connect mysql fail when insert built-in algorithm.")
-            return DATABASE_CONNECT_ERROR
+        with WorkflowDao() as workflow_proxy:
+            status_code, workflow = workflow_proxy.get_workflow(
+                data=dict(username=self.__username, workflow_id=self.__workflow_id)
+            )
 
         if status_code != SUCCEED:
             return DATABASE_QUERY_ERROR
@@ -215,11 +212,9 @@ class Workflow:
             return DATABASE_QUERY_ERROR
         return dict(workflow=workflow, hosts=hosts, domain=domain)
 
+    @connect_database
     def _get_app_execute_result(self, time_range, hosts, workflow):
-        data_dao = DataDao(configuration)
-        if not data_dao.connect():
-            LOGGER.error("Promethus connection failed.")
-            return DATABASE_CONNECT_ERROR
+        data_dao = DataDao()
 
         # data time range should based on the algorithm in the future
         data_time_range = [time_range[1] - 1500, time_range[1]]
@@ -245,7 +240,7 @@ class Workflow:
 
         return network_monitor_data
 
-    def execute(self, time_range: list, kafka=False, storage=True) -> int:
+    def execute(self, time_range: list, kafka=False, storage=True) -> str:
         """
         Workflow control
         Args:
@@ -256,12 +251,12 @@ class Workflow:
             int
         """
         workflow = self._get_workflow()
-        if isinstance(workflow, int):
+        if isinstance(workflow, str):
             return workflow
 
         network_monitor_data = self._get_app_execute_result(time_range, workflow["hosts"], workflow["workflow"])
         LOGGER.debug(network_monitor_data)
-        if isinstance(network_monitor_data, int):
+        if isinstance(network_monitor_data, str):
             return network_monitor_data
 
         storage_status, kafka_status = DATABASE_INSERT_ERROR, DATABASE_INSERT_ERROR
@@ -341,8 +336,9 @@ class Workflow:
         get app's step detail and check the step supported or not
         """
         support_steps = {"singlecheck", "multicheck", "diag"}
-        app_proxy = AppDao(configuration)
-        if not app_proxy.connect():
+        try:
+            app_proxy = AppDao()
+        except DatabaseConnectionFailed:
             raise WorkflowModelAssignError("Connect to elasticsearch failed.", workflow_id)
 
         status_code, app_info = app_proxy.query_app({"username": username, "app_id": app_id})
@@ -531,9 +527,9 @@ class Workflow:
 
         data = {"model_list": list(model_set)}
         try:
-            with ModelDao(configuration) as modeldao_proxy:
+            with ModelDao() as modeldao_proxy:
                 _, result = modeldao_proxy.get_model_algo(data)
 
             return result
-        except sqlalchemy.exc.SQLAlchemyError:
+        except DatabaseConnectionFailed:
             return dict()

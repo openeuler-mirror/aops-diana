@@ -15,3 +15,20 @@ Time:
 Author:
 Description:
 """
+from unittest import TestCase
+
+from vulcanus.conf import configuration
+from vulcanus.manage import init_application
+from diana.conf import configuration as settings
+from diana.url import URLS
+
+
+class BaseTestCase(TestCase):
+    def setUp(self) -> None:
+        for config in [config for config in dir(settings) if not config.startswith("_")]:
+            setattr(configuration, config, getattr(settings, config))
+
+    def init_application(self):
+        app = init_application(name="diana", settings=settings, register_urls=URLS)
+        app.testing = True
+        return app

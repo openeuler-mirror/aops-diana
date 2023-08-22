@@ -19,13 +19,14 @@ from typing import Optional
 from threading import Lock
 from flask import Flask
 import sqlalchemy
+
+from vulcanus.restful.resp.state import SUCCEED, DATABASE_CONNECT_ERROR, PARAM_ERROR
+from vulcanus.log.log import LOGGER
+from vulcanus.common import singleton
 from diana.conf import configuration
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.core.check.check_scheduler.task_keeper import CheckTaskKeeper
 from diana.core.check.check_scheduler.time_keeper import time_keeper_manager
-from vulcanus.singleton import singleton
-from vulcanus.restful.resp.state import SUCCEED, DATABASE_CONNECT_ERROR, PARAM_ERROR
-from vulcanus.log.log import LOGGER
 
 
 @singleton
@@ -49,8 +50,7 @@ class CheckScheduler:
 
         """
         try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
+            with WorkflowDao() as workflow_proxy:
                 status, result = workflow_proxy.get_all_workflow_list("running")
         except sqlalchemy.exc.SQLAlchemyError:
             LOGGER.error("Connect to workflow_proxy failed.")

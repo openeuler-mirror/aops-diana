@@ -30,7 +30,7 @@ from vulcanus.restful.resp.state import (
 
 
 class ResultDao(MysqlProxy):
-    def query_result_host(self, data: Dict[str, str]) -> Tuple[int, dict]:
+    def query_result_host(self, data: Dict[str, str]) -> Tuple[str, dict]:
         """
             query check result info from database
 
@@ -42,7 +42,7 @@ class ResultDao(MysqlProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
             dict:   e.g {
                         "result": {
                         1 : {  //host id
@@ -136,7 +136,7 @@ class ResultDao(MysqlProxy):
         )
         return check_result_info_list
 
-    def query_result_list(self, data: Dict[str, str]) -> Tuple[int, dict]:
+    def query_result_list(self, data: Dict[str, str]) -> Tuple[str, dict]:
         """
             query check result host list sorted by alert id
 
@@ -154,7 +154,7 @@ class ResultDao(MysqlProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
             dict: e.g
                 {
                     "total_count": int,
@@ -299,14 +299,14 @@ class ResultDao(MysqlProxy):
             res.append(check_result_host_info)
         return res
 
-    def query_result_total_count(self, data: Dict[str, str]) -> Tuple[int, dict]:
+    def query_result_total_count(self, data: Dict[str, str]) -> Tuple[str, dict]:
         """
             query the number of alerts for user
         Args:
             data(dict): param e.g {'username': "admin"}
 
         Returns:
-            int: status code
+            str: status code
             dict: {"count": int}
         """
         try:
@@ -320,7 +320,7 @@ class ResultDao(MysqlProxy):
 
         return SUCCEED, {'count': alert_count_query}
 
-    def confirm_check_result(self, data: Dict[str, str]) -> int:
+    def confirm_check_result(self, data: Dict[str, str]) -> str:
         """
             confirm check result
         Args:
@@ -331,7 +331,7 @@ class ResultDao(MysqlProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
 
         """
         filters = {DomainCheckResult.alert_id == data['alert_id'], DomainCheckResult.username == data['username']}
@@ -351,7 +351,7 @@ class ResultDao(MysqlProxy):
 
         return SUCCEED
 
-    def count_domain_check_result(self, data: Dict[str, str]) -> Tuple[int, dict]:
+    def count_domain_check_result(self, data: Dict[str, str]) -> Tuple[str, dict]:
         """
             get number of domain check result
         Args:
@@ -365,7 +365,7 @@ class ResultDao(MysqlProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
             dict: e.g
             {
                 'total_count': int,
@@ -438,7 +438,7 @@ class ResultDao(MysqlProxy):
             res.append(domain_count_info)
         return res
 
-    def insert_domain(self, data: dict) -> int:
+    def insert_domain(self, data: dict) -> str:
         """
         insert domain info into database
         Args:
@@ -455,7 +455,7 @@ class ResultDao(MysqlProxy):
             }
 
         Returns:
-            int
+            str
         """
         try:
             domain = DomainCheckResult(**data)
@@ -468,7 +468,7 @@ class ResultDao(MysqlProxy):
             LOGGER.error("Insert domain info failed due to internal error.")
             return DATABASE_INSERT_ERROR
 
-    def insert_alert_host(self, data: dict) -> int:
+    def insert_alert_host(self, data: dict) -> str:
         """
         insert alert host info into database
         Args:
@@ -480,7 +480,7 @@ class ResultDao(MysqlProxy):
             }
 
         Returns:
-            int
+            str
         """
         try:
             alert_host = AlertHost(**data)
@@ -493,7 +493,7 @@ class ResultDao(MysqlProxy):
             LOGGER.error("Insert alert host info failed due to internal error.")
             return DATABASE_INSERT_ERROR
 
-    def insert_host_check(self, data: dict) -> int:
+    def insert_host_check(self, data: dict) -> str:
         """
         insert host check info into database
         Args:
@@ -506,7 +506,7 @@ class ResultDao(MysqlProxy):
             }
 
         Returns:
-            int
+            str
         """
         try:
             host_check = HostCheckResult(**data)
@@ -519,7 +519,7 @@ class ResultDao(MysqlProxy):
             LOGGER.error("Insert host check info failed due to internal error.")
             return DATABASE_INSERT_ERROR
 
-    def delete_alert(self, alert_id: str) -> int:
+    def delete_alert(self, alert_id: str) -> str:
         """
         Delete alert info
         """

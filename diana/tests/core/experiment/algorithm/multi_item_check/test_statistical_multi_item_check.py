@@ -19,21 +19,16 @@ class TestStatisticalMultiItemCheckTestCase(unittest.TestCase):
     """
     test statistical multi-item check algo
     """
-
     def test_calculate_should_return_true_when_error_rate_acceptable(self):
         algorithm = StatisticalCheck(1)
-        data = [
-            {"metric_name": "scrape_duration_seconds", "metric_label": {}},
-            {"metric_name": "scrape_samples_scraped", "metric_label": {}},
-        ]
+        data = [{"metric_name": "scrape_duration_seconds", "metric_label": {}},
+                {"metric_name": "scrape_samples_scraped", "metric_label": {}}]
         res = algorithm.calculate(data)
         self.assertEqual(res, False)
 
     def test_calculate_should_return_false_when_error_rate_unacceptable(self):
         algorithm = StatisticalCheck(0.5)
-        data = [
-            {"metric_name": "scrape_duration_seconds", "metric_label": {}},
-            {"metric_name": "scrape_samples_scraped", "metric_label": {}},
-        ]
+        data = [{"metric_name": "scrape_duration_seconds", "metric_label": {}},
+                {"metric_name": "scrape_samples_scraped", "metric_label": {}}]
         res = algorithm.calculate(data)
         self.assertEqual(res, True)

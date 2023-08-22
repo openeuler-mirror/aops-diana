@@ -13,25 +13,24 @@
 from vulcanus.restful.response import BaseResponse
 from diana.database.dao.data_dao import DataDao
 from diana.utils.schema.metric import QueryHostMetricDataSchema, QueryHostMetricListSchema, QueryHostMetricNamesSchema
-from diana.conf import configuration
 
 
 class QueryHostMetricNames(BaseResponse):
-    @BaseResponse.handle(schema=QueryHostMetricNamesSchema, proxy=DataDao, config=configuration)
+    @BaseResponse.handle(schema=QueryHostMetricNamesSchema, proxy=DataDao)
     def get(self, callback: DataDao, **params):
         status_code, result = callback.query_metric_names(params)
         return self.response(code=status_code, data=result)
 
 
 class QueryHostMetricData(BaseResponse):
-    @BaseResponse.handle(schema=QueryHostMetricDataSchema, proxy=DataDao, config=configuration)
+    @BaseResponse.handle(schema=QueryHostMetricDataSchema, proxy=DataDao)
     def post(self, callback: DataDao, **params):
         status_code, result = callback.query_metric_data(params)
         return self.response(code=status_code, data=result)
 
 
 class QueryHostMetricList(BaseResponse):
-    @BaseResponse.handle(schema=QueryHostMetricListSchema, proxy=DataDao, config=configuration)
+    @BaseResponse.handle(schema=QueryHostMetricListSchema, proxy=DataDao)
     def post(self, callback: DataDao, **params):
         status_code, result = callback.query_metric_list(params)
         return self.response(code=status_code, data=result)

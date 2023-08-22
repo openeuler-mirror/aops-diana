@@ -19,7 +19,6 @@ import json
 import time
 from typing import NoReturn, List, Dict
 
-from flask import Flask
 from flask_apscheduler import APScheduler
 from diana.mode import mode
 from diana.mode.scheduler import Scheduler
@@ -30,6 +29,7 @@ from diana.core.rule.default_workflow import DefaultWorkflow
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.response import BaseResponse
 from vulcanus.restful.resp.state import SUCCEED
+from vulcanus.manage import init_application
 
 
 class Util:
@@ -151,9 +151,10 @@ class DefaultScheduler(Scheduler):
 
     @staticmethod
     def run():
-        app = Flask(__name__)
-        app.config.from_object(Config())
+        config_obj = Config()
+        config_dict = {key: getattr(config_obj, key) for key in dir(config_obj) if key.isupper()}
 
+        app = init_application(name="diana", settings=configuration, config=config_dict)
         scheduler = APScheduler()
         scheduler.init_app(app)
         scheduler.start()

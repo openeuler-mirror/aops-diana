@@ -33,7 +33,7 @@ class ModelDao(MysqlProxy):
     Model related operation
     """
 
-    def insert_model(self, data) -> int:
+    def insert_model(self, data) -> str:
         """
         insert model info into database. Called after model's file has been saved.
         Args:
@@ -88,7 +88,7 @@ class ModelDao(MysqlProxy):
             return True
         return False
 
-    def get_model_list(self, data: dict) -> Tuple[int, dict]:
+    def get_model_list(self, data: dict) -> Tuple[str, dict]:
         """
         get model info from database.
         Args:
@@ -107,7 +107,7 @@ class ModelDao(MysqlProxy):
             }
 
         Returns:
-            int
+            str
             dict: model list info.  e.g.
                 {
                     "total_count": 0,
@@ -228,7 +228,7 @@ class ModelDao(MysqlProxy):
             result.append(model_info)
         return result
 
-    def get_model_algo(self, data: dict) -> Tuple[int, dict]:
+    def get_model_algo(self, data: dict) -> Tuple[str, dict]:
         """
         get model's name and its algorithm info
         Args:
@@ -247,7 +247,7 @@ class ModelDao(MysqlProxy):
             LOGGER.error("Get model's algorithm info failed due to internal error.")
             return DATABASE_QUERY_ERROR, result
 
-    def _get_model_algo_info(self, model_list: list) -> Tuple[int, dict]:
+    def _get_model_algo_info(self, model_list: list) -> Tuple[str, dict]:
         """
         get model's name and its algorithm info from mysql
         """
@@ -273,7 +273,7 @@ class ModelDao(MysqlProxy):
         return status_code, result
 
     # builtin interface
-    def get_model(self, model_list: List[str]) -> Tuple[int, Dict[str, dict]]:
+    def get_model(self, model_list: List[str]) -> Tuple[str, Dict[str, dict]]:
         """
         The interface is for model loading, offering model path and algorithm path.
         """
@@ -286,7 +286,7 @@ class ModelDao(MysqlProxy):
             LOGGER.error("Get model info failed due to internal error.")
             return DATABASE_QUERY_ERROR, result
 
-    def _get_model_info(self, model_list: List[str]) -> Tuple[int, Dict[str, dict]]:
+    def _get_model_info(self, model_list: List[str]) -> Tuple[str, Dict[str, dict]]:
         model_query = (
             self.session.query(Model.model_id, Model.model_name, Model.file_path, Algorithm.path)
             .join(Algorithm, Model.algo_id == Algorithm.algo_id)

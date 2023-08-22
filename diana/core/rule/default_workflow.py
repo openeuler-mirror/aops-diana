@@ -153,7 +153,7 @@ class DefaultWorkflow:
             LOGGER.error("Produce workflow msg failed. %s" % error)
             return TASK_EXECUTION_FAIL
 
-    def execute(self, time_range: list) -> int:
+    def execute(self, time_range: list) -> str:
         """
         Defaultworkflow control
         Args:

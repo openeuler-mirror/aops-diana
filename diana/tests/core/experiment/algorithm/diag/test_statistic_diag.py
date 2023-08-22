@@ -5,17 +5,30 @@ from diana.core.experiment.algorithm.diag.statistic_diag import StatisticDiag
 
 
 class StatisticDiagTestCase(unittest.TestCase):
+
     def test_run_should_return_correct_result_when_input_is_normal(self):
         ...
 
     def test_get_candidate_should_return_correct_result_when_input_is_larger_than_k(self):
-        data = {"1": [1, 2, 3, 4], "2": [2, 3, 4], "3": [1, 2, 2, 1, 1], "4": [1, 2, 2], "5": [1, 2, 2, 2, 2, 2]}
+        data = {
+            "1": [1, 2, 3, 4],
+            "2": [2, 3, 4],
+            "3": [1, 2, 2, 1, 1],
+            "4": [1, 2, 2],
+            "5": [1, 2, 2, 2, 2, 2]
+        }
         diag = StatisticDiag(2)
         result = diag.get_candidate(data)
         self.assertEqual(result, ["3", "5"])
 
     def test_get_candidate_should_return_all_id_when_input_is_smaller_than_k(self):
-        data = {"1": [1, 2, 3, 4], "2": [2, 3, 4], "3": [1, 2, 2, 1, 1], "4": [1, 2, 2], "5": [1, 2, 2, 2, 2, 2]}
+        data = {
+            "1": [1, 2, 3, 4],
+            "2": [2, 3, 4],
+            "3": [1, 2, 2, 1, 1],
+            "4": [1, 2, 2],
+            "5": [1, 2, 2, 2, 2, 2]
+        }
         diag = StatisticDiag(6)
         result = diag.get_candidate(data)
         self.assertEqual(result, ["1", "2", "3", "4", "5"])

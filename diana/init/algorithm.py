@@ -25,19 +25,18 @@ from vulcanus.restful.resp.state import DATABASE_INSERT_ERROR
 from diana.conf.constant import SYSTEM_USER, ALGO_LIST
 from diana.database.dao.algo_dao import AlgorithmDao
 from diana.database.dao.model_dao import ModelDao
-from diana.conf import configuration
 
 
 def init_algo_and_model():
     """
     add built in algorithm info into database
     """
-    algo_proxy = AlgorithmDao(configuration)
+    algo_proxy = AlgorithmDao()
     if not algo_proxy.connect():
         LOGGER.error("Connect mysql fail when insert built-in algorithm.")
         raise sqlalchemy.exc.SQLAlchemyError("Connect mysql failed.")
 
-    model_proxy = ModelDao(configuration)
+    model_proxy = ModelDao()
     if not model_proxy.connect():
         LOGGER.error("Connect mysql fail when insert built-in model.")
         raise sqlalchemy.exc.SQLAlchemyError("Connect mysql failed.")

@@ -15,42 +15,32 @@ Time:
 Author:
 Description:
 """
-import unittest
 from unittest import mock
-from flask import Flask
-from flask_restful import Api
-from flask.blueprints import Blueprint
-from diana.database.dao.model_dao import ModelDao
 
 from vulcanus.restful.resp.state import SUCCEED, PARAM_ERROR, TOKEN_ERROR, DATABASE_CONNECT_ERROR
 from vulcanus.restful.response import BaseResponse
-
+from diana.database.dao.model_dao import ModelDao
 from diana.conf.constant import QUERY_MODEL_LIST
-from diana.url import SPECIFIC_URLS
+from diana.tests import BaseTestCase
 
-API = Api()
-for view, url in SPECIFIC_URLS['MODEL_URLS']:
-    API.add_resource(view, url)
 
-DIANA = Blueprint('diana', __name__)
-app = Flask("diana")
-API.init_app(DIANA)
-app.register_blueprint(DIANA)
-
-app.testing = True
-client = app.test_client()
 header = {"Content-Type": "application/json; charset=UTF-8"}
 header_with_token = {"Content-Type": "application/json; charset=UTF-8", "access_token": "81fe"}
 
 
-class ModelControllerTestCase(unittest.TestCase):
+class ModelControllerTestCase(BaseTestCase):
     """
     ModelController integration tests stubs
     """
 
+    def setUp(self) -> None:
+        super().setUp()
+        app = self.init_application()
+        self.client = app.test_client()
+
     def test_query_model_list_should_return_error_when_request_method_is_wrong(self):
         args = {}
-        response = client.get(QUERY_MODEL_LIST, json=args).json
+        response = self.client.get(QUERY_MODEL_LIST, json=args).json
         self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_query_model_list_should_return_param_error_when_input_wrong_param(self):
@@ -61,7 +51,7 @@ class ModelControllerTestCase(unittest.TestCase):
             "per_page": 2,
             "filter": {"tag": 1, "field": "singlecheck", "model_name": "", "algo_name": [""]},
         }
-        response = client.post(QUERY_MODEL_LIST, json=args, headers=header_with_token).json
+        response = self.client.post(QUERY_MODEL_LIST, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_query_model_list_should_return_token_error_when_input_wrong_token(self):
@@ -72,7 +62,7 @@ class ModelControllerTestCase(unittest.TestCase):
             "per_page": 2,
             "filter": {"tag": "aaa", "field": "singlecheck", "model_name": "test", "algo_name": ["test"]},
         }
-        response = client.post(QUERY_MODEL_LIST, json=args, headers=header).json
+        response = self.client.post(QUERY_MODEL_LIST, json=args, headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_token')
@@ -87,7 +77,7 @@ class ModelControllerTestCase(unittest.TestCase):
         }
         mock_connect.return_value = False
         mock_token.return_value = SUCCEED
-        response = client.post(QUERY_MODEL_LIST, json=args, headers=header_with_token).json
+        response = self.client.post(QUERY_MODEL_LIST, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], DATABASE_CONNECT_ERROR)
 
     def test_query_model_list_should_return_successfully_when_given_correct_params(self):
@@ -98,5 +88,5 @@ class ModelControllerTestCase(unittest.TestCase):
             "per_page": 2,
             "filter": {"tag": "aaa", "field": "singlecheck", "model_name": "test", "algo_name": ["test"]},
         }
-        response = client.post(QUERY_MODEL_LIST, json=args, headers=header_with_token).json
+        response = self.client.post(QUERY_MODEL_LIST, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], TOKEN_ERROR)

@@ -11,11 +11,8 @@
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
 import unittest
-from diana.core.experiment.algorithm.base_algo import (
-    BaseSingleItemAlgorithm,
-    BaseMultiItemAlgorithmOne,
-    BaseMultiItemAlgorithmTwo,
-)
+from diana.core.experiment.algorithm.base_algo import BaseSingleItemAlgorithm, \
+    BaseMultiItemAlgorithmOne, BaseMultiItemAlgorithmTwo
 
 
 class TestBaseSingleItemAlgorithm(unittest.TestCase):

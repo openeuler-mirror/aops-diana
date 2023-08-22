@@ -19,67 +19,21 @@ class TestMae(unittest.TestCase):
     """
     test algorithm mae
     """
-
     def test_calculate_should_return_error_data_when_input_data_has_error(self):
         algorithm = Mae()
-        data = [
-            [1, 1],
-            [2, 2],
-            [3, 3],
-            [4, 1],
-            [5, 2],
-            [6, 3],
-            [7, 1],
-            [8, 2],
-            [9, 3],
-            [10, 1],
-            [11, 2],
-            [12, 10],
-            [13, 1],
-            [14, 2],
-        ]
+        data = [[1,1],[2,2],[3,3],[4,1],[5,2],[6,3],[7,1],[8,2],[9,3],[10,1],[11,2],[12,10],[13,1],[14,2]]
         res = algorithm.calculate(data)
-        self.assertEqual(res, [[1, 1], [2, 2], [3, 3], [4, 1], [12, 10], [13, 1], [14, 2]])
+        self.assertEqual(res, [[1,1],[2,2],[3,3],[4,1],[12,10],[13,1],[14,2]])
 
     def test_calculate_should_return_empty_list_when_input_data_has_error_beyond_time_range(self):
         algorithm = Mae()
-        data = [
-            [1, 1],
-            [2, 2],
-            [3, 3],
-            [4, 1],
-            [5, 2],
-            [6, 3],
-            [7, 1],
-            [8, 2],
-            [9, 3],
-            [10, 1],
-            [11, 2],
-            [12, 10],
-            [13, 1],
-            [14, 2],
-        ]
+        data = [[1,1],[2,2],[3,3],[4,1],[5,2],[6,3],[7,1],[8,2],[9,3],[10,1],[11,2],[12,10],[13,1],[14,2]]
         res = algorithm.calculate(data, [12, 14])
-        self.assertEqual(res, [[13, 1]])
+        self.assertEqual(res, [[13,1]])
 
     def test_calculate_should_return_empty_list_when_input_data_is_normal(self):
         algorithm = Mae()
-        data = [
-            [1, 1],
-            [2, 2],
-            [3, 3],
-            [4, 4],
-            [5, 1],
-            [6, 2],
-            [7, 3],
-            [8, 4],
-            [9, 1],
-            [10, 2],
-            [11, 3],
-            [12, 4],
-            [13, 1],
-            [14, 2],
-        ]
+        data = [[1,1],[2,2],[3,3],[4,4],[5,1],[6,2],[7,3],[8,4],[9,1],[10,2],[11,3],[12,4],[13,1],[14,2]]
         res = algorithm.calculate(data)
         # should optimize the algorithm
         self.assertEqual(res, data)

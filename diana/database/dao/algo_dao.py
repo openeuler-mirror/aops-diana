@@ -33,7 +33,7 @@ class AlgorithmDao(MysqlProxy):
     Algorithm related operation
     """
 
-    def insert_algo(self, data) -> int:
+    def insert_algo(self, data) -> str:
         """
         insert algorithm info into database
         Args:
@@ -46,7 +46,7 @@ class AlgorithmDao(MysqlProxy):
             }
 
         Returns:
-            int
+            str
         """
         try:
             status_code = self._insert_algo(data)
@@ -85,7 +85,7 @@ class AlgorithmDao(MysqlProxy):
             return True
         return False
 
-    def query_algorithm_list(self, data) -> Tuple[int, dict]:
+    def query_algorithm_list(self, data) -> Tuple[str, dict]:
         """
             get algorithm list
         Args:
@@ -98,7 +98,7 @@ class AlgorithmDao(MysqlProxy):
                     }
 
         Returns:
-            int: status code
+            str: status code
             dict: query result
 
         Notes:
@@ -149,7 +149,7 @@ class AlgorithmDao(MysqlProxy):
             res.append(algo_info)
         return res
 
-    def query_algorithm(self, data: Dict[str, str]) -> Tuple[int, dict]:
+    def query_algorithm(self, data: Dict[str, str]) -> Tuple[str, dict]:
         """
             query algorithm info from database
 
@@ -161,7 +161,7 @@ class AlgorithmDao(MysqlProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
             dict: query result
         """
         res = {"result": {}}

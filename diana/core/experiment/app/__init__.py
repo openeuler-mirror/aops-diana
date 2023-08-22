@@ -121,7 +121,7 @@ class App:
 
         else:
             try:
-                with ModelDao(configuration) as modeldao_proxy:
+                with ModelDao() as modeldao_proxy:
                     model_list = list(model_info.keys())
                     status_code, models = modeldao_proxy.get_model(model_list)
                 if status_code != SUCCEED:
