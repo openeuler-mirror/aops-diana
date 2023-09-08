@@ -261,7 +261,7 @@ class Workflow:
 
         network_monitor_data = self._get_app_execute_result(time_range, workflow["hosts"], workflow["workflow"])
         LOGGER.debug(network_monitor_data)
-        if isinstance(network_monitor_data, int):
+        if isinstance(network_monitor_data, str):
             return network_monitor_data
 
         storage_status, kafka_status = DATABASE_INSERT_ERROR, DATABASE_INSERT_ERROR

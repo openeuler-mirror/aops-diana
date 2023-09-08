@@ -64,10 +64,10 @@ class MysqlNetworkDiagnoseApp(App):
         """
         result = {}
         for host_id, metrics in data.items():
-            if metrics is None or detail.get(host_id) is None:
+            if metrics is None or detail.get(str(host_id)) is None:
                 continue
 
-            model_id = detail[host_id]
+            model_id = detail[str(host_id)]
             model: Algorithm = self.model.get(model_id)
             result[host_id] = model.calculate(metrics, time_range)
 
