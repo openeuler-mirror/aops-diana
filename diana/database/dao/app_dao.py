@@ -41,7 +41,7 @@ class AppDao(ElasticsearchProxy):
 
         return False
 
-    def create_app(self, data: Dict, index: Optional[str] = APP_INDEX) -> int:
+    def create_app(self, data: Dict, index: Optional[str] = APP_INDEX) -> str:
         """
         Insert app info to elasticsearch.
 
@@ -70,7 +70,7 @@ class AppDao(ElasticsearchProxy):
         LOGGER.error("add app [%s] fail", data['app_name'])
         return DATABASE_INSERT_ERROR
 
-    def query_app_list(self, data: Dict, index: Optional[str] = APP_INDEX) -> Tuple[int, Dict]:
+    def query_app_list(self, data: Dict, index: Optional[str] = APP_INDEX) -> Tuple[str, Dict]:
         """
         Only return app min info, just for list display.
 
@@ -96,11 +96,12 @@ class AppDao(ElasticsearchProxy):
             return SUCCEED, result
 
         total_count = count_res[1]
-        total_page = self._make_es_paginate_body(data, total_count, query_body)
+        paginate = dict(page=data["page"], size=data["per_page"])
+        self._make_es_paginate_body(paginate, query_body)
         res = self.query(index, query_body, ["app_id", "version", "app_name", "description"])
         if res[0]:
             LOGGER.debug("query app list succeed")
-            result["total_page"] = total_page
+            result["total_page"] = (total_count + data["per_page"] - 1) / data["per_page"]
             result["total_count"] = total_count
             for item in res[1]['hits']['hits']:
                 result["app_list"].append(item['_source'])
@@ -109,7 +110,7 @@ class AppDao(ElasticsearchProxy):
         LOGGER.error("query app list fail")
         return DATABASE_QUERY_ERROR, result
 
-    def query_app(self, data: Dict, index: Optional[str] = APP_INDEX) -> Tuple[int, Dict]:
+    def query_app(self, data: Dict, index: Optional[str] = APP_INDEX) -> Tuple[str, Dict]:
         """
         Query app specific info.
 

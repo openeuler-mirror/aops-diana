@@ -17,9 +17,24 @@ Description: mysql tables
 """
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, String, Float, Boolean
-from vulcanus.database.table import Base, MyBase
-from vulcanus.database.helper import create_tables
-from diana.database import ENGINE
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+
+
+class MyBase:  # pylint: disable=R0903
+    """
+    Class that provide helper function
+    """
+
+    def to_dict(self):
+        """
+        Transfer query data to dict
+
+        Returns:
+            dict
+        """
+        return {col.name: getattr(self, col.name) for col in self.__table__.columns}  # pylint: disable=E1101
 
 
 class WorkflowHostAssociation(Base, MyBase):
@@ -135,18 +150,3 @@ class HostCheckResult(Base, MyBase):
     is_root = Column(Boolean, default=False)
     metric_name = Column(String(50))
     metric_label = Column(String(255))
-
-
-def create_check_tables(engine=ENGINE):
-    """
-    create check tables of aops-diana service
-    Args:
-        engine: mysql engine
-
-    Returns:
-
-    """
-    # pay attention, the sequence of list is important. Base table need to be listed first.
-    tables = [Workflow, WorkflowHostAssociation, Algorithm, Model, DomainCheckResult, HostCheckResult, AlertHost]
-    tables_objects = [Base.metadata.tables[table.__tablename__] for table in tables]
-    create_tables(Base, engine, tables=tables_objects)

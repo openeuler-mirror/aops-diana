@@ -21,7 +21,6 @@ from diana.utils.schema.result import (
     QueryResultDomainCountSchema,
 )
 from vulcanus.restful.response import BaseResponse
-from diana.conf import configuration
 
 
 class QueryCheckResultHost(BaseResponse):
@@ -30,7 +29,7 @@ class QueryCheckResultHost(BaseResponse):
     Restful API: GET
     """
 
-    @BaseResponse.handle(schema=QueryCheckResultHostSchema, proxy=ResultDao, config=configuration)
+    @BaseResponse.handle(schema=QueryCheckResultHostSchema, proxy=ResultDao)
     def get(self, callback: ResultDao, **params):
         """
             Get check result by alert id
@@ -62,7 +61,7 @@ class QueryCheckResultList(BaseResponse):
     Restful API: GET
     """
 
-    @BaseResponse.handle(schema=QueryCheckResultListSchema, proxy=ResultDao, config=configuration)
+    @BaseResponse.handle(schema=QueryCheckResultListSchema, proxy=ResultDao)
     def get(self, callback: ResultDao, **params):
         """
         get check result list from database
@@ -77,7 +76,7 @@ class QueryResultTotalCount(BaseResponse):
     Restful API: GET
     """
 
-    @BaseResponse.handle(proxy=ResultDao, config=configuration)
+    @BaseResponse.handle(proxy=ResultDao)
     def get(self, callback: ResultDao, **params):
         """
         get number of alerts from database
@@ -92,7 +91,7 @@ class ConfirmCheckResult(BaseResponse):
     Restful API: POST
     """
 
-    @BaseResponse.handle(schema=CheckResultConfirmSchema, proxy=ResultDao, config=configuration)
+    @BaseResponse.handle(schema=CheckResultConfirmSchema, proxy=ResultDao)
     def post(self, callback: ResultDao, **params):
         """
         confirm check result, modify confirmed value to True
@@ -106,7 +105,7 @@ class QueryDomainResultCount(BaseResponse):
     Restful API: GET
     """
 
-    @BaseResponse.handle(schema=QueryResultDomainCountSchema, proxy=ResultDao, config=configuration)
+    @BaseResponse.handle(schema=QueryResultDomainCountSchema, proxy=ResultDao)
     def get(self, callback: ResultDao, **params):
         status_code, result = callback.count_domain_check_result(params)
         return self.response(code=status_code, data=result)
@@ -171,7 +170,7 @@ class DownloadAlertReport(BaseResponse):
             stream_content += _host + check_result
         return stream_content
 
-    @BaseResponse.handle(proxy=ResultDao, config=configuration)
+    @BaseResponse.handle(proxy=ResultDao)
     def get(self, callback: ResultDao, **params):
         """
         Get file stream

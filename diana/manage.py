@@ -24,6 +24,9 @@ from diana.mode.executor import Executor
 
 
 def main():
+    """
+    Service initiation
+    """
     try:
         scheduler_mode = mode.build(configuration.diana.get('MODE'))
         return scheduler_mode.run()

@@ -24,7 +24,6 @@ from vulcanus.restful.response import BaseResponse
 from vulcanus.restful.resp.state import SUCCEED, WORKFLOW_ASSIGN_MODEL_FAIL, DATABASE_CONNECT_ERROR
 from vulcanus.log.log import LOGGER
 
-from diana.conf import configuration
 from diana.database.dao.workflow_dao import WorkflowDao
 from diana.core.rule.workflow import Workflow
 from diana.utils.schema.workflow import (
@@ -90,8 +89,7 @@ class CreateWorkflow(BaseResponse):
         # change host id list to host info dict
         args["input"]["hosts"] = host_infos
         try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
+            with WorkflowDao() as workflow_proxy:
                 status = workflow_proxy.insert_workflow(args)
         except sqlalchemy.exc.SQLAlchemyError:
             return DATABASE_CONNECT_ERROR, result
@@ -129,8 +127,7 @@ class QueryWorkflow(BaseResponse):
             3.get workflow from database
         """
         try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
+            with WorkflowDao() as workflow_proxy:
                 status_code, result = workflow_proxy.get_workflow(params)
 
             return self.response(code=status_code, data=result)
@@ -152,8 +149,7 @@ class QueryWorkflowList(BaseResponse):
             3.get workflow list from database
         """
         try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
+            with WorkflowDao() as workflow_proxy:
                 status_code, result = workflow_proxy.get_workflow_list(params)
 
             return self.response(code=status_code, data=result)
@@ -178,8 +174,7 @@ class ExecuteWorkflow(BaseResponse):
         workflow_id = args["workflow_id"]
         username = args["username"]
         try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
+            with WorkflowDao() as workflow_proxy:
                 status_code, result = workflow_proxy.get_workflow(args)
 
                 if status_code != SUCCEED:
@@ -228,8 +223,7 @@ class StopWorkflow(BaseResponse):
         """
         workflow_id = args["workflow_id"]
         try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
+            with WorkflowDao() as workflow_proxy:
                 status_code, result = workflow_proxy.get_workflow(args)
 
                 if status_code != SUCCEED:
@@ -275,8 +269,7 @@ class DeleteWorkflow(BaseResponse):
             4.delete workflow from database
         """
         try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
+            with WorkflowDao() as workflow_proxy:
                 status = workflow_proxy.delete_workflow(params)
             return self.response(code=status)
 
@@ -311,8 +304,7 @@ class UpdateWorkflow(BaseResponse):
         model_info = Workflow.get_model_info(args["detail"])
         args["model_info"] = model_info
         try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
+            with WorkflowDao() as workflow_proxy:
                 status = workflow_proxy.update_workflow(args)
             return status
 
@@ -345,8 +337,7 @@ class IfHostInWorkflow(BaseResponse):
         """
 
         try:
-            with WorkflowDao(configuration) as workflow_proxy:
-                workflow_proxy.connect()
+            with WorkflowDao() as workflow_proxy:
                 status_code, result = workflow_proxy.if_host_in_workflow(params)
 
             return self.response(code=status_code, data=result)

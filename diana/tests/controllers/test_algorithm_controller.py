@@ -10,29 +10,26 @@
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
-import unittest
 from unittest import mock
 
 from sqlalchemy.orm import scoping
-from flask import Flask
 
-import diana
 from diana.database.dao.algo_dao import AlgorithmDao
 from vulcanus.restful.resp.state import TOKEN_ERROR, SUCCEED, NO_DATA, PARAM_ERROR
 from vulcanus.restful.response import BaseResponse
+from diana.tests import BaseTestCase
 
-app = Flask("check")
-for blue, api in diana.BLUE_POINT:
-    api.init_app(blue)
-    app.register_blueprint(blue)
 
-app.testing = True
-client = app.test_client()
 header = {"Content-Type": "application/json; charset=UTF-8"}
 header_with_token = {"Content-Type": "application/json; charset=UTF-8", "access_token": "123456"}
 
 
-class TestQueryAlgorithmList(unittest.TestCase):
+class TestQueryAlgorithmList(BaseTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        app = self.init_application()
+        self.client = app.test_client()
+
     @mock.patch.object(AlgorithmDao, '_query_algo_list')
     @mock.patch.object(AlgorithmDao, '_algo_rows_to_dict')
     @mock.patch.object(AlgorithmDao, 'connect')
@@ -59,7 +56,7 @@ class TestQueryAlgorithmList(unittest.TestCase):
         mock_token.return_value = SUCCEED
         mock_query_algo_list.return_value = mock.Mock
         mock_query_to_dict.return_value = algo_list
-        resp = client.get(
+        resp = self.client.get(
             f'/check/algo/list?page={mock_param["page"]}&per_page='
             f'{mock_param["per_page"]}&field={mock_param["field"]}',
             headers=header_with_token,
@@ -96,7 +93,7 @@ class TestQueryAlgorithmList(unittest.TestCase):
         mock_token.return_value = SUCCEED
         mock_query_algo_list.return_value = mock.Mock
         mock_query_to_dict.return_value = algo_list
-        resp = client.get(
+        resp = self.client.get(
             f'/check/algo/list?page={mock_param["page"]}&per_page={mock_param["per_page"]}', headers=header_with_token
         )
         self.assertEqual(algo_list, resp.json["data"].get('algo_list'))
@@ -132,7 +129,7 @@ class TestQueryAlgorithmList(unittest.TestCase):
         mock_token.return_value = SUCCEED
         mock_query_algo_list.return_value = mock.Mock
         mock_query_to_dict.return_value = algo_list
-        resp = client.get(
+        resp = self.client.get(
             f'/check/algo/list?per_page={mock_param["per_page"]}&field={mock_param["field"]}', headers=header_with_token
         )
         self.assertEqual(algo_list, resp.json["data"].get('algo_list'))
@@ -168,7 +165,7 @@ class TestQueryAlgorithmList(unittest.TestCase):
         mock_token.return_value = SUCCEED
         mock_query_algo_list.return_value = mock.Mock
         mock_query_to_dict.return_value = algo_list
-        resp = client.get(
+        resp = self.client.get(
             f'/check/algo/list?page={mock_param["page"]}&field={mock_param["field"]}', headers=header_with_token
         )
         self.assertEqual(algo_list, resp.json["data"].get('algo_list'))
@@ -202,15 +199,15 @@ class TestQueryAlgorithmList(unittest.TestCase):
         mock_token.return_value = SUCCEED
         mock_query_algo_list.return_value = mock.Mock
         mock_query_to_dict.return_value = algo_list
-        resp = client.get(f'/check/algo/list', headers=header_with_token)
+        resp = self.client.get(f'/check/algo/list', headers=header_with_token)
         self.assertEqual(algo_list, resp.json["data"].get('algo_list'))
 
     def test_query_algorithm_list_should_return_token_error_when_input_with_no_token(self):
-        resp = client.get(f'/check/algo/list', headers=header)
+        resp = self.client.get(f'/check/algo/list', headers=header)
         self.assertEqual(TOKEN_ERROR, resp.json.get('label'), resp.json)
 
     def test_query_algorithm_list_should_return_method_error_when_request_by_incorrect_method(self):
-        resp = client.post(f'/check/algo/list', headers=header)
+        resp = self.client.post(f'/check/algo/list', headers=header)
         self.assertEqual(405, resp.status_code, resp.json)
 
     @mock.patch.object(AlgorithmDao, "query_algorithm")
@@ -228,17 +225,17 @@ class TestQueryAlgorithmList(unittest.TestCase):
         }
 
         input_data = 'test'
-        resp = client.get(f'/check/algo?algo_id={input_data}', headers=header_with_token)
+        resp = self.client.get(f'/check/algo?algo_id={input_data}', headers=header_with_token)
         self.assertEqual(SUCCEED, resp.json.get('label'))
 
     def test_query_algorithm_should_return_405_when_request_by_other_method(self):
         input_data = 'test'
-        resp = client.post(f'/check/algo?algo_id={input_data}', headers=header_with_token)
+        resp = self.client.post(f'/check/algo?algo_id={input_data}', headers=header_with_token)
         self.assertEqual(405, resp.status_code)
 
     def test_query_algorithm_should_return_token_error_when_input_correct_with_no_token(self):
         input_data = 'test'
-        resp = client.get(f'/check/algo?algo_id={input_data}', headers=header)
+        resp = self.client.get(f'/check/algo?algo_id={input_data}', headers=header)
         self.assertEqual(TOKEN_ERROR, resp.json.get('label'))
 
     @mock.patch.object(AlgorithmDao, "query_algorithm")
@@ -253,14 +250,14 @@ class TestQueryAlgorithmList(unittest.TestCase):
         mock_token.return_value = SUCCEED
         mock_query_algo.return_value = NO_DATA, {}
         input_data = 123456
-        resp = client.get(f'/check/algo?algo_id={input_data}', headers=header_with_token)
+        resp = self.client.get(f'/check/algo?algo_id={input_data}', headers=header_with_token)
         self.assertEqual(NO_DATA, resp.json.get('label'))
 
     def test_query_algorithm_should_return_param_error_when_no_input(self):
-        resp = client.get('/check/algo', headers=header_with_token)
+        resp = self.client.get('/check/algo', headers=header_with_token)
         self.assertEqual(PARAM_ERROR, resp.json.get('label'))
 
     def test_query_algorithm_should_return_param_error_when_input_algo_id_is_null(self):
         input_data = ''
-        resp = client.get(f'/check/algo?algo_id={input_data}', headers=header_with_token)
+        resp = self.client.get(f'/check/algo?algo_id={input_data}', headers=header_with_token)
         self.assertEqual(PARAM_ERROR, resp.json.get('label'))

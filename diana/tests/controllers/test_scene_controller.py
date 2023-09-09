@@ -15,42 +15,30 @@ Time:
 Author:
 Description:
 """
-import unittest
 from unittest import mock
-from flask import Flask
-from flask_restful import Api
-from flask.blueprints import Blueprint
-
 from vulcanus.restful.resp.state import SUCCEED, PARAM_ERROR, TOKEN_ERROR
-
 from diana.conf.constant import IDENTIFY_SCENE
-from diana.url import SPECIFIC_URLS
 from vulcanus.restful.response import BaseResponse
+from diana.tests import BaseTestCase
 
 
-API = Api()
-for view, url in SPECIFIC_URLS['SCENE_URLS']:
-    API.add_resource(view, url)
-
-DIANA = Blueprint('diana', __name__)
-app = Flask("diana")
-API.init_app(DIANA)
-app.register_blueprint(DIANA)
-
-app.testing = True
-client = app.test_client()
 header = {"Content-Type": "application/json; charset=UTF-8"}
 header_with_token = {"Content-Type": "application/json; charset=UTF-8", "access_token": "81fe"}
 
 
-class SceneControllerTestCase(unittest.TestCase):
+class SceneControllerTestCase(BaseTestCase):
     """
     SceneController integration tests stubs
     """
 
+    def setUp(self) -> None:
+        super().setUp()
+        app = self.init_application()
+        self.client = app.test_client()
+
     def test_get_scene_should_return_error_when_request_method_is_wrong(self):
         args = {}
-        response = client.get(IDENTIFY_SCENE, json=args).json
+        response = self.client.get(IDENTIFY_SCENE, json=args).json
         self.assertEqual(response['message'], 'The method is not allowed for the requested URL.')
 
     def test_get_scene_should_return_param_error_when_input_wrong_param(self):
@@ -58,7 +46,7 @@ class SceneControllerTestCase(unittest.TestCase):
             "applications": ["nginx", ""],
             "collect_items": {"gala-gopher": [{"probe_name": "probe1", "probe_status": "on", "support_auto": True}]},
         }
-        response = client.post(IDENTIFY_SCENE, json=args, headers=header_with_token).json
+        response = self.client.post(IDENTIFY_SCENE, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], PARAM_ERROR)
 
     def test_get_scene_should_return_token_error_when_input_wrong_token(self):
@@ -66,7 +54,7 @@ class SceneControllerTestCase(unittest.TestCase):
             "applications": ["nginx"],
             "collect_items": {"gala-gopher": [{"probe_name": "probe1", "probe_status": "on", "support_auto": True}]},
         }
-        response = client.post(IDENTIFY_SCENE, json=args, headers=header).json
+        response = self.client.post(IDENTIFY_SCENE, json=args, headers=header).json
         self.assertEqual(response['label'], TOKEN_ERROR)
 
     @mock.patch.object(BaseResponse, 'verify_token')
@@ -76,5 +64,5 @@ class SceneControllerTestCase(unittest.TestCase):
             "collect_items": {"gala-gopher": [{"probe_name": "probe1", "probe_status": "on", "support_auto": True}]},
         }
         mock_token.return_value = SUCCEED
-        response = client.post(IDENTIFY_SCENE, json=args, headers=header_with_token).json
+        response = self.client.post(IDENTIFY_SCENE, json=args, headers=header_with_token).json
         self.assertEqual(response['label'], SUCCEED)

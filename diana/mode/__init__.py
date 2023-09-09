@@ -44,3 +44,6 @@ class Mode(Register):
 
 
 mode = Mode()
+
+
+__all__ = ("mode", "Mode")

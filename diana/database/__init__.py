@@ -10,12 +10,3 @@
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
-from vulcanus.database.helper import make_mysql_engine_url
-from vulcanus.database.helper import create_database_engine
-from diana.conf import configuration
-
-
-engine_url = make_mysql_engine_url(configuration)
-ENGINE = create_database_engine(
-    engine_url, configuration.mysql.get("POOL_SIZE"), configuration.mysql.get("POOL_RECYCLE")  # pylint: disable=E1101
-)  # pylint: disable=E1101

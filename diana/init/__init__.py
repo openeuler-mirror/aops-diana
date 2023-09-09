@@ -15,30 +15,12 @@ Time:
 Author:
 Description:
 """
-import redis
-from redis import RedisError
-from vulcanus.database.proxy import RedisProxy
-from diana.conf import configuration
 from diana.init.app import init_app
 from diana.init.elasticsearch import init_es
-from diana.init.mysql import init_mysql
 from diana.init.algorithm import init_algo_and_model
 
 
-def init_redis_connect():
-    """
-    Init redis connect
-    """
-    try:
-        redis_connect = RedisProxy(configuration)
-        redis_connect.connect()
-    except (RedisError, redis.ConnectionError):
-        raise RedisError("redis connect error.")
-
-
 def init():
-    init_redis_connect()
-    init_mysql()
     init_es()
     init_app()
     init_algo_and_model()

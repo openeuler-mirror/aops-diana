@@ -10,21 +10,3 @@
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
 # ******************************************************************************/
-"""
-Add view and url into api
-"""
-from flask.blueprints import Blueprint
-from flask_restful import Api
-
-from diana.url import URLS
-
-CHECK = Blueprint('check', __name__)
-
-API = Api()
-
-for view, url in URLS:
-    API.add_resource(view, url)
-
-BLUE_POINT = [(CHECK, API)]
-
-__all__ = ['BLUE_POINT']

@@ -16,12 +16,12 @@ Author: YangYunYi
 Description: Query raw data from Prometheus
 """
 from typing import Dict, Tuple, List, Optional
-from datetime import datetime
 import datetime
 from prometheus_api_client import PrometheusApiClientException
 from vulcanus.database.proxy import PromDbProxy
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.resp.state import SUCCEED, DATABASE_QUERY_ERROR, NO_DATA, PARAM_ERROR, PARTIAL_SUCCEED
+from diana.conf import configuration
 
 
 class DataDao(PromDbProxy):
@@ -29,7 +29,7 @@ class DataDao(PromDbProxy):
     Proxy of prometheus time series database
     """
 
-    def __init__(self, configuration, host=None, port=None):
+    def __init__(self, host=None, port=None):
         """
         Init DataDao
 
@@ -38,7 +38,7 @@ class DataDao(PromDbProxy):
             host (str)
             port (int)
         """
-        PromDbProxy.__init__(self, configuration, host, port)
+        PromDbProxy.__init__(self, host, port)
         self.default_instance_port = configuration.agent.get('DEFAULT_INSTANCE_PORT') or 9100
         self.query_range_step = configuration.prometheus.get('QUERY_RANGE_STEP') or "15s"
 
@@ -82,14 +82,14 @@ class DataDao(PromDbProxy):
             ret = "%s{%s}" % (metric["__name__"], label_str[:-1])
         return ret
 
-    def query_metric_names(self, query_ip: str) -> Tuple[int, dict]:
+    def query_metric_names(self, query_ip: str) -> Tuple[str, dict]:
         """
         Query data
         Args:
             query_ip(str): query ip address
 
         Returns:
-            int: status code
+            str: status code
             dict: e.g
             {
                 "results": ["metric1", "metric2"]
@@ -117,7 +117,7 @@ class DataDao(PromDbProxy):
 
         return ret, res
 
-    def query_metric_list(self, data: Dict[str, str]) -> Tuple[int, dict]:
+    def query_metric_list(self, data: Dict[str, str]) -> Tuple[str, dict]:
         """
         Query metric list
         Args:
@@ -128,7 +128,7 @@ class DataDao(PromDbProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
             dict: e.g
             {
                 'results': {
@@ -174,7 +174,7 @@ class DataDao(PromDbProxy):
 
         return ret, res
 
-    def query_metric_data(self, data: Dict[str, str]) -> Tuple[int, dict]:
+    def query_metric_data(self, data: Dict[str, str]) -> Tuple[str, dict]:
         """
         Query metric data
         Args:
@@ -195,7 +195,7 @@ class DataDao(PromDbProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
             dict: e.g
             {
                 'results': {
@@ -280,7 +280,7 @@ class DataDao(PromDbProxy):
         host_list: list,
         metric: Optional[str] = None,
         adjusted_range_step: Optional[int] = None,
-    ) -> Tuple[int, Dict]:
+    ) -> Tuple[str, Dict]:
         """
         Query data
         Args:
@@ -291,7 +291,7 @@ class DataDao(PromDbProxy):
                  {"host_id": "id2", "host_ip": "172.168.128.165"}]
 
         Returns:
-            ret(int): query ret
+            ret(str): query ret
             host_data_list(dict): host data list ret
                     {
                         'id1': {
@@ -406,7 +406,7 @@ class DataDao(PromDbProxy):
 
     def __query_data_by_host(
         self, metrics_list: List[str], time_range: List[int], adjusted_range_step: Optional[int] = None
-    ) -> Tuple[int, Dict]:
+    ) -> Tuple[str, Dict]:
         """
         Query data of a host
         Args:
@@ -414,7 +414,7 @@ class DataDao(PromDbProxy):
             time_range(list): time range to query
 
         Returns:
-            ret(int): query ret
+            ret(str): query ret
             data_list(list): data list ret
                 {
                     'metric1'{instance="172.168.128.164:9100",label1="value2"}':

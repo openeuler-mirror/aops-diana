@@ -19,7 +19,7 @@ Description: Time keeper of check scheduler
 import time
 from typing import List
 from threading import Lock
-from vulcanus.singleton import singleton
+from vulcanus.common import singleton
 from vulcanus.log.log import LOGGER
 
 

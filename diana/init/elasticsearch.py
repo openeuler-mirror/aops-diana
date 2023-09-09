@@ -24,9 +24,7 @@ from diana.database.factory.mapping import MAPPINGS
 
 
 def init_es():
-    dao = AppDao(configuration=configuration)
-    if not dao.connect():
-        raise ElasticsearchException("connect to elasticsearch fail")
+    dao = AppDao()
 
     for index_name, body in MAPPINGS.items():
         res = dao.create_index(index_name, body)

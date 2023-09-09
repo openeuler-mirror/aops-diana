@@ -37,9 +37,6 @@ from diana.conf.constant import (
     CHECK_RESULT_CONFIRM,
     QUERY_DOMAIN_COUNT,
     DOWNLOAD_HOST_CHECK_RESULT,
-    QUERY_METRIC_NAMES,
-    QUERY_METRIC_DATA,
-    QUERY_METRIC_LIST,
 )
 from diana.controllers import (
     app_controller,
@@ -48,7 +45,6 @@ from diana.controllers import (
     model_controller,
     algorithm_controller,
     result_controller,
-    metric_controller,
 )
 
 URLS = []
@@ -82,13 +78,7 @@ SPECIFIC_URLS = {
         (result_controller.ConfirmCheckResult, CHECK_RESULT_CONFIRM),
         (result_controller.QueryDomainResultCount, QUERY_DOMAIN_COUNT),
         (result_controller.DownloadAlertReport, DOWNLOAD_HOST_CHECK_RESULT),
-    ]
-    # The route is moved to zeus, and the diana service is not present for the time being
-    # 'METRIC': [
-    #     (metric_controller.QueryHostMetricNames, QUERY_METRIC_NAMES),
-    #     (metric_controller.QueryHostMetricData, QUERY_METRIC_DATA),
-    #     (metric_controller.QueryHostMetricList, QUERY_METRIC_LIST),
-    # ],
+    ],
 }
 
 for _, value in SPECIFIC_URLS.items():

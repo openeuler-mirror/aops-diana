@@ -45,7 +45,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
     Workflow related database operation
     """
 
-    def __init__(self, configuration, host=None, port=None):
+    def __init__(self, host=None, port=None):
         """
         Instance initialization
 
@@ -54,16 +54,10 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             host(str)
             port(int)
         """
-        MysqlProxy.__init__(self, configuration)
-        ElasticsearchProxy.__init__(self, configuration, host, port)
+        MysqlProxy.__init__(self)
+        ElasticsearchProxy.__init__(self, host, port)
 
-    def connect(self):
-        """
-        connect to msyql and elasticsearch
-        """
-        return ElasticsearchProxy.connect(self)
-
-    def insert_workflow(self, data: dict) -> int:
+    def insert_workflow(self, data: dict) -> str:
         """
         Insert workflow basic info into mysql and elasticsearch
         Args:
@@ -104,7 +98,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
                     }
                 }
         Returns:
-            int: status code
+            str: status code
         """
         try:
             status_code = self._insert_workflow(data)
@@ -117,7 +111,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             LOGGER.error("Insert new workflow failed due to internal error.")
             return DATABASE_INSERT_ERROR
 
-    def _insert_workflow(self, data: dict) -> int:
+    def _insert_workflow(self, data: dict) -> str:
         """
         insert a workflow into database。
         1. insert workflow basic info into mysql workflow table
@@ -222,7 +216,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
 
     def _insert_workflow_into_es(
         self, username: str, workflow_id: str, detail: dict, model_info: dict, index: Optional[str] = WORKFLOW_INDEX
-    ) -> int:
+    ) -> str:
         """
         insert workflow's detail info and model info into elasticsearch
         """
@@ -235,7 +229,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         LOGGER.error("Add workflow '%s' info into es failed", workflow_id)
         return DATABASE_INSERT_ERROR
 
-    def get_workflow_list(self, data: dict) -> Tuple[int, Dict]:
+    def get_workflow_list(self, data: dict) -> Tuple[str, Dict]:
         """
         Get workflow list of a user
 
@@ -253,7 +247,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
             dict: query result. e.g.
                 {
                     "total_count": 1,
@@ -405,7 +399,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             result.append(workflow_info)
         return result
 
-    def get_all_workflow_list(self, status: str) -> Tuple[int, dict]:
+    def get_all_workflow_list(self, status: str) -> Tuple[str, dict]:
         """
         get all users' workflow list. It's a internal interface for scheduler
         Args:
@@ -431,7 +425,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             LOGGER.error("Get all users' workflow list failed due to internal error.")
             return DATABASE_QUERY_ERROR, result
 
-    def _get_all_workflow_list(self, status: str) -> Tuple[int, dict]:
+    def _get_all_workflow_list(self, status: str) -> Tuple[str, dict]:
         """
         get all users' workflow from mysql
         """
@@ -448,7 +442,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             result[row.workflow_id] = {"workflow_name": row.workflow_name, "username": row.username, "step": row.step}
         return SUCCEED, result
 
-    def get_workflow(self, data) -> Tuple[int, dict]:
+    def get_workflow(self, data) -> Tuple[str, dict]:
         """
         get workflow's detail info
         Args:
@@ -511,14 +505,14 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             LOGGER.error("Get workflow info failed due to internal error.")
             return DATABASE_QUERY_ERROR, result
 
-    def _get_workflow_info(self, data) -> Tuple[int, dict]:
+    def _get_workflow_info(self, data) -> Tuple[str, dict]:
         """
         get workflow basic info from mysql and detail info from elasticsearch
         Args:
             data: e.g. {"username": "admin", "workflow_id": ""}
 
         Returns:
-            int, dict
+            str, dict
         """
         basic_info = self._get_workflow_basic_info(data["username"], data["workflow_id"])
         status_code, detail_info = self._get_workflow_detail_info(data)
@@ -574,7 +568,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         }
         return workflow_info
 
-    def _get_workflow_detail_info(self, data, index: str = WORKFLOW_INDEX) -> Tuple[int, dict]:
+    def _get_workflow_detail_info(self, data, index: str = WORKFLOW_INDEX) -> Tuple[str, dict]:
         """
         Get workflow detail info from elasticsearch
         Args:
@@ -596,7 +590,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         LOGGER.error("query workflow %s fail", data['workflow_id'])
         return DATABASE_QUERY_ERROR, result
 
-    def update_workflow(self, data) -> int:
+    def update_workflow(self, data) -> str:
         """
         Update workflow
         Args:
@@ -671,7 +665,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             Workflow.username == data["username"], Workflow.workflow_id == data["workflow_id"]
         ).update(basic_info_row)
 
-    def _update_workflow_detail_info(self, data: dict, index: str = WORKFLOW_INDEX) -> int:
+    def _update_workflow_detail_info(self, data: dict, index: str = WORKFLOW_INDEX) -> str:
         """
         update workflow's detail info in es
         """
@@ -683,7 +677,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             return DATABASE_UPDATE_ERROR
         return SUCCEED
 
-    def delete_workflow(self, data: dict) -> int:
+    def delete_workflow(self, data: dict) -> str:
         """
         delete workflow by id
         Args:
@@ -694,7 +688,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
         """
         try:
             status_code = self._delete_workflow(data)
@@ -707,7 +701,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
             LOGGER.error("Deleting workflow failed due to internal error.")
             return DATABASE_DELETE_ERROR
 
-    def _delete_workflow(self, data, index: str = WORKFLOW_INDEX) -> int:
+    def _delete_workflow(self, data, index: str = WORKFLOW_INDEX) -> str:
         if self._if_workflow_running(data):
             return DATABASE_DELETE_ERROR
 
@@ -729,7 +723,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         LOGGER.error("Delete workflow from elasticsearch failed due to internal error.")
         return DATABASE_DELETE_ERROR
 
-    def _if_workflow_running(self, data) -> int:
+    def _if_workflow_running(self, data) -> bool:
         """
         check if workflow running or recommending
         """
@@ -751,7 +745,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
         self.session.query(Workflow).filter(Workflow.workflow_id == workflow_id).update({"status": status})
         self.session.commit()
 
-    def if_host_in_workflow(self, data: dict) -> Tuple[int, dict]:
+    def if_host_in_workflow(self, data: dict) -> Tuple[str, dict]:
         """
         if host exist workflow
         Args:
@@ -762,7 +756,7 @@ class WorkflowDao(MysqlProxy, ElasticsearchProxy):
                 }
 
         Returns:
-            int: status code
+            str: status code
             bool: if host exists or not:  {"host_id1": True, "host_id2": False}
         """
         result = {}

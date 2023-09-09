@@ -20,7 +20,6 @@ import uuid
 from vulcanus.restful.response import BaseResponse
 from vulcanus.restful.resp.state import SUCCEED
 
-from diana.conf import configuration
 from diana.database.dao.app_dao import AppDao
 from diana.utils.schema.app import CreateAppSchema, QueryAppListSchema, QueryAppSchema
 
@@ -30,7 +29,7 @@ class CreateApp(BaseResponse):
     Create app interface, it's a post request.
     """
 
-    @BaseResponse.handle(schema=CreateAppSchema, proxy=AppDao, config=configuration)
+    @BaseResponse.handle(schema=CreateAppSchema, proxy=AppDao)
     def post(self, callback: AppDao, **params):
         """
         It's post request, step:
@@ -54,7 +53,7 @@ class QueryAppList(BaseResponse):
     Query app list interface, it's a get request.
     """
 
-    @BaseResponse.handle(schema=QueryAppListSchema, proxy=AppDao, config=configuration)
+    @BaseResponse.handle(schema=QueryAppListSchema, proxy=AppDao)
     def get(self, callback: AppDao, **params):
         """
         It's get request, step:
@@ -71,7 +70,7 @@ class QueryApp(BaseResponse):
     Query app interface, it's a get request.
     """
 
-    @BaseResponse.handle(schema=QueryAppSchema, proxy=AppDao, config=configuration)
+    @BaseResponse.handle(schema=QueryAppSchema, proxy=AppDao)
     def get(self, callback: AppDao, **param):
         """
         It's get request, step:

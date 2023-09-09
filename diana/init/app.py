@@ -15,12 +15,8 @@ Time:
 Author:
 Description:
 """
-from elasticsearch import ElasticsearchException
-
 from vulcanus.log.log import LOGGER
 from vulcanus.restful.resp.state import DATA_EXIST, SUCCEED
-from diana.conf import configuration
-from diana.core.experiment.app.network_diagnose import NetworkDiagnoseApp
 from diana.core.experiment.app.mysql_network_diagnose import MysqlNetworkDiagnoseApp
 from diana.database.dao.app_dao import AppDao
 
@@ -28,9 +24,7 @@ default_app = [MysqlNetworkDiagnoseApp]
 
 
 def init_app():
-    dao = AppDao(configuration=configuration)
-    if not dao.connect():
-        raise ElasticsearchException("connect to elasticsearch fail")
+    dao = AppDao()
 
     for app in default_app:
         info = app().info
