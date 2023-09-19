@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 NAME = "aops-diana"
-VERSION = "1.1.0"
+VERSION = "1.3.0"
 
 # To install the library, run the following
 #
@@ -60,6 +60,7 @@ setup(
         ('/etc/aops/algorithm/intelligent/lvs', ['conf/model/intelligent/lvs/rule1_gala_gopher_cpu_net_rx']),
         ('/etc/aops/algorithm/intelligent/lvs', ['conf/model/intelligent/lvs/rule2_gala_gopher_nic_tc_backlog']),
         ('/usr/lib/systemd/system', ['aops-diana.service']),
+        ("/opt/aops/database", ["database/diana.sql"]),
     ],
     scripts=['aops-diana'],
     zip_safe=False,

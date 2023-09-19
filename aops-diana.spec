@@ -1,5 +1,5 @@
 Name:		aops-diana
-Version:	v1.2.0
+Version:	v1.3.0
 Release:	1
 Summary:	An intelligent abnormal detection framework of aops
 License:	MulanPSL2
@@ -9,7 +9,7 @@ Source0:	%{name}-%{version}.tar.gz
 BuildRequires:  python3-setuptools
 Requires:   aops-vulcanus >= v1.2.0
 Requires:   python3-requests python3-flask python3-flask-restful python3-marshmallow >= 3.13.0
-Requires:   python3-numpy python3-pandas python3-prometheus-api-client
+Requires:   python3-numpy python3-pandas python3-prometheus-api-client python3-uWSGI
 Requires:   python3-sqlalchemy python3-PyMySQL python3-Flask-APScheduler >= 1.11.0
 Requires:   python3-scipy python3-adtk
 Provides:   aops-diana
@@ -30,6 +30,8 @@ An intelligent abnormal detection framework of aops
 
 # install for aops-diana
 %py3_install
+mkdir -p %{buildroot}/opt/aops/
+cp -r database %{buildroot}/opt/aops/
 
 
 %files
@@ -42,9 +44,13 @@ An intelligent abnormal detection framework of aops
 %attr(0755,root,root) /usr/lib/systemd/system/aops-diana.service
 %{python3_sitelib}/aops_diana*.egg-info
 %{python3_sitelib}/diana/*
+%attr(0755, root, root) /opt/aops/database/*
 
 
 %changelog
+* Mon Sep 18 2023 gongzhengtang<gong_zhengtang@163.com> - v1.3.0-1
+- Support sql script to create tables
+
 * Fri Mar 24 2023 gongzhengtang<gong_zhengtang@163.com> - v1.2.0-1
 - update the structure of response body; update how to get session used to
 - connect to the database
