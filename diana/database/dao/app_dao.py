@@ -96,12 +96,12 @@ class AppDao(ElasticsearchProxy):
             return SUCCEED, result
 
         total_count = count_res[1]
-        paginate = dict(page=data["page"], size=data["per_page"])
+        paginate = dict(page=int(data["page"]), size=int(data["per_page"]))
         self._make_es_paginate_body(paginate, query_body)
         res = self.query(index, query_body, ["app_id", "version", "app_name", "description"])
         if res[0]:
             LOGGER.debug("query app list succeed")
-            result["total_page"] = (total_count + data["per_page"] - 1) / data["per_page"]
+            result["total_page"] = (total_count + int(data["per_page"]) - 1) / int(data["per_page"])
             result["total_count"] = total_count
             for item in res[1]['hits']['hits']:
                 result["app_list"].append(item['_source'])
