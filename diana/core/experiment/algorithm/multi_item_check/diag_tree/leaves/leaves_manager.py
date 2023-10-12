@@ -12,6 +12,7 @@
 # ******************************************************************************/
 from collections import defaultdict
 
+from typing import Tuple, Dict
 from diana.core.experiment.algorithm.multi_item_check.diag_tree.leaves.leaf import Leaf
 
 
@@ -69,7 +70,7 @@ class LeavesManager:
                 metric_name = metric_info["metric"]
                 self.all_data_time_shift[metric_name] = max(self.all_data_time_shift[metric_name], leaf.time_shift)
 
-    def do_check(self, data: dict, time_range: list, sample_period: int) -> dict:
+    def do_check(self, data: dict, time_range: list, sample_period: int) -> Tuple[Dict[str, set], Dict[str, list]]:
         """
         do all leaves' check
         Args:
@@ -90,8 +91,11 @@ class LeavesManager:
                     "no data": no_data_set,
                     "internal error": internal_error_set
                 }
+            dict: metric list of abnormal leaves. e.g {"leaf_name": ["metric1", "metric2"]}
+
         """
         result = {"abnormal": set(), "no data": set(), "internal error": set()}
+        abnormal_leaf_metric = {}
         for leaf in self.leaves_cache.values():
             leaf_data = leaf.get_required_data(data, time_range, sample_period)
             leaf_res = leaf.do_check(leaf_data, time_range)
@@ -101,9 +105,13 @@ class LeavesManager:
                 result["no data"].add(leaf.name)
             elif leaf_res == 1:
                 result["abnormal"].add(leaf.name)
+                metric_list = []
+                for metric_info in leaf.data_list:
+                    metric_list.append(metric_info["metric"])
+                abnormal_leaf_metric[leaf.name] = metric_list
             elif leaf_res == 2:
                 result["internal error"].add(leaf.name)
             else:
                 result["internal error"].add(leaf.name)
 
-        return result
+        return result, abnormal_leaf_metric

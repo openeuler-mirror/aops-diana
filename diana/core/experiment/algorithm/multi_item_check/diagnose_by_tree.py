@@ -77,7 +77,7 @@ class Diagnose(BaseMultiItemAlgorithmOne):
         """
         return self.leaves_manager.all_data_time_shift
 
-    def calculate(self, data: dict, time_range: list) -> bool:
+    def calculate(self, data: dict, time_range: list) -> str:
         """
         calculate each node of the tree and judge the host has error or not
         Args:
@@ -98,8 +98,36 @@ class Diagnose(BaseMultiItemAlgorithmOne):
             time_range: time range of the diagnose.  e.g. [1660000015, 1660000030]
 
         Returns:
+            dict: abnormal items and metrics.  e.g. {"item1": ["metric_a"], "item2": ["metric_a", "metric_b"]}
 
         """
-        check_result = self.leaves_manager.do_check(data, time_range, self.sample_period)
+        check_result, abnormal_leaf_metrics = self.leaves_manager.do_check(data, time_range, self.sample_period)
         self.tree.diagnose(check_result)
-        return self.tree.root.value
+        abnormal_leaves_dict = self.get_abnormal_leaves_metrics(abnormal_leaf_metrics)
+        return abnormal_leaves_dict
+
+    def get_abnormal_leaves_metrics(self, abnormal_leaf_metrics) -> dict:
+        """
+        get abnormal leaves and metrics
+        Args:
+            abnormal_leaf_metrics: {"leaf_name": ["metric1", "metric2"]}
+        Returns:
+            dict:  {"item1": ["metric_a"], "item2": ["metric_a", "metric_b"]}
+
+        """
+        tree = self.tree
+        abnormal_leaves_dict = {}
+
+        def dfs_get_abnormal_metric(parent):
+            if not parent.value:
+                return
+
+            children = parent.children
+            for child in children:
+                if child.is_leaf() and child.value:
+                    abnormal_leaves_dict[child.name] = abnormal_leaf_metrics[child.check_item]
+                else:
+                    dfs_get_abnormal_metric(child)
+
+        dfs_get_abnormal_metric(tree.root)
+        return abnormal_leaves_dict
