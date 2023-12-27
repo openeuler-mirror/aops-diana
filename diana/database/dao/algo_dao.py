@@ -104,20 +104,21 @@ class AlgorithmDao(MysqlProxy):
         Notes:
             If you do not enter anything, query all data by default.
         """
-        page = data.get('page')
-        per_page = data.get('per_page')
-        filters = {Algorithm.username.in_([data.get('username'), 'system'])}
-        if data.get('field'):
-            filters.add(Algorithm.field == data.get('field'))
-
-        res = {'total_count': 0, 'total_page': 0, 'algo_list': []}
-        algo_query = self._query_algo_list(filters)
-        total_count = len(algo_query.all())
-        algo_info_list, total_page = sort_and_page(algo_query, None, None, per_page, page)
-        res['algo_list'] = self._algo_rows_to_dict(algo_info_list)
-        res['total_page'] = total_page
-        res['total_count'] = total_count
-
+        res = {}
+        try:
+            filters = {Algorithm.username.in_([data.get('username'), 'system'])}
+            if data.get('field'):
+                filters.add(Algorithm.field == data.get('field'))
+            algo_query = self._query_algo_list(filters)
+            total_count = len(algo_query.all())
+            algo_info_list, total_page = sort_and_page(algo_query, None, None, data.get('per_page'), data.get('page'))
+            res['algo_list'] = self._algo_rows_to_dict(algo_info_list)
+            res['total_page'] = total_page
+            res['total_count'] = total_count
+        except SQLAlchemyError as error:
+            LOGGER.error(error)
+            LOGGER.error("Fail to query algorithm list.")
+            return DATABASE_QUERY_ERROR, {}
         return SUCCEED, res
 
     def _query_algo_list(self, filters):

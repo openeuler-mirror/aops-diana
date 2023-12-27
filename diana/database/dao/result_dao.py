@@ -216,14 +216,13 @@ class ResultDao(MysqlProxy):
             check_result_host_list, total_page = sort_and_page(
                 check_result_host_query, column, direction, per_page, page
             )
+            res['result'] = self._check_result_host_rows_to_list(check_result_host_list)
+            res['total_page'] = total_page
+            res['total_count'] = total_count
         except SQLAlchemyError as error:
             LOGGER.error(error)
             LOGGER.error("Query check result list failed.")
             return DATABASE_QUERY_ERROR, res
-
-        res['result'] = self._check_result_host_rows_to_list(check_result_host_list)
-        res['total_page'] = total_page
-        res['total_count'] = total_count
 
         return SUCCEED, res
 
@@ -390,15 +389,14 @@ class ResultDao(MysqlProxy):
             domain_check_result = self._query_all_domain_check_count()
             total_count = len(domain_check_result.all())
             domain_check_result_list, total_page = sort_and_page(domain_check_result, column, direction, per_page, page)
+            res['results'] = self._domain_check_result_count_rows_to_list(domain_check_result_list)
+            res['total_page'] = total_page
+            res['total_count'] = total_count
 
         except SQLAlchemyError as error:
             LOGGER.error(error)
             LOGGER.error("Get domain check result failed.")
             return DATABASE_QUERY_ERROR, res
-
-        res['results'] = self._domain_check_result_count_rows_to_list(domain_check_result_list)
-        res['total_page'] = total_page
-        res['total_count'] = total_count
 
         return SUCCEED, res
 
