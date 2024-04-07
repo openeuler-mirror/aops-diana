@@ -31,12 +31,21 @@ class MysqlNetworkDiagnoseApp(App):
             "version": "1.0",
             "description": "",
             "username": "admin",
-            "api": {"type": "api", "address": "execute"},
-            "detail": {"multicheck": {"default_model": "intelligent-for-mysql"}},
+            "api": {
+                "type": "api",
+                "address": "execute"
+            },
+            "detail": {
+                "multicheck": {
+                    "default_model": "intelligent-for-mysql"
+                }
+            }
         }
         return info
 
-    def do_check(self, detail: Dict[str, str], data: Dict[str, List[str]], time_range: list) -> Dict[str, List[int]]:
+
+    def do_check(self, detail: Dict[str, str],
+                 data: Dict[str, List[str]], time_range: list) -> Dict[str, List[int]]:
         """
         Args:
             detail: it's a map between metric and model. e.g.
@@ -59,7 +68,7 @@ class MysqlNetworkDiagnoseApp(App):
 
         Returns:
             dict, e.g. {
-                    "host1": ["metric1", "metric2"]
+                    "host1": {"item1": ["metric_a"], "item2": ["metric_a", "metric_b"]}
                 }
         """
         result = {}
@@ -74,10 +83,11 @@ class MysqlNetworkDiagnoseApp(App):
         return result
 
     @staticmethod
-    def format_result(check_result: Dict[str, List[int]]) -> Dict[str, List[Dict[str, str]]]:
+    def format_result(check_result: Dict[str, Dict[str, List[str]]]) -> Dict[str, List[Dict[str, str]]]:
         """
         Args:
             check_result
+                e.g. {"host1": {"item1": ["metric_a"], "item2": ["metric_a", "metric_b"]}}
 
         Returns:
             dict, e.g.
@@ -87,22 +97,26 @@ class MysqlNetworkDiagnoseApp(App):
                             "metric_label": "",
                             "is_root": False
                         }]
+            } -> change
+            {
+                "host1": [{
+                            "metric_label": "", // actually this is abnormal check item name
+                            "metric_name": ""
+                            "is_root": False
+                        }]
             }
         """
         result = defaultdict(list)
         for host_id, value in check_result.items():
-            if value:
-                result[host_id].append({"metric_name": "", "metric_label": "", "is_root": False})
+            if not value:
+                continue
+            for abnormal_item, metric_list in value.items():
+                for metric in metric_list:
+                    result[host_id].append({"metric_label": abnormal_item, "metric_name": metric, "is_root": False})
         return result
 
-    def execute(
-        self,
-        model_info: Dict[str, Dict[str, str]],
-        detail: dict,
-        data: dict,
-        time_range: list,
-        default_mode: bool = False,
-    ) -> dict:
+    def execute(self, model_info: Dict[str, Dict[str, str]],
+                detail: dict, data: dict, time_range: list, default_mode: bool = False) -> dict:
         """
         Args:
             model_info: it's information about model and algorithm. e.g.
@@ -152,14 +166,18 @@ class MysqlNetworkDiagnoseApp(App):
         """
         if not self.load_models(model_info, default_mode):
             return {}
-
-        check_result = self.do_check(detail['multicheck'], data, time_range)
-        if not check_result:
+         
+        abnormal_leaves_dict = self.do_check(detail['multicheck'], data, time_range)
+        if not abnormal_leaves_dict:
             return {}
 
-        format_result = self.format_result(check_result)
+        format_result = self.format_result(abnormal_leaves_dict)
         if not format_result:
             return {}
 
-        result = {"host_result": format_result, "alert_name": "network abnormal"}
+        result = {
+            "host_result": format_result,
+            "alert_name": "network abnormal"
+        }
         return result
+
