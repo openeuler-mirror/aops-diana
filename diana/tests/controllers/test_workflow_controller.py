@@ -15,11 +15,8 @@ Time:
 Author:
 Description:
 """
-import unittest
+
 from unittest import mock
-from flask import Flask
-from flask_restful import Api
-from flask.blueprints import Blueprint
 
 from vulcanus.restful.resp.state import PARAM_ERROR, TOKEN_ERROR, DATABASE_CONNECT_ERROR, SUCCEED, DATABASE_QUERY_ERROR
 
@@ -34,7 +31,7 @@ from diana.conf.constant import (
     DELETE_WORKFLOW,
     UPDATE_WORKFLOW,
 )
-from diana.url import SPECIFIC_URLS
+
 from vulcanus.restful.response import BaseResponse
 from diana.tests import BaseTestCase
 
