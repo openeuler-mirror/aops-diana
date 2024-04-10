@@ -76,9 +76,13 @@ def chaos_inject_network(host, port, params, time_out, fault_node, fault_type):
             + get_fault_type_name(str(fault_type))
             + '\n'
         )
+        
+    except PermissionError as err:
+        logging.error("The {} Permissions unable:{}".format(file_name,err))
+    except FileExistsError as error:
+	    logging.error("Error information:{0}".format(error))
+    finally:
         file_handle.close()
-    except PermissionError:
-        pass
 
     result = json.loads(response.text).get('result')
     print(
@@ -143,7 +147,8 @@ def check_mysql_running(mysql_ip):
             nums = [int(s) for s in re.findall(r'\b\d+\b', info)]
             current_active_conn = nums[6]
             continue
-
+            
+    client.close()
     if current_active_conn == 0:
         return False
     return True
