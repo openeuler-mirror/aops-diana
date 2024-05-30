@@ -190,7 +190,7 @@ class Workflow:
             LOGGER.error("Produce workflow msg failed. %s" % error)
             return TASK_EXECUTION_FAIL
 
-    @connect_database
+    @connect_database()
     def _get_workflow(self):
         with WorkflowDao() as workflow_proxy:
             status_code, workflow = workflow_proxy.get_workflow(
@@ -212,7 +212,7 @@ class Workflow:
             return DATABASE_QUERY_ERROR
         return dict(workflow=workflow, hosts=hosts, domain=domain)
 
-    @connect_database
+    @connect_database()
     def _get_app_execute_result(self, time_range, hosts, workflow):
         data_dao = DataDao()
 
