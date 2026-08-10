@@ -3,7 +3,7 @@ Version:	v1.3.0
 Release:	1
 Summary:	An intelligent abnormal detection framework of aops
 License:	MulanPSL2
-URL:		https://gitee.com/openeuler/%{name}
+URL:		https://atomgit.com/openeuler/%{name}
 Source0:	%{name}-%{version}.tar.gz
 
 BuildRequires:  python3-setuptools
